@@ -27,6 +27,7 @@
 
 (->> (slurp "hello.tc")
      (r/map tok/char-default-token)
+     (s-reduce tok/subst-escapes)
      (s-reduce tok/melt-tokens)
      (s-reduce tok/insert-indents)
      (s-reduce tok/subst-newlines)

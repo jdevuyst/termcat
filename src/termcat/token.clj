@@ -12,6 +12,7 @@
 
 (defn char-default-type [c]
   (condp contains? c
+    #{\\} :escape
     #{\space} :whitespace
     #{\newline} :newline
     #{\( \[ \{} :bracket
@@ -23,6 +24,11 @@
 
 (defn char-default-token [c]
   (token (char-default-type c) (str c)))
+
+(defn subst-escapes [state result tok]
+  (if (= (toktype (last result)) :escape)
+    [nil 1 (token :default (lexeme tok))]
+    [nil 0 tok]))
 
 (defn tokmelt [tok1 tok2]
   (assert (= (toktype tok1) (toktype tok2)))
