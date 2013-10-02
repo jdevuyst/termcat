@@ -1,8 +1,6 @@
 (ns termcat.token
-  (:require [clojure.core.match :refer (match)]))
-
-(defn penultimate [coll]
-  (nth coll (- (count coll) 2)))
+  (:require [clojure.core.match :refer (match)]
+            [termcat.util :refer :all]))
 
 (defn token
   ([type] (token type nil))
@@ -16,67 +14,70 @@
   (condp contains? c
     #{\space} :whitespace
     #{\newline} :newline
-    #{\* \+ \- \.} :magic
+    #{\( \[ \{} :bracket
+    #{\) \] \}} :unbracket
+    #{\. \,} :maybe-thunk
+    #{\* \+ \-} :maybe-magic
     :default))
 
 (defn char-default-token [c]
-  (token (char-default-type c) c))
+  (token (char-default-type c) (str c)))
 
-(defn tok-merge [tok1 tok2]
+(defn tokmelt [tok1 tok2]
+  (assert (= (toktype tok1) (toktype tok2)))
   (token (toktype tok1)
          (str (lexeme tok1) (lexeme tok2))))
 
-(defn tok-conj [result tok]
+(defn melt-tokens [state result tok]
   (let [prevtok (last result)]
-    (if (= (toktype prevtok)
-           (toktype tok))
-      (conj (pop result)
-            (tok-merge prevtok tok))
-      (conj result tok))))
+    (if (and (= (toktype prevtok)
+                (toktype tok))
+             (contains? #{:whitespace :default}
+                        (toktype tok)))
+      [nil 1 (tokmelt prevtok tok)]
+      [nil 0 tok])))
 
-(defn insert-indents [result tok]
-  (let [prevtok (last result)
-        prevtype (toktype prevtok)
-        newtype (toktype tok)
-        prevstate (if prevtok
-                    (meta prevtok)
-                    {:empty-line? true
-                     :indent-level 0
-                     :verified-indent-level 0})
+(defn insert-indents
+  ([] {:empty-line? true
+       :indent-level 0
+       :verified-indent-level 0})
+  ([state result tok]
+   (let [prevtok (last result)
+         prevtype (toktype prevtok)
+         newtype (toktype tok)
 
-        prev-empty (:empty-line? prevstate)
-        prev-indent (:indent-level prevstate)
-        prev-verified-indent (:verified-indent-level prevstate)
-        [new-empty
-         new-indent
-         new-verified-indent] (match [newtype prev-empty]
-                                     [:newline _] [true 0 prev-verified-indent]
-                                     [:whitespace true] [true
-                                                    (+ prev-indent (count (lexeme tok)))
-                                                    prev-verified-indent]
-                                     :else [false prev-indent prev-indent])
+         prev-empty (:empty-line? state)
+         prev-indent (:indent-level state)
+         prev-verified-indent (:verified-indent-level state)
+         [new-empty
+          new-indent
+          new-verified-indent] (match [newtype prev-empty]
+                                      [:newline _] [true 0 prev-verified-indent]
+                                      [:whitespace true] [true
+                                                          (+ prev-indent (count (lexeme tok)))
+                                                          prev-verified-indent]
+                                      :else [false prev-indent prev-indent])
 
-        verified-indent-diff (/ (- new-verified-indent prev-verified-indent) 2)]
-    (if (not= prev-verified-indent new-verified-indent)
-      (println prev-verified-indent new-verified-indent new-indent tok))
-    (-> result
-        (into (for [x (range verified-indent-diff)]
-                (token :indent)))
-        (into (for [x (range (- verified-indent-diff))]
-                (token :unindent)))
-        (conj (vary-meta tok merge {:empty-line? new-empty
-                                    :indent-level new-indent
-                                    :verified-indent-level new-verified-indent})))))
+         verified-indent-diff (/ (- new-verified-indent prev-verified-indent) 2)]
+     (concat [{:empty-line? new-empty
+               :indent-level new-indent
+               :verified-indent-level new-verified-indent}
+              0]
+             (for [x (range verified-indent-diff)]
+               (token :indent))
+             (for [x (range (- verified-indent-diff))]
+               (token :unindent))
+             [tok]))))
 
-(defn remove-trailing-whitespace [result tok]
-  (if (and (= (toktype (last result)) :whitespace)
-           (contains? #{:indent :unindent :newline} (toktype tok)))
-    (conj (pop result) tok)
-    (conj result tok)))
-
-(defn substitute-newlines [result tok]
-  (if (= (toktype tok) :newline)
-    (if (> (count (lexeme tok)) 1)
-      (conj (pop result) (token :emptyline))
-      result)
-    (conj result tok)))
+(defn subst-newlines [state result tok]
+  (let [[prevprevtok prevtok] (last-n result 2)]
+    (match [(toktype (last result))
+            (toktype tok)]
+           [:whitespace :newline] [nil 1 tok]
+           [:newline :newline] [nil 1 (token :emptyline)]
+           [:emptyline :whitespace] [nil 0]
+           [:emptyline :newline] [nil 0]
+           [:emptyline :indent] [nil 1 tok]
+           [:emptyline :unindent] [nil 1 tok]
+           [:newline _] [nil 1 (token :whitespace) tok]
+           :else [nil 0 tok])))

@@ -1,15 +1,36 @@
-Hi. This is a Termcat document
+Hi. (This) is a Termcat document
 
   This is indented
 
-    This is even more so
+    This (is (even() more()) so
 
     Same level
 
   Previous level
 
-First level
+First level .foo(bar) .cite(author2000)
 
-    Second level
+    (Second) (level)
 
-First again
+(First (()again))
+
+$\Graph n \implies \Graph'h(n)$
+
+x = y
+
+.foo(bar)(baz)
+
+.foo
+- bar
+- baz
+
+.foo
+- bar
+
+1. aaa .identity(moo) bbb
+
+  2. .identity .identity() .identity(test)
+
+  3. sadfdsa .identity(.identity(test)) test2
+
+4. .identity(A random number: .identity(.rand()))
