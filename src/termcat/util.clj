@@ -14,8 +14,7 @@
 (defn s-reduce [f coll]
   (r/reduce (fn [result v]
               (let [[state popc & vs] (f (meta result) result v)]
-                (vary-meta (into (pop-n result popc) vs)
-                           merge
+                (with-meta (into (pop-n result popc) vs)
                            state)))
             (with-meta [] (try (f)
                             (catch clojure.lang.ArityException x {})))

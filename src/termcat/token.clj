@@ -16,7 +16,8 @@
     #{\newline} :newline
     #{\( \[ \{} :bracket
     #{\) \] \}} :unbracket
-    #{\. \,} :maybe-thunk
+    #{\. \,} :maybe-fun
+    #{\#} :maybe-title
     #{\* \+ \-} :maybe-magic
     :default))
 
