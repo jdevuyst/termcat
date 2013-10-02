@@ -5,12 +5,14 @@
 (defn html [s]
   [:html s])
 
+(defn subst-indents [state result tok]
+  (case (toktype tok)
+    :indent [nil 0 (html "\n<blockquote>")]
+    :unindent [nil 0 (html "</blockquote>\n")]
+    [nil 0 tok]))
+
 (defn escape [s]
-  (apply str (for [c s]
-               (case c
-                 \< "&lt;"
-                 \> "&gt;"
-                 c))))
+  (apply str (for [c s] (case c \< "&lt;" \> "&gt;" c))))
 
 (defn to-html [state result tok]
   (case (toktype tok)
