@@ -16,6 +16,22 @@
                           [(fun (fn [y] (concat [(html "\n<h1>")]
                                                 y
                                                 [(html "</h1>\n")])))]))]
+     ".bullet-list" [(fun (fn [body]
+                            (concat [(html "\n<ul>")]
+                                    (s-reduce (fn [state result tok]
+                                                (case (toktype tok)
+                                                  :maybe-magic [nil 0 (html "\n<li>")]
+                                                  :whitespace [nil 0]
+                                                  :bracketed (concat [nil 0]
+                                                                     (do
+                                                                       (println :test (second tok))
+                                                                       (rest (pop (second tok)))))))
+                                              body)
+                                    [(html "</ul>\n")])))]
+     ".blockquote" [(fun (fn [body]
+                           (concat [(html "\n<blockquote>")]
+                                   body
+                                   [(html "</blockquote>\n")])))]
      ".identity" [(fun identity)]
      ".rand" [(token :default (str (rand)))]
      [(html "<span class='error'>")

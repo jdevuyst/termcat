@@ -4,11 +4,11 @@
 
 ## Subsection
 
-Hi. (This) is a Termcat document
+Hi. (This) is a Termcat document   
 
-  This is indented
-
-    This (is (even() more()) so
+  This is indented   
+ 
+    This (is (even() more()) so   
 
     Same level
 
@@ -25,11 +25,11 @@ $\Graph n \implies \Graph'h(n)$
 x = y
 
 .foo(bar)(baz)
-
-.foo
-- bar
-- baz
-
+   
+.foo   
+- bar  
+- baz   
+  
 .foo
 - bar
 
@@ -53,4 +53,51 @@ x = y
 
 \a \b \* \.rand \\
 
+- this is afdlk;ds afkj a
+dsak;fj klfjd sak;lfj sdaf
+
+dsafsadf
+
+-
+  one
+- two
+- three
+- four
+
+  - a
+  - b
+  - c
+
+- - a
+  - a.1
+  - a.2
+- b
+
+test
+  indented?
+test2
+
+  XXXXX
+  YYYYY
+  ZZZZZ
+
+-
+
+  This
+
+-
+
+  That
+
+-
+
+  Test
+
+-
+
+    Test2
+
+aaa
+  bbb
+ccc
 

@@ -17,16 +17,18 @@
                 (with-meta (into (pop-n result popc) vs)
                            state)))
             (with-meta [] (try (f)
-                            (catch clojure.lang.ArityException x {})))
+                            (catch clojure.lang.ArityException x nil)))
             coll))
 
 (defn rs-reduce [f rf coll]
-  (s-reduce (fn [state result v]
-              (f state
-                 result
-                 (if-let [coll2 (rf v)]
-                   [:bracketed (rs-reduce f rf coll2)]
-                   v)))
+  (s-reduce (fn
+              ([] (f))
+              ([state result v]
+                (f state
+                   result
+                   (if-let [coll2 (rf v)]
+                     [:bracketed (rs-reduce f rf coll2)]
+                     v))))
             coll))
 
 ; args: state result v

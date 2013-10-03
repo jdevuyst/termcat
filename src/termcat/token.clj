@@ -44,7 +44,7 @@
       [nil 1 (tokmelt prevtok tok)]
       [nil 0 tok])))
 
-(defn insert-indents
+(defn abstract-indents
   ([] {:empty-line? true
        :indent-level 0
        :verified-indent-level 0})
@@ -60,6 +60,9 @@
           new-indent
           new-verified-indent] (match [newtype prev-empty]
                                       [:newline _] [true 0 prev-verified-indent]
+                                      [:maybe-magic true] [true
+                                                          (+ prev-indent (count (lexeme tok)))
+                                                          prev-indent]
                                       [:whitespace true] [true
                                                           (+ prev-indent (count (lexeme tok)))
                                                           prev-verified-indent]
@@ -77,14 +80,17 @@
              [tok]))))
 
 (defn subst-newlines [state result tok]
-  (let [[prevprevtok prevtok] (last-n result 2)]
+  (let [prevtok (last result)]
     (match [(toktype (last result))
             (toktype tok)]
            [:whitespace :newline] [nil 1 tok]
+           [:newline :whitespace] [nil 0]
+           [:newline :indent] [nil 1 tok]
+           [:newline :unindent] [nil 1 tok]
            [:newline :newline] [nil 1 (token :emptyline)]
            [:emptyline :whitespace] [nil 0]
            [:emptyline :newline] [nil 0]
-           [:emptyline :indent] [nil 1 tok]
-           [:emptyline :unindent] [nil 1 tok]
+           ;[:emptyline :indent] [nil 1 tok]
+           ;[:emptyline :unindent] [nil 1 tok]
            [:newline _] [nil 1 (token :whitespace) tok]
            :else [nil 0 tok])))

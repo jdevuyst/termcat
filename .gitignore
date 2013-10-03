@@ -6,3 +6,6 @@ pom.xml
 /target/
 .lein-deps-sum
 .lein-repl-history
+termcat.sublime-project
+termcat.sublime-workspace
+.DS_Store
