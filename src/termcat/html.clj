@@ -1,5 +1,6 @@
 (ns termcat.html
-  (:require [termcat.util :refer :all]
+  (:require [clojure.string :refer (split)]
+            [termcat.util :refer :all]
             [termcat.token :refer (toktype lexeme)]))
 
 (defn html [s]
@@ -14,3 +15,10 @@
     :whitespace [nil 0 \space]
     :html [nil 0 (lexeme tok)]
     [nil 0 (escape (lexeme tok))]))
+
+(defn prettier [xs]
+  (s-reduce (fn [state result x]
+              [nil 0 (case x
+                       "<p>" "\n<p>\n"
+                       x)])
+            xs))

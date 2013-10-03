@@ -27,5 +27,6 @@
      (rs-reduce lam/abstract-funs bracketed-rf)
      (rs-reduce lam/apply-funs bracketed-rf)
      (rs-reduce html/to-html bracketed-rf)
+     (html/prettier)
      (apply str)
      println)

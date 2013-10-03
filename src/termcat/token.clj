@@ -90,7 +90,6 @@
            [:newline :newline] [nil 1 (token :emptyline)]
            [:emptyline :whitespace] [nil 0]
            [:emptyline :newline] [nil 0]
-           ;[:emptyline :indent] [nil 1 tok]
-           ;[:emptyline :unindent] [nil 1 tok]
+           [:emptyline :indent] [nil 1 tok]
            [:newline _] [nil 1 (token :whitespace) tok]
            :else [nil 0 tok])))

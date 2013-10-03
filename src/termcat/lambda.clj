@@ -11,27 +11,25 @@
   ([prefix id] (resolve-fun (str prefix id)))
   ([fname]
    (case fname
-     ".par" [(html "\n<p>\n")]
+     ".par" [(html "<p>")]
      ".title" [(fun (fn [x]
-                          [(fun (fn [y] (concat [(html "\n<h1>")]
+                          [(fun (fn [y] (concat [(html "<h1>")]
                                                 y
-                                                [(html "</h1>\n")])))]))]
+                                                [(html "</h1>")])))]))]
      ".bullet-list" [(fun (fn [body]
-                            (concat [(html "\n<ul>")]
+                            (concat [(html "<ul>")]
                                     (s-reduce (fn [state result tok]
                                                 (case (toktype tok)
-                                                  :maybe-magic [nil 0 (html "\n<li>")]
+                                                  :maybe-magic [nil 0 (html "<li>")]
                                                   :whitespace [nil 0]
                                                   :bracketed (concat [nil 0]
-                                                                     (do
-                                                                       (println :test (second tok))
-                                                                       (rest (pop (second tok)))))))
+                                                                     (rest (pop (second tok))))))
                                               body)
-                                    [(html "</ul>\n")])))]
+                                    [(html "</ul>")])))]
      ".blockquote" [(fun (fn [body]
-                           (concat [(html "\n<blockquote>")]
+                           (concat [(html "<blockquote>")]
                                    body
-                                   [(html "</blockquote>\n")])))]
+                                   [(html "</blockquote>")])))]
      ".identity" [(fun identity)]
      ".rand" [(token :default (str (rand)))]
      [(html "<span class='error'>")
