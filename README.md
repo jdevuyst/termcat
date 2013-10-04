@@ -1,13 +1,5 @@
-# termcat
+# Termcat
 
-A Clojure library designed to ... well, that part is up to you.
+Termcat is a markup language for scientific and technical writing. It is currently under active development and not yet in a usable state.
 
-## Usage
-
-FIXME
-
-## License
-
-Copyright © 2013 FIXME
-
-Distributed under the Eclipse Public License, the same as Clojure.
+See [my blog](http://jdevuyst.blogspot.com) for preliminary documentation.
