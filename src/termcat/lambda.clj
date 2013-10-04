@@ -11,12 +11,12 @@
   ([prefix id] (resolve-fun (str prefix id)))
   ([fname]
    (case fname
-     ".par" [(html "<p>")]
-     ".title" [(fun (fn [x]
-                          [(fun (fn [y] (concat [(html "<h1>")]
-                                                y
-                                                [(html "</h1>")])))]))]
-     ".bullet-list" [(fun (fn [body]
+     ":par" [(html "<p>")]
+     ":title" [(fun (fn [x]
+                      [(fun (fn [y] (concat [(html "<h1>")]
+                                            y
+                                            [(html "</h1>")])))]))]
+     ":bullet-list" [(fun (fn [body]
                             (concat [(html "<ul>")]
                                     (s-reduce (fn [state result tok]
                                                 (case (toktype tok)
@@ -26,10 +26,22 @@
                                                                      (rest (pop (second tok))))))
                                               body)
                                     [(html "</ul>")])))]
-     ".blockquote" [(fun (fn [body]
+     ":blockquote" [(fun (fn [body]
                            (concat [(html "<blockquote>")]
                                    body
                                    [(html "</blockquote>")])))]
+     ":emph" [(fun (fn [text]
+                     (concat [(html "<emph>")]
+                             text
+                             [(html "</emph>")])))]
+     ":strong" [(fun (fn [text]
+                       (concat [(html "<strong>")]
+                               text
+                               [(html "</strong>")])))]
+     ":u" [(fun (fn [text]
+                  (concat [(html "<u>")]
+                          text
+                          [(html "</u>")])))]
      ".identity" [(fun identity)]
      ".rand" [(token :default (str (rand)))]
      [(html "<span class='error'>")

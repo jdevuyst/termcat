@@ -24,6 +24,7 @@
      (rs-reduce sugar/subst-emptylines bracketed-rf)
      (rs-reduce sugar/subst-bullets bracketed-rf)
      (rs-reduce sugar/subst-indents bracketed-rf)
+     (rs-reduce sugar/subst-decorators bracketed-rf)
      (rs-reduce lam/abstract-funs bracketed-rf)
      (rs-reduce lam/apply-funs bracketed-rf)
      (rs-reduce html/to-html bracketed-rf)

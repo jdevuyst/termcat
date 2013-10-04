@@ -17,9 +17,9 @@
     #{\newline} :newline
     #{\( \[ \{} :bracket
     #{\) \] \}} :unbracket
-    #{\. \,} :maybe-fun
+    #{\. \, \: \;} :maybe-fun
     #{\#} :maybe-title
-    #{\* \+ \-} :maybe-magic
+    #{\* \+ \- \_} :maybe-magic
     :default))
 
 (defn char-default-token [c]
@@ -39,7 +39,7 @@
   (let [prevtok (last result)]
     (if (and (= (toktype prevtok)
                 (toktype tok))
-             (contains? #{:whitespace :default}
+             (contains? #{:whitespace :maybe-magic :default}
                         (toktype tok)))
       [nil 1 (tokmelt prevtok tok)]
       [nil 0 tok])))

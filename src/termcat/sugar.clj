@@ -14,7 +14,7 @@
 
 (defn subst-emptylines [state result tok]
   (if (= (toktype tok) :emptyline)
-    (concat [nil 0] (funcall ".par"))
+    (concat [nil 0] (funcall ":par"))
     [nil 0 tok]))
 
 (defn subst-hashlines [state result tok]
@@ -33,7 +33,7 @@
                                       [nil (+ 1
                                               (:title-level state)
                                               (:length state))]
-                                      (funcall ".title"
+                                      (funcall ":title"
                                                [(token :default
                                                        (str (:title-level state)))]
                                                (last-n result
@@ -59,9 +59,9 @@
            [false :whitespace :block :maybe-magic] [(update-in state [:distance] inc) 0 tok]
            [false :block :maybe-magic :whitespace] [(update-in state [:distance] inc) 0 tok]
            [false _ _ _] (concat [nil (:distance state)]
-                               (funcall ".bullet-list"
-                                        (last-n result (:distance state)))
-                               [tok])
+                                 (funcall ":bullet-list"
+                                          (last-n result (:distance state)))
+                                 [tok])
            :else [nil 0 tok])))
 
 (defn subst-indents [state result tok]
@@ -71,6 +71,18 @@
             (blocktype tok)]
            [:maybe-magic :whitespace :block] [nil 0 tok]
            [_ _ :block] (concat [nil 0]
-                                (funcall ".blockquote" (second tok)))
+                                (funcall ":blockquote" (second tok)))
            :else [nil 0 tok])))
 
+(defn subst-decorators [state result tok]
+  (let [[prevprevtok prevtok] (last-n result 2)]
+    (match [(lexeme prevprevtok)
+            (toktype prevtok)
+            (lexeme tok)]
+           ["*" :default "*"] (concat [nil 2]
+                                      (funcall ":emph" [prevtok]))
+           ["**" :default "**"] (concat [nil 2]
+                                        (funcall ":strong" [prevtok]))
+           ["_" :default "_"] (concat [nil 2]
+                                      (funcall ":u" [prevtok]))
+           :else [nil 0 tok])))
