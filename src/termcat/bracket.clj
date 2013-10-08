@@ -17,12 +17,14 @@
   ([state result tok]
    (condp contains? (toktype tok)
      #{:indent
+       :bullet
        :bracket} [{:distance 1
                    :stack (conj (:stack state)
                                 (inc (:distance state)))}
                   0
                   tok]
      #{:unindent
+       :unbullet
        :unbracket} [{:distance (peek (:stack state))
                      :stack (pop (:stack state))}
                     (:distance state)

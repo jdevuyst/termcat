@@ -16,7 +16,7 @@
     #{\space} :whitespace
     #{\newline} :newline
     #{\( \[ \{} :bracket
-    #{\) \] \}} :unbracket
+           #{\) \] \}} :unbracket
     #{\. \, \: \;} :maybe-fun
     #{\#} :maybe-title
     #{\* \+ \- \_} :maybe-magic
@@ -44,51 +44,69 @@
       [nil 1 (tokmelt prevtok tok)]
       [nil 0 tok])))
 
+(defn abstract-emptylines [state result tok]
+  (let [prevtok (last result)]
+    (match [(toktype prevtok)
+            (toktype tok)]
+           [:emptyline :newline] [nil 0]
+           [:newline :newline] [nil 1 (token :emptyline)]
+           :else [nil 0 tok])))
+
 (defn abstract-indents
-  ([] {:empty-line? true
-       :indent-level 0
-       :verified-indent-level 0})
+  ([] {:indent 0})
   ([state result tok]
    (let [prevtok (last result)
-         prevtype (toktype prevtok)
-         newtype (toktype tok)
-
-         prev-empty (:empty-line? state)
-         prev-indent (:indent-level state)
-         prev-verified-indent (:verified-indent-level state)
-         [new-empty
-          new-indent
-          new-verified-indent] (match [newtype prev-empty]
-                                      [:newline _] [true 0 prev-verified-indent]
-                                      [:maybe-magic true] [true
-                                                          (+ prev-indent (count (lexeme tok)))
-                                                          prev-indent]
-                                      [:whitespace true] [true
-                                                          (+ prev-indent (count (lexeme tok)))
-                                                          prev-verified-indent]
-                                      :else [false prev-indent prev-indent])
-
-         verified-indent-diff (/ (- new-verified-indent prev-verified-indent) 2)]
-     (concat [{:empty-line? new-empty
-               :indent-level new-indent
-               :verified-indent-level new-verified-indent}
-              0]
-             (for [x (range verified-indent-diff)]
-               (token :indent))
-             (for [x (range (- verified-indent-diff))]
+         atstart (contains? #{:newline :emptyline} (toktype prevtok))
+         indent (match [atstart (toktype tok)]
+                       [true :whitespace] (count (lexeme tok))
+                       [true _] 0
+                       :else (:indent state))
+         diff (/ (- indent (:indent state)) 2)]
+     (concat [{:indent indent}
+              (if prevtok 1 0)]
+             (for [x (range (- diff))]
                (token :unindent))
+             (if prevtok [prevtok])
+             (for [x (range diff)]
+               (token :indent))
              [tok]))))
 
-(defn subst-newlines [state result tok]
-  (let [prevtok (last result)]
-    (match [(toktype (last result))
-            (toktype tok)]
-           [:whitespace :newline] [nil 1 tok]
-           [:newline :whitespace] [nil 0]
-           [:newline :indent] [nil 1 tok]
-           [:newline :unindent] [nil 1 tok]
-           [:newline :newline] [nil 1 (token :emptyline)]
-           [:emptyline :whitespace] [nil 0]
-           [:emptyline :newline] [nil 0]
-           [:newline _] [nil 1 (token :whitespace) tok]
-           :else [nil 0 tok])))
+(defn subst-whitespace [state result tok]
+  (match [(toktype (last result)) (toktype tok)]
+         [(:or :indent
+               :unindent
+               :newline
+               :emptyline) :whitespace] [nil 0]
+         :else [nil 0 tok]))
+
+(defn abstract-bullets
+  ([] {:in-bullet false})
+  ([state result tok]
+   (let [prevtok (last result)
+         atstart (contains? #{:newline :emptyline :indent :unindent nil}
+                            (toktype prevtok))
+         atbullet (and atstart (= (lexeme tok) "-"))]
+     (match [atstart (:in-bullet state) atbullet (toktype prevtok)]
+            [false _ _ _] [state 0 tok]
+            [_ _ _ :indent] [{:in-bullet false
+                              :prev-state state}
+                             0
+                             tok]
+            [_ _ _ :unindent] [(:prev-state state)
+                               0
+                               tok]
+            [_ false true _] [{:in-bullet true
+                               :prev-state state}
+                              0
+                              (token :bullet)
+                              tok]
+            [_ true true _] [state
+                             0
+                             (token :unbullet)
+                             (token :bullet)
+                             tok]
+            [_ true _ _] [(:prev-state state)
+                          0
+                          (token :unbullet)
+                          tok]
+            :else [state 0 tok]))))

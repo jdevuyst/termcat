@@ -3,6 +3,7 @@
             [termcat.util :refer :all]
             [termcat.token :refer (token toktype lexeme)]
             [termcat.html :refer (html)]
+            [termcat.bracket :as br]
             [termcat.lambda :refer (resolve-fun)]))
 
 (defn funcall [fname & args]
@@ -24,6 +25,7 @@
                   :else :in-title)
             (toktype prevtok)
             (toktype tok)]
+           [_ nil :maybe-title] [{:title-level 1} 0 tok]
            [_ :emptyline :maybe-title] [{:title-level 1} 1 tok]
            [:at-start _ :maybe-title] [(update-in state [:title-level] inc)
                                        0
@@ -43,36 +45,48 @@
            [_ _ _] [nil 0 tok])))
 
 (defn blocktype [term]
-  (if (and (= (toktype term) :bracketed)
-           (= (toktype (first (second term))) :indent))
-    :block
-    (toktype term)))
+  (cond (and (= (toktype term) :bracketed)
+             (= (toktype (first (second term))) :indent)) :block
+        (and (= (toktype term) :bracketed)
+             (= (toktype (first (second term))) :bullet)) :bullet-item
+        :else (toktype term)))
+
+(defn merge-bracketed [b1 b2]
+  (assert (= :bracketed (toktype b1) (toktype b2)))
+  (println :merge)
+  (println :b1 (pop (lexeme b1)))
+  (println :b2 (rest (pop (lexeme b2))))
+  (br/bracketed-term (apply vector (concat (pop (lexeme b1) )
+                                           (rest (pop (lexeme b2)))
+                                           [(peek (lexeme b1))]))))
+
+(defn subst-bullet-continuations [state result tok]
+  (if (= "consist" (lexeme tok))
+    (println (last-n result 4)))
+
+  (let [prevtok (last result)]
+    (match [(blocktype (last result))
+            (blocktype tok)]
+           [:bullet-item :block] [nil 1 (merge-bracketed prevtok tok)]
+           :else [nil 0 tok])))
 
 (defn subst-bullets [state result tok]
-  (let [[prevprevtok prevtok] (last-n result 2)]
-    (match [(empty? state)
-            (blocktype prevprevtok)
-            (blocktype prevtok)
-            (blocktype tok)]
-           [true :maybe-magic :whitespace :block] [{:distance 3} 0 tok]
-           [false :maybe-magic :whitespace :block] [(update-in state [:distance] inc) 0 tok]
-           [false :whitespace :block :maybe-magic] [(update-in state [:distance] inc) 0 tok]
-           [false :block :maybe-magic :whitespace] [(update-in state [:distance] inc) 0 tok]
-           [false _ _ _] (concat [nil (:distance state)]
-                                 (funcall ":bullet-list"
-                                          (last-n result (:distance state)))
-                                 [tok])
-           :else [nil 0 tok])))
+  (match [(nil? state) (blocktype tok)]
+         [true :bullet-item] [{:distance 1} 0 tok]
+         [false :bullet-item] [(update-in state [:distance] inc) 0 tok]
+         [false _] (concat [nil
+                            (:distance state)]
+                           (funcall ":bullet-list"
+                                    [(token :default (str (:distance state)))])
+                           (last-n result (:distance state))
+                           [tok])
+         :else [nil 0 tok]))
 
 (defn subst-indents [state result tok]
-  (let [[prevprevtok prevtok] (last-n result 2)]
-    (match [(blocktype prevprevtok)
-            (blocktype prevtok)
-            (blocktype tok)]
-           [:maybe-magic :whitespace :block] [nil 0 tok]
-           [_ _ :block] (concat [nil 0]
-                                (funcall ":blockquote" (second tok)))
-           :else [nil 0 tok])))
+    (if (= (blocktype tok) :block)
+      (concat [nil 0]
+              (funcall ":blockquote" (second tok)))
+      [nil 0 tok]))
 
 (defn subst-decorators [state result tok]
   (let [[prevprevtok prevtok] (last-n result 2)]

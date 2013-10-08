@@ -1,113 +1,37 @@
+# Termcat
 
+test3
 
-# This is a title
+Hi, this is termcat.
 
-## Subsection
+  This is a
+  blockquote
 
-Hi. (This) is a Termcat document
+- This is
+- a bullet
+- list.
 
-  This is indented
+- This is another list.
+- Notice that bullets can
+  consist of several paragraphs.
 
-    This (is (even() more()) so
+  For real!
+  - Bullet lists can also be nested!
+  (Need this because of a bug.)
 
-    Same level
+*emphasis* **strong** _underline_
 
-  Previous level
+FAIL
 
-First level .foo(bar) .cite(author2000)
+.identity(.identity(.rand))
 
-    (Second) (level)
+  This is another
+  blockquote.
 
-(First (()again))
+  It consists
+  of two
+  paragraphs.
 
-$\Graph n \implies \Graph'h(n)$
-
-x = y
-
-.foo(bar)(baz)
-
-.foo
-- bar
-- baz
-
-.foo
-- bar
-
-.identity(.identity(test))
-
-0. aaa .identity(moo) bbb
-
-  1. .identity(.identity(test))
-
-  2. .identity() .identity(test)
-
-  3. sadfdsa .identity(.identity(test)) test2
-
-4. .identity(A random number: .identity(.rand))
-
-.DOES-NOT-EXIST test
-
-.rand
-
-<<>>>>>>>>
-
-\a \b \* \.rand \\
-
-- this is afdlk;ds afkj a
-dsak;fj klfjd sak;lfj sdaf
-
-dsafsadf
-
--
-  one
-- two
-- three
-- four
-
-  - a
-  - b
-  - c
-
-- - a
-  - a.1
-  - a.2
-- b
-
-test
-  indented?
-test2
-
-  XXXXX
-  YYYYY
-  ZZZZZ
-
--
-
-  This
-
--
-
-  That
-
--
-
-  Test
-
--
-
-    Test2
-
-aaa
-  bbb
-ccc
-
-- a
-- b
-
-- c
-
-- XXXXX
-  YYYYY
-  ZZZZZ *emph* **strong** _underline_
+    And here's a blockquote within a blockquote
 
 fin.
