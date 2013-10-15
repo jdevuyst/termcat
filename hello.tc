@@ -1,6 +1,9 @@
-# Termcat
 
-test3
+
+# Termcat
+## Subsection
+
+### Subsubsection
 
 Hi, this is termcat.
 
@@ -17,21 +20,22 @@ Hi, this is termcat.
 
   For real!
   - Bullet lists can also be nested!
-  (Need this because of a bug.)
 
 *emphasis* **strong** _underline_
-
-FAIL
 
 .identity(.identity(.rand))
 
   This is another
   blockquote.
 
+
   It consists
-  of two
+  of *two*
   paragraphs.
 
-    And here's a blockquote within a blockquote
+    And here's a blockquote **within** a blockquote
 
 fin.
+
+
+

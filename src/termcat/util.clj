@@ -1,35 +1,17 @@
 (ns termcat.util
   (:require [clojure.core.reducers :as r]))
 
-(defn last-n [coll n]
-  (for [x (range (- (count coll) n) (count coll))]
-    (get coll x)))
-
 (defn pop-n [coll n]
-  (assert (>= n 0))
-  (if (= n 0)
-    coll
-    (recur (pop coll) (dec n))))
+  (subvec coll 0 (- (count coll) n)))
 
-(defn s-reduce [f coll]
-  (r/reduce (fn [result v]
-              (let [[state popc & vs] (f (meta result) result v)]
-                (with-meta (into (pop-n result popc) vs)
-                           state)))
-            (with-meta [] (try (f)
-                            (catch clojure.lang.ArityException x nil)))
-            coll))
+(defn pop-upto-n [coll n]
+  (pop-n coll (min n (count coll))))
 
-(defn rs-reduce [f rf coll]
-  (s-reduce (fn
-              ([] (f))
-              ([state result v]
-                (f state
-                   result
-                   (if-let [coll2 (rf v)]
-                     [:bracketed (rs-reduce f rf coll2)]
-                     v))))
-            coll))
+(defn last-n [coll n]
+  (subvec coll (- (count coll) n)))
 
-; args: state result v
-;  ret: state-extention pop-n & vs
+(defn pad-n
+  ([coll n] (pad-n coll n nil))
+  ([coll n filler] (into (vec (repeat (- n (count coll))
+                                      filler))
+                         (last-n coll (min n (count coll))))))
