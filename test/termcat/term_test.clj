@@ -46,11 +46,12 @@
     (is (delim-pair? (ldelim :delim "(")
                      (rdelim :delim ")")))))
 
-(defrule rule1 [state x y]
-  (match [x y]
-         [_ nil] [state x y]
-         [nil _] [state x y]
-         :else [state y x]))
+(defrule rule1
+  [state x y]
+  identity
+  [_ _ nil] [state x y]
+  [_ nil _] [state x y]
+  [_ _ _] [state y x])
 
 (deftest fragment-test
   (testing
