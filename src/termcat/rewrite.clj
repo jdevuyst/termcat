@@ -33,7 +33,8 @@
          (let [[~@rest-args] (conj (u/pad-n ~result-arg ~popc)
                                    ~new-el-arg)
                ~temp (or (match [~first-arg ~@rest-args-mapped]
-                                ~@body)
+                                ~@body
+                                :else nil)
                          [~first-arg ~@rest-args])]
            (assert (> (count ~temp) 0))
            (concat [(first ~temp) ~popc]

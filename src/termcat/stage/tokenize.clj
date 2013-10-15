@@ -6,8 +6,7 @@
   "[:escape \\] + [type payload] -> [:default payload]"
   [state t1 t2]
   tt
-  [_ :escape _] [nil (token :default (payload t2))]
-  :else nil)
+  [_ :escape _] [nil (token :default (payload t2))])
 
 (defrule merge-tokens
   "[type x] + [type y] -> [type xy] for some token types.
@@ -23,8 +22,7 @@ tt
           :maybe-sugar)] (if (= (tt t1) (tt t2))
                            [nil
                             (token (tt t1)
-                                   (str (payload t1) (payload t2)))])
-:else nil)
+                                   (str (payload t1) (payload t2)))]))
 
 (defrule introduce-emptyline-tokens
   "Any two or more successive :newline tokens are replaced by
@@ -33,8 +31,7 @@ tt
 [state t1 t2]
 tt
 [_ :emptyline :newline] [nil t2]
-[_ :newline :newline] [nil (token :emptyline)]
-:else nil)
+[_ :newline :newline] [nil (token :emptyline)])
 
 (defrule introduce-indent-tokens
   "Introduces [:ldelim :indent] and [:rdelim :indent] tokens.
@@ -55,8 +52,7 @@ tt
                                  (if t1 [t1])
                                  (for [x (range diff)]
                                    (ldelim :indent))
-                                 [t2]))
-:else nil)
+                                 [t2])))
 
 (defrule remove-superfluous-whitespace
   "Removes leading and trailing whitespace."
@@ -73,8 +69,7 @@ tt
    (:or [:ldelim :indent]
         [:rdelim :indent]
         :newline
-        :emptyline)] [nil t2]
-  :else nil)
+        :emptyline)] [nil t2])
 
 (defn item-type [tok]
   "Returns the item 'type' of the token, if any, or nil. The item
@@ -123,5 +118,4 @@ tt
                                  t1
                                  (token [:ldelim (item-type t2)] (payload t2))])
 [_ [:ldelim :indent] _] [{:in-bullet false :prev-state state} t1 t2]
-[_ [:rdelim :indent] _] [(:prev-state state) t1 t2]
-:else nil)
+[_ [:rdelim :indent] _] [(:prev-state state) t1 t2])

@@ -37,14 +37,12 @@
 (defrule fix-bullet-continuations
   [state t1 t2]
   tt
-  [_ [:block :bullet] [:block :indent]] [nil (merge-blocks t1 t2)]
-  :else nil)
+  [_ [:block :bullet] [:block :indent]] [nil (merge-blocks t1 t2)])
 
 (defrule convert-newlines-to-whitespace
   [state t1]
   tt
-  [_ :newline] [nil (token :whitespace)]
-  :else nil)
+  [_ :newline] [nil (token :whitespace)])
 
 (defrule remove-superfluous-whitespace
   [state t1 t2]
@@ -52,8 +50,7 @@
   [_ nil (:or :emptyline
               :whitespace)] [nil]
   [_ (:or :emptyline
-          :whitespace) nil] [nil]
-  :else nil)
+          :whitespace) nil] [nil])
 
 (defn s-reduce [fragments f]
   ; This needs to be abstracted better!
