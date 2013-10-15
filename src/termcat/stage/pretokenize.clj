@@ -23,7 +23,7 @@
          :default)
        c))
 
-(defn load-termcat-file [filename]
+(defn map-file [filename]
   (->> (slurp filename)
        (r/map char-to-token)
        r/foldcat

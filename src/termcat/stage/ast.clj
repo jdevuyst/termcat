@@ -6,33 +6,31 @@
             [termcat.term :refer :all]))
 
 (defn abstract-blocks
-  ([] {:distance 0
-       :stack nil})
-  ([result tok]
-   (let [state (meta result)]
-     (cond
-       (ldelim? tok) (with-meta
-                       (conj result tok)
-                       {:distance 1
-                        :stack (conj (:stack state)
-                                     (inc (:distance state)))})
-       (rdelim? tok) (let [ldelim (get result (- (count result)
-                                                 (:distance state)))]
-                       (if (delim-pair? ldelim tok)
-                         (with-meta
-                           (conj (u/pop-n result (:distance state))
-                                 (block ldelim
-                                        (fragmentcat (u/last-n result
-                                                               (dec (:distance state))))
-                                        tok))
-                           {:distance (peek (:stack state))
-                            :stack (pop (:stack state))})
-                         (vary-meta (-> result
-                                        (conj (token :error "Delimiter mismatch:"))
-                                        (conj tok))
-                                    update-in [:distance] (partial + 2))))
-       :else (vary-meta (conj result tok)
-                        update-in [:distance] inc)))))
+  ([] {:init-state {:distance 0 :stack nil}
+       :padding-right 0})
+  ([state result tok]
+   (println state)
+   (cond
+     (ldelim? tok) [{:distance 1
+                     :stack (conj (:stack state)
+                                  (inc (:distance state)))}
+                    (conj result tok)]
+     (rdelim? tok) (let [ldelim (get result (- (count result)
+                                               (:distance state)))]
+                     (if (delim-pair? ldelim tok)
+                       [{:distance (peek (:stack state))
+                         :stack (pop (:stack state))}
+                        (conj (u/pop-n result (:distance state))
+                              (block ldelim
+                                     (fragmentcat (u/last-n result
+                                                            (dec (:distance state))))
+                                     tok))]
+                       [(update-in state [:distance] (partial + 2))
+                        (-> result
+                            (conj (token :error "Delimiter mismatch:"))
+                            (conj tok))]))
+     :else [(update-in state [:distance] inc)
+            (conj result tok)])))
 
 (defrule fix-bullet-continuations
   [state t1 t2]
@@ -51,9 +49,3 @@
               :whitespace)] [nil]
   [_ (:or :emptyline
           :whitespace) nil] [nil])
-
-(defn s-reduce [fragments f]
-  ; This needs to be abstracted better!
-  (fragmentcat (r/reduce f
-                         (with-meta [] (f))
-                         (.terms fragments))))

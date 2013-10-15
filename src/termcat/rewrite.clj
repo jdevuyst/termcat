@@ -27,8 +27,8 @@
      (assert (>= (count args) 2))
      `(defn ~fnname
         ~doc-str
-        ([] {:init ~init-state
-             :padding ~popc})
+        ([] {:init-state ~init-state
+             :padding-right ~popc})
         ([~first-arg ~result-arg ~new-el-arg]
          (let [[~@rest-args] (conj (u/pad-n ~result-arg ~popc)
                                    ~new-el-arg)
@@ -37,9 +37,10 @@
                                 :else nil)
                          [~first-arg ~@rest-args])]
            (assert (> (count ~temp) 0))
-           (concat [(first ~temp) ~popc]
-                   (for [~x (range 1 (count ~temp))]
-                     (nth ~temp ~x)))))))))
+           [(first ~temp)
+            (-> ~result-arg
+                (u/pop-upto-n ~popc)
+                (into (next ~temp)))]))))))
 
 (defprotocol IRewrite
   (rewrite [coll f]))
@@ -47,17 +48,16 @@
 (extend-protocol IRewrite
   clojure.lang.IPersistentVector
   (rewrite [coll f]
-           (let [{init :init padding :padding} (f)]
-             (->> (into coll (repeat padding nil))
+           (assert (= (keys (f)) '(:init-state :padding-right)))
+           (let [{init-state :init-state padding-right :padding-right} (f)]
+             (->> (into coll (repeat padding-right nil)) ; right padding
                   (r/reduce
                     (fn [result v]
-                      (let [[state popc & vs] (f (get (meta result) :state)
-                                                 result
-                                                 v)]
-                        (with-meta (into (u/pop-upto-n result
-                                                       padding)
-                                         vs)
+                      (let [[state new-result] (f (get (meta result) :state)
+                                                  result
+                                                  v)]
+                        (with-meta new-result
                                    {:state state})))
-                    (with-meta [] {:state init}))
+                    (with-meta [] {:state init-state}))
                   (r/filter (complement nil?))
                   (r/reduce conj [])))))
