@@ -18,12 +18,15 @@
                                        [(token :html "</ul>")]))
               ":emph" (html-wrapper "emph")
               ":strong" (html-wrapper "strong")
-              ":underline" (html-wrapper "u")})
+              ":underline" (html-wrapper "u")
+              ".identity" identity
+              ".rand" (fn [] [(token :default (str (rand)))])})
 
 (defn fun-call-head [fname]
   (let [f (get fun-map fname)]
-    (assert (fn? f))
-    (token :fun f)))
+    (if (fn? f)
+      (token :fun f)
+      (token :error (str "Function not found: " fname)))))
 
 (defn fun-call-seq
   "Returns a sequence of terms that represent a function call."

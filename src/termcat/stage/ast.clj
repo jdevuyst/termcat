@@ -9,7 +9,6 @@
   ([] {:init-state {:distance 0 :stack nil}
        :padding-right 0})
   ([state result tok]
-   (println state)
    (cond
      (ldelim? tok) [{:distance 1
                      :stack (conj (:stack state)

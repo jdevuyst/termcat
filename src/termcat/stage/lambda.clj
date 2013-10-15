@@ -1,18 +1,23 @@
 (ns termcat.stage.lambda
-  (:require [clojure.core.match :refer (match)]
-            [termcat.util :refer :all]
-            [termcat.token :refer :all]
-            [termcat.html :refer (html)]))
+  (:require [termcat.term :refer :all]
+            [termcat.rewrite :refer :all]
+            [termcat.fun :as fun]))
 
-(defn as-int [terms]
-  ; placeholder hack!
-  (read-string (lexeme (first terms))))
+(defrule introduce-fun-calls
+  [state t1 t2]
+  tt
+  [_ :maybe-fun :default] [nil (fun/fun-call-head (str (payload t1)
+                                                       (payload t2)))])
 
-(defn fun [f]
-  [:fun (fn [x] (f (rest (pop x))))])
+; (defn as-int [terms]
+;   ; placeholder hack!
+;   (read-string (lexeme (first terms))))
 
-(defn fun2 [f]
-  [:fun (fn [x] (f (drop 3 x)))])
+; (defn fun [f]
+;   [:fun (fn [x] (f (rest (pop x))))])
+
+; (defn fun2 [f]
+;   [:fun (fn [x] (f (drop 3 x)))])
 
 ; (defn resolve-fun
 ;   ([prefix id] (resolve-fun (str prefix id)))
@@ -54,29 +59,29 @@
 ;       (token :default (str "Uknown function -- " fname))
 ;       (html "</span>")])))
 
-(defn abstract-funs [state result tok]
-  (let [[prevprevprevtok prevprevtok prevtok] (last-n result 3)]
-    (match [(toktype prevprevprevtok)
-            (toktype prevprevtok)
-            (toktype prevtok)
-            (toktype tok)]
-           [:default _ _ _] [nil 0 tok]
-           [_ _ _ :default] [nil 0 tok]
-           [_ :maybe-fun :default _] (concat [nil 2]
-                                             (resolve-fun (lexeme prevprevtok)
-                                                          (lexeme prevtok))
-                                             [tok])
-           :else [nil 0 tok])))
+; (defn abstract-funs [state result tok]
+;   (let [[prevprevprevtok prevprevtok prevtok] (last-n result 3)]
+;     (match [(toktype prevprevprevtok)
+;             (toktype prevprevtok)
+;             (toktype prevtok)
+;             (toktype tok)]
+;            [:default _ _ _] [nil 0 tok]
+;            [_ _ _ :default] [nil 0 tok]
+;            [_ :maybe-fun :default _] (concat [nil 2]
+;                                              (resolve-fun (lexeme prevprevtok)
+;                                                           (lexeme prevtok))
+;                                              [tok])
+;            :else [nil 0 tok])))
 
-(defn apply-funs [state result tok]
-  (let [prevtok (last result)]
-    (match [(toktype prevtok) (toktype tok)]
-           [:fun :bracketed] (concat [nil 1]
-                                     ((second prevtok) (second tok)))
-           [:fun _] [nil
-                     1
-                     (html "<span class='error'>")
-                     (token :default (str "Missing argument"))
-                     (html "</span>")
-                     tok]
-           :else [nil 0 tok])))
+; (defn apply-funs [state result tok]
+;   (let [prevtok (last result)]
+;     (match [(toktype prevtok) (toktype tok)]
+;            [:fun :bracketed] (concat [nil 1]
+;                                      ((second prevtok) (second tok)))
+;            [:fun _] [nil
+;                      1
+;                      (html "<span class='error'>")
+;                      (token :default (str "Missing argument"))
+;                      (html "</span>")
+;                      tok]
+;            :else [nil 0 tok])))

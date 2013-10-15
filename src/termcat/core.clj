@@ -4,7 +4,9 @@
             [termcat.stage.pretokenize :as pretok]
             [termcat.stage.tokenize :as tok]
             [termcat.stage.ast :as ast]
-            [termcat.stage.sugar :as sugar]))
+            [termcat.stage.sugar :as sugar]
+            [termcat.stage.lambda :as lambda]
+            [termcat.stage.html :as html]))
 
 (defn print-fragment
   ([frag] (print-fragment frag ""))
@@ -36,5 +38,7 @@
     (rewrite sugar/introduce-section-calls)
     (rewrite sugar/introduce-bullet-list-calls)
     (rewrite sugar/introduce-decorator-calls)
+    (rewrite lambda/introduce-fun-calls)
+    (rewrite html/flatten-to-html)
     print-fragment
     )
