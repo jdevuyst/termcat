@@ -53,7 +53,7 @@
              (->> (into coll (repeat padding-right nil)) ; right padding
                   (r/reduce
                     (fn [result v]
-                      (let [[state new-result] (f (get (meta result) :state)
+                      (let [[state new-result] (f (:state (meta result))
                                                   result
                                                   v)]
                         (with-meta new-result

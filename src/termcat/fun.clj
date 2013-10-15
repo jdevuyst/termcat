@@ -1,10 +1,11 @@
 (ns termcat.fun
-  (:require [termcat.term :refer :all]))
+  (:require [clojure.core.reducers :as r]
+            [termcat.term :refer :all]))
 
 (defn html-wrapper [tag]
-  (fn [x] [(token :html (str \< tag \>))
-           (center x)
-           (token :html (str \< \/ tag \>))]))
+  (fn [x] (concat [(token :html (str \< tag \>))]
+                  (.terms (center x))
+                  [(token :html (str \< \/ tag \>))])))
 
 (def fun-map {":par" (fn [] [(token :html "<p>")])
               ":section" (html-wrapper "h1")
@@ -12,14 +13,13 @@
               ":subsubsection" (html-wrapper "h3")
               ":bullet-list" (fn [& xs]
                                (concat [(token :html "<ul>")]
-                                       (concat (for [x xs]
-                                                 [(token :html "<li>")
-                                                  (center x)]))
+                                       (mapcat (fn [x] (cons (token :html "<li>")
+                                                             (.terms (center x)))))
                                        [(token :html "</ul>")]))
               ":emph" (html-wrapper "emph")
               ":strong" (html-wrapper "strong")
               ":underline" (html-wrapper "u")
-              ".identity" identity
+              ".identity" (fn [x] [x])
               ".rand" (fn [] [(token :default (str (rand)))])})
 
 (defn fun-call-head [fname]
@@ -35,4 +35,5 @@
           (for [arg args]
             (block (token [:ldelim :parenthesis])
                    arg
-                   (token [:rdelim :parenthesis])))))
+                   (token [:rdelim :parenthesis])))
+          [(token :default)]))

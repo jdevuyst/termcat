@@ -103,7 +103,8 @@ tt
                                  [(assoc state :item-type (item-type t2))
                                   t1
                                   (token [:rdelim (:item-type state)])
-                                  (token [:ldelim (item-type t2)] (payload t2))]
+                                  (token [:ldelim (item-type t2)]
+                                         (payload t2))]
                                  [(:prev-state state)
                                   t1
                                   (token [:rdelim (:item-type state)])
@@ -116,6 +117,7 @@ tt
                                   :item-type (item-type t2)
                                   :prev-state state}
                                  t1
-                                 (token [:ldelim (item-type t2)] (payload t2))])
+                                 (token [:ldelim (item-type t2)]
+                                        (payload t2))])
 [_ [:ldelim :indent] _] [{:in-bullet false :prev-state state} t1 t2]
 [_ [:rdelim :indent] _] [(:prev-state state) t1 t2])

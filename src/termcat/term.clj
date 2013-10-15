@@ -79,6 +79,7 @@
 
 (defn fragmentcat
   ([terms]
+   ;(println :fragmentcat-FAIL (filter #(not (or (token? %) (block? %))) terms))
    (assert (reduce (fn [result t]
                      (and result
                           (or (token? t) (block? t))))

@@ -39,6 +39,7 @@
     (rewrite sugar/introduce-bullet-list-calls)
     (rewrite sugar/introduce-decorator-calls)
     (rewrite lambda/introduce-fun-calls)
-    (rewrite html/flatten-to-html)
+    (rewrite lambda/evaluate-fun-calls)
+    ; (rewrite html/flatten-to-html)
     print-fragment
     )

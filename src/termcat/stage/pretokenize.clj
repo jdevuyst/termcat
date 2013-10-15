@@ -19,7 +19,7 @@
          #{\<} (ldelim-t :chevron)
          #{\>} (rdelim-t :chevron)
          #{\. \, \: \;} :maybe-fun
-         #{\# \* \+ \- \_} :maybe-sugar
+         #{\# \* \+ \- \_ \%} :maybe-sugar
          :default)
        c))
 

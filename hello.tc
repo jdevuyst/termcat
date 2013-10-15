@@ -10,9 +10,10 @@ Hi, this is termcat.
   This is a
   blockquote
 
+% this is a comment
 - This is
-- a bullet
-- list.
+- a bullet %
+- list. %
 
 - This is another list.
 - Notice that bullets can
@@ -22,8 +23,6 @@ Hi, this is termcat.
   - Bullet lists can also be nested!
 
 *emphasis* **strong** _underline_
-
-.identity(.identity(.rand))
 
   This is another
   blockquote.
@@ -37,4 +36,6 @@ Hi, this is termcat.
 
 \fin.
 
+.count-args(1)(2)(3)[4]%
 
+.identity(.identity(.rand))
