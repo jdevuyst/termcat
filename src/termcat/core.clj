@@ -38,27 +38,3 @@
     (rewrite sugar/introduce-decorator-calls)
     print-fragment
     )
-
-; (->> (slurp "hello.tc")
-;      (r/map tok/char-default-token)
-;      (s-reduce tok/subst-escapes)
-;      (s-reduce tok/melt-tokens)
-;      (s-reduce tok/abstract-emptylines)
-;      (s-reduce tok/abstract-indents)
-;      (s-reduce tok/subst-whitespace)
-;      (s-reduce tok/abstract-bullets)
-;      ; TODO add :emptyline at start and end
-;      (s-reduce br/abstract-brackets)
-;      (rs-reduce sugar/subst-hashlines bracketed-rf)
-;      ; TODO remove first and last :emptyline
-;      (rs-reduce sugar/subst-emptylines bracketed-rf)
-;      (rs-reduce sugar/subst-bullet-continuations bracketed-rf)
-;      (rs-reduce sugar/subst-bullets bracketed-rf)
-;      (rs-reduce sugar/subst-indents bracketed-rf)
-;      (rs-reduce sugar/subst-decorators bracketed-rf)
-;      (rs-reduce lam/abstract-funs bracketed-rf)
-;      (rs-reduce lam/apply-funs bracketed-rf)
-;      (rs-reduce html/to-html bracketed-rf)
-;      (html/prettier)
-;      (apply str)
-;      println)
