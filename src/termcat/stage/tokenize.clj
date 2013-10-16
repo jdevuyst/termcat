@@ -97,6 +97,13 @@ tt
  :prev-state nil}
 [state t1 t2]
 tt
+[{:in-bullet true} _ nil] (letfn [(unwind [state2]
+                                           (if (nil? state2)
+                                             nil
+                                             (cons (token [:rdelim (:item-type state2)])
+                                                   (unwind (:prev-state state2)))))]
+                            (cons nil
+                                 (unwind state)))
 [{:in-bullet true} _ (:or :emptyline
                           [:rdelim :indent])] [(:prev-state state)
                                                t1
