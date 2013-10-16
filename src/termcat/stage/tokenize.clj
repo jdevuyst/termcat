@@ -121,3 +121,13 @@ tt
                                         (payload t2))])
 [_ [:ldelim :indent] _] [{:in-bullet false :prev-state state} t1 t2]
 [_ [:rdelim :indent] _] [(:prev-state state) t1 t2])
+
+(defrule remove-percent-magic
+  [state t1 t2 t3]
+  tt
+  [_ :maybe-sugar :whitespace :newline] (if (= (payload t1) \%)
+                                          [nil])
+  [_ :maybe-sugar :whitespace _] (if (= (payload t1) \%)
+                                   [nil t1 t2])
+  [_ _ _ :maybe-sugar] (if (= (payload t1) "%%")
+                         [nil (token :html)]))

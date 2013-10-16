@@ -15,7 +15,6 @@
        :padding-right 1})
   ([state result term]
    (letfn [(eval-list [x]
-                        (if x (println :args (next x)))
                       (if x
                         (try (apply (first x) (next x))
                           (catch clojure.lang.ArityException x

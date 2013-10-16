@@ -15,6 +15,12 @@
   [_ [:block :subsection]] [nil (fun/fun-call-head ":subsection") t1]
   [_ [:block :subsubsection]] [nil (fun/fun-call-head ":subsubsection") t1])
 
+(defrule introduce-blockquote-calls
+  [state t1 t2 t3]
+  tt
+  [_ :maybe-fun :default _] nil
+  [_ _ _ [:block :indent]] [nil t1 t2 (fun/fun-call-head ":blockquote") t3])
+
 (defrule introduce-bullet-list-calls
   [state t1 t2]
   tt
@@ -31,8 +37,11 @@
 (defrule introduce-decorator-calls
   [state t1 t2 t3]
   tt
-  [_ :maybe-sugar :default :maybe-sugar]
+  [_ :maybe-sugar (:or :default
+                       [:block _]) :maybe-sugar]
   (if (= (payload t1) (payload t3))
     (if-let [fname (decorator-fname t1)]
       (concat [nil]
-              (fun/fun-call-seq fname (fragment t2))))))
+              (fun/fun-call-seq fname (if (block? t2)
+                                        (center t2)
+                                        (fragment t2)))))))

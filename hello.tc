@@ -10,10 +10,9 @@ Hi, this is termcat.
   This is a
   blockquote
 
-% this is a comment
 - This is
-- a bullet %
-- list. %
+- a bullet
+- list.
 
 - This is another list.
 - Notice that bullets can
@@ -35,6 +34,8 @@ Hi, this is termcat.
     And here's a blockquote **within** a blockquote
 
 \fin.
+
+*(This is an emphasized sentence.)* *((Brackets and emphasized))*
 
 .count-args(1)(2)(3)[4]%
 

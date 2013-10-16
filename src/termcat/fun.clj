@@ -11,10 +11,13 @@
               ":section" (html-wrapper "h1")
               ":subsection" (html-wrapper "h2")
               ":subsubsection" (html-wrapper "h3")
+              ":blockquote" (html-wrapper "blockquote")
               ":bullet-list" (fn [& xs]
                                (concat [(token :html "<ul>")]
-                                       (mapcat (fn [x] (cons (token :html "<li>")
-                                                             (.terms (center x)))))
+                                       (mapcat (fn [x]
+                                                 (cons (token :html "<li>")
+                                                       (.terms (center x))))
+                                               xs)
                                        [(token :html "</ul>")]))
               ":emph" (html-wrapper "emph")
               ":strong" (html-wrapper "strong")
@@ -36,4 +39,4 @@
             (block (token [:ldelim :parenthesis])
                    arg
                    (token [:rdelim :parenthesis])))
-          [(token :default)]))
+          [(token :html)]))

@@ -44,7 +44,11 @@
 (defrule remove-superfluous-whitespace
   [state t1 t2]
   tt
-  [_ nil (:or :emptyline
-              :whitespace)] [nil]
+  [_ (:or nil
+          [:block :indent]
+          [:block :bullet]) (:or :emptyline
+                                 :whitespace)] [nil t1]
   [_ (:or :emptyline
-          :whitespace) nil] [nil])
+          :whitespace) (:or nil
+                            [:block :indent]
+                            [:block :bullet])] [nil t2])
