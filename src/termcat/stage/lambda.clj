@@ -19,7 +19,7 @@
                      (if x
                        (try (apply (first x) (next x))
                          (catch clojure.lang.ArityException x
-                           [(token :error "arity error")]))))]
+                           [(token :error "Arity error")]))))]
      (cond (= (tt term) :fun) [{:call-list [(payload term)]}
                                (into result (eval-list call-l))]
            (and call-l

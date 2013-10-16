@@ -7,7 +7,7 @@
 
 (defn abstract-blocks
   ([] {:init-state {:distance 0 :stack nil}
-       :padding-right 0})
+       :padding-right 1})
   ([state result tok]
    (cond
      (ldelim? tok) [{:distance 1
@@ -25,9 +25,9 @@
                                                             (dec (:distance state))))
                                      tok))]
                        [(update-in state [:distance] (partial + 2))
-                        (-> result
-                            (conj (token :error "Delimiter mismatch:"))
-                            (conj tok))]))
+                        (conj result (token :error
+                                            (str "Delimiter mismatch: "
+                                                 (payload tok))))]))
      :else [(update-in state [:distance] inc)
             (conj result tok)])))
 

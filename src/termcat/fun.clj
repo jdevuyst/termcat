@@ -12,13 +12,20 @@
               ":subsection" (html-wrapper "h2")
               ":subsubsection" (html-wrapper "h3")
               ":quotation" (html-wrapper "blockquote")
-              ":unordered-list" (fn [& xs]
-                                  (concat [(token :html "<ul>")]
-                                          (mapcat (fn [x]
-                                                    (cons (token :html "<li>")
-                                                          (.terms (center x))))
-                                                  xs)
-                                          [(token :html "</ul>")]))
+              ":bullet-list" (fn [& xs]
+                               (concat [(token :html "<ul>")]
+                                       (mapcat (fn [x]
+                                                 (cons (token :html "<li>")
+                                                       (.terms (center x))))
+                                               xs)
+                                       [(token :html "</ul>")]))
+              ":numberedlist" (fn [& xs]
+                                 (concat [(token :html "<ol>")]
+                                         (mapcat (fn [x]
+                                                   (cons (token :html "<li>")
+                                                         (.terms (center x))))
+                                                 xs)
+                                         [(token :html "</ol>")]))
               ":emph" (html-wrapper "em")
               ":strong" (html-wrapper "strong")
               ":underline" (html-wrapper "u")
