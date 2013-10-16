@@ -19,7 +19,8 @@
               (token :html "<span class='termcat_error'>")
               (token :html (escape (payload t1)))
               (token :html "</span>")]
-  [_ :whitespace] [nil (token :html \space)]
+  [_ :whitespace] [nil (token :html (escape (or (payload t1)
+                                                \space)))]
   [_ :html] [nil t1]
   [_ _] [nil (token :html (escape (payload t1)))])
 
@@ -32,7 +33,7 @@
              (token :html "<head>")
              (token :html "<meta charset='utf-8'>")
              (token :html "<title>")
-             (token :default "A Termcat Document")
+             (token :html "A Termcat Document")
              (token :html "</title>")
              (token :html "<style>")
              (token :html ".termcat_error { background: red; color: white }")

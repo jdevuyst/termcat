@@ -2,12 +2,15 @@
   (:require [clojure.core.reducers :as r]
             [termcat.term :refer :all]))
 
+(defn html-constant [code]
+  (fn [] [(token :html code)]))
+
 (defn html-wrapper [tag]
   (fn [x] (concat [(token :html (str \< tag \>))]
                   (.terms (center x))
                   [(token :html (str \< \/ tag \>))])))
 
-(def fun-map {":par" (fn [] [(token :html "<p>")])
+(def fun-map {":par" (html-constant "<p>")
               ":section" (html-wrapper "h1")
               ":subsection" (html-wrapper "h2")
               ":subsubsection" (html-wrapper "h3")
@@ -29,6 +32,19 @@
               ":emph" (html-wrapper "em")
               ":strong" (html-wrapper "strong")
               ":underline" (html-wrapper "u")
+              ":union" (html-constant "⋃")
+              ":intersection" (html-constant "⋂")
+              ":times" (html-constant "×")
+              ":in" (html-constant "∈")
+              ":nin" (html-constant "∉")
+              ":subset" (html-constant "⊂")
+              ":subseteq" (html-constant "⊆")
+              ":nsubset" (html-constant "⊄")
+              ":nsubseteq" (html-constant "⊈")
+              ":supset" (html-constant "⊃")
+              ":supseteq" (html-constant "⊇")
+              ":nsupset" (html-constant "⊅")
+              ":nsupseteq" (html-constant "⊉")
               ".identity" (fn [x] (.terms (center x)))
               ".countargs" (fn [& xs] [(token :default
                                               (str (count xs)))])
