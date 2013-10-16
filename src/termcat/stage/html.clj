@@ -27,8 +27,10 @@
   [state t1 t2]
   tt
   [_ nil _] [nil
+             (token :html "<!DOCTYPE html>")
              (token :html "<html>")
              (token :html "<head>")
+             (token :html "<meta charset='utf-8'>")
              (token :html "<title>")
              (token :default "A Termcat Document")
              (token :html "</title>")

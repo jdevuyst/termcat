@@ -41,6 +41,9 @@ tt
 {:indent 0}
 [state t1 t2]
 tt
+[_ _ nil] (cons nil
+                (for [x (range (/ (:indent state) 2))]
+                  (rdelim :indent)))
 [_ (:or :newline
         :emptyline) _] (let [indent (if (= (tt t2) :whitespace)
                                       (count (payload t2))

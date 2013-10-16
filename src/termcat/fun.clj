@@ -38,7 +38,7 @@
   (let [f (get fun-map fname)]
     (if (fn? f)
       (token :fun f)
-      (token :error (str "Function not found: " fname)))))
+      (token :error (str "Function not found — " fname)))))
 
 (defn fun-call-seq
   "Returns a sequence of terms that represent a function call."

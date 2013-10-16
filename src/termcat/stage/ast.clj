@@ -26,7 +26,7 @@
                                      tok))]
                        [(update-in state [:distance] (partial + 2))
                         (conj result (token :error
-                                            (str "Delimiter mismatch: "
+                                            (str "Delimiter mismatch — "
                                                  (payload tok))))]))
      :else [(update-in state [:distance] inc)
             (conj result tok)])))
