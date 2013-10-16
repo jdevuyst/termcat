@@ -21,7 +21,8 @@
             (println indent \> (token-to-string (left t)))
             (print-fragment (center t) new-indent)
             (println indent \< (token-to-string (right t))))
-          (println indent (token-to-string t)))))))
+          (println indent (token-to-string t)))))
+   frag))
 
 (-> (pretok/map-file "hello.tc")
     (rewrite tok/remove-escape-tokens)
@@ -42,6 +43,6 @@
     (rewrite sugar/introduce-decorator-calls)
     (rewrite lambda/introduce-fun-calls)
     (rewrite lambda/evaluate-fun-calls)
-    ; (rewrite html/flatten-to-html)
+    (rewrite html/flatten-to-html)
     print-fragment
     )

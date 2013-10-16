@@ -129,5 +129,5 @@ tt
                                           [nil])
   [_ :maybe-sugar :whitespace _] (if (= (payload t1) \%)
                                    [nil t1 t2])
-  [_ _ _ :maybe-sugar] (if (= (payload t1) "%%")
-                         [nil (token :html)]))
+  [_ _ _ :maybe-sugar] (if (= (payload t3) "%%")
+                         [nil t1 t2 (token :html)]))

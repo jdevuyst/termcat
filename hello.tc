@@ -10,7 +10,8 @@ Hi, this is termcat.
   This is a
   blockquote
 
-- This is
+% MOOOooooooo
+- This is % k;lsdafj
 - a bullet
 - list.
 
@@ -36,6 +37,8 @@ Hi, this is termcat.
 \fin.
 
 *(This is an emphasized sentence.)* *((Brackets and emphasized))*
+
+two%%tokens
 
 .count-args(1)(2)(3)[4]%
 
