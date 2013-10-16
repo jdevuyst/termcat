@@ -33,6 +33,7 @@
           (rewrite tok/introduce-item-tokens)
           (rewrite tok/remove-percent-magic)
           (rewrite ast/abstract-blocks)
+          (rewrite ast/introduce-delim-errors)
           (rewrite ast/fix-bullet-continuations)
           (rewrite ast/convert-newlines-to-whitespace)
           (rewrite ast/remove-superfluous-whitespace)

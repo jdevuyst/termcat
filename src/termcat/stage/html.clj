@@ -35,7 +35,11 @@
              (token :html "A Termcat Document")
              (token :html "</title>")
              (token :html "<style>")
-             (token :html ".termcat_error { background: red; color: white }")
+             (token :html ".termcat_error {
+                          background: red;
+                          color: white;
+                          margin-left: .33ex;
+                          margin-right: .33ex }")
              (token :html "</style>")
              (token :html "</head>")
              (token :html "<body>")

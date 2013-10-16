@@ -24,12 +24,15 @@
                                      (fragmentcat (u/last-n result
                                                             (dec (:distance state))))
                                      tok))]
-                       [(update-in state [:distance] (partial + 2))
-                        (conj result (token :error
-                                            (str "Delimiter mismatch — "
-                                                 (payload tok))))]))
+                       [(update-in state [:distance] inc)
+                        (conj result tok)]))
      :else [(update-in state [:distance] inc)
             (conj result tok)])))
+
+(defrule introduce-delim-errors
+  [state t1]
+  tt
+  [_ [(:or :ldelim :rdelim) _]] [nil (token :error (payload t1))])
 
 (defrule fix-bullet-continuations
   [state t1 t2]
