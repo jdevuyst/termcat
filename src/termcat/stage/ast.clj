@@ -45,10 +45,10 @@
   [state t1 t2]
   tt
   [_ (:or nil
+          :emptyline
           [:block :indent]
-          [:block :bullet]) (:or :emptyline
-                                 :whitespace)] [nil t1]
-  [_ (:or :emptyline
-          :whitespace) (:or nil
-                            [:block :indent]
-                            [:block :bullet])] [nil t2])
+          [:block :bullet]) :whitespace] [nil t1]
+  [_ :whitespace (:or nil
+                      :emptyline
+                      [:block :indent]
+                      [:block :bullet])] [nil t2])

@@ -14,16 +14,20 @@
   ([] {:init-state nil
        :padding-right 1})
   ([state result term]
-   (letfn [(eval-list [x]
-                      (if x
-                        (try (apply (first x) (next x))
-                          (catch clojure.lang.ArityException x
-                            [(token :error "arity error")]))))]
+   (let [call-l (:call-list state)
+         eval-list (fn [x]
+                     (if x
+                       (try (apply (first x) (next x))
+                         (catch clojure.lang.ArityException x
+                           [(token :error "arity error")]))))]
      (cond (= (tt term) :fun) [{:call-list [(payload term)]}
-                               (into result (eval-list (:call-list state)))]
-           (and (:call-list state)
-                (block? term)) [{:call-list (conj (:call-list state) term)}
-                                result]
+                               (into result (eval-list call-l))]
+           (and call-l
+                (block? term)
+                (or (= (count call-l) 1)
+                    (= (dt (left term))
+                       (dt (left (second call-l)))))) [{:call-list (conj call-l term)}
+                                                       result]
            :else [nil (-> result
-                          (into (eval-list (:call-list state)))
+                          (into (eval-list call-l))
                           (conj term))]))))

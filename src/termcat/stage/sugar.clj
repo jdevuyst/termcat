@@ -19,13 +19,13 @@
   [state t1 t2 t3]
   tt
   [_ :maybe-fun :default _] nil
-  [_ _ _ [:block :indent]] [nil t1 t2 (fun/fun-call-head ":blockquote") t3])
+  [_ _ _ [:block :indent]] [nil t1 t2 (fun/fun-call-head ":quotation") t3])
 
 (defrule introduce-bullet-list-calls
   [state t1 t2]
   tt
   [_ [:block :bullet] _] nil
-  [_ _ [:block :bullet]] [nil t1 (fun/fun-call-head ":bullet-list") t2])
+  [_ _ [:block :bullet]] [nil t1 (fun/fun-call-head ":unordered-list") t2])
 
 (defn decorator-fname [tok]
   (case (payload tok)

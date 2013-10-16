@@ -42,7 +42,11 @@
     (rewrite sugar/introduce-bullet-list-calls)
     (rewrite sugar/introduce-decorator-calls)
     (rewrite lambda/introduce-fun-calls)
+    ; print-fragment
     (rewrite lambda/evaluate-fun-calls)
-    (rewrite html/flatten-to-html)
     print-fragment
+    (rewrite html/to-html-tokens)
+    (rewrite html/introduce-boilerplate)
+    (html/to-string)
+    (#(spit "hello.html" %))
     )

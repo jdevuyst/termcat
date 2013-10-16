@@ -11,18 +11,20 @@
               ":section" (html-wrapper "h1")
               ":subsection" (html-wrapper "h2")
               ":subsubsection" (html-wrapper "h3")
-              ":blockquote" (html-wrapper "blockquote")
-              ":bullet-list" (fn [& xs]
-                               (concat [(token :html "<ul>")]
-                                       (mapcat (fn [x]
-                                                 (cons (token :html "<li>")
-                                                       (.terms (center x))))
-                                               xs)
-                                       [(token :html "</ul>")]))
-              ":emph" (html-wrapper "emph")
+              ":quotation" (html-wrapper "blockquote")
+              ":unordered-list" (fn [& xs]
+                                  (concat [(token :html "<ul>")]
+                                          (mapcat (fn [x]
+                                                    (cons (token :html "<li>")
+                                                          (.terms (center x))))
+                                                  xs)
+                                          [(token :html "</ul>")]))
+              ":emph" (html-wrapper "em")
               ":strong" (html-wrapper "strong")
               ":underline" (html-wrapper "u")
-              ".identity" (fn [x] [x])
+              ".identity" (fn [x] (.terms (center x)))
+              ".countargs" (fn [& xs] [(token :default
+                                              (str (count xs)))])
               ".rand" (fn [] [(token :default (str (rand)))])})
 
 (defn fun-call-head [fname]
