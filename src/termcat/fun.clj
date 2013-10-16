@@ -70,7 +70,7 @@
 (defn fun-call-head [fname]
   (let [f (get fun-map fname)]
     (if (fn? f)
-      (token :fun f)
+      (token :fun (with-meta f {:fun-name fname}))
       (token :error (str "Function not found — " fname)))))
 
 (defn fun-call-seq

@@ -15,11 +15,15 @@
        :padding-right 1})
   ([state result term]
    (let [call-l (:call-list state)
-         eval-list (fn [x]
-                     (if x
-                       (try (apply (first x) (next x))
+         eval-list (fn [coll]
+                     (if coll
+                       (try (apply (first coll) (next coll))
                          (catch clojure.lang.ArityException x
-                           [(token :error "Arity error")]))))]
+                           [(token :error
+                                   (str "Invalid number of arguments ("
+                                        (count (next coll))
+                                        ") – "
+                                        (:fun-name (meta (first coll)))))]))))]
      (cond (= (tt term) :fun) [{:call-list [(payload term)]}
                                (into result (eval-list call-l))]
            (and call-l

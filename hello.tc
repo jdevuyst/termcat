@@ -42,8 +42,10 @@ Hi, this is termcat.
 
 *(This is an emphasized sentence.)* *((Brackets and emphasized))*
 
+.identity
+
 .identity(.identity(.rand))
 
-E = {<a, n, n'> :subseteq I :times N :times N | Pa \and n < n'}
-
 So [this](http://example.com) is a link. ![alt text](http://example.com/img.jpg)
+
+E = {<a, n, n'> :subseteq I :times N :times N | Pa \and n < n'}
