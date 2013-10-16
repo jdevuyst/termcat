@@ -19,7 +19,7 @@
 tt
 [_ _ (:or :default
           :whitespace
-          :maybe-sugar)] (if (= (tt t1) (tt t2))
+          :maybe-magic)] (if (= (tt t1) (tt t2))
                            [nil
                             (token (tt t1)
                                    (str (payload t1) (payload t2)))]))
@@ -135,9 +135,9 @@ tt
 (defrule remove-percent-magic
   [state t1 t2 t3]
   tt
-  [_ :maybe-sugar :whitespace :newline] (if (= (payload t1) \%)
+  [_ :maybe-magic :whitespace :newline] (if (= (payload t1) \%)
                                           [nil])
-  [_ :maybe-sugar :whitespace _] (if (= (payload t1) \%)
+  [_ :maybe-magic :whitespace _] (if (= (payload t1) \%)
                                    [nil t1 t2])
-  [_ _ _ :maybe-sugar] (if (= (payload t3) "%%")
+  [_ _ _ :maybe-magic] (if (= (payload t3) "%%")
                          [nil t1 t2 (token :html)]))

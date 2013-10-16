@@ -28,6 +28,25 @@
   [_ _ [:block :bullet] _] nil
   [_ _ _ [:block :bullet]] [nil t1 t2 (fun/fun-call-head ":bullet-list") t3])
 
+(defrule introduce-link-calls
+  [state t1 t2 t3 t4]
+  tt
+  [_ :maybe-fun :default _ _] nil
+  [_ _
+   :maybe-fun
+   [:block :bracket]
+   [:block :parenthesis]] (if (= (payload t2) \!)
+                            (concat [nil t1]
+                                    (fun/fun-call-seq ":img"
+                                                      (center t3)
+                                                      (center t4))))
+  [_ _ _
+   [:block :bracket]
+   [:block :parenthesis]] (concat [nil t1 t2]
+                                  (fun/fun-call-seq ":link"
+                                                    (center t3)
+                                                    (center t4))))
+
 (defn decorator-fname [tok]
   (case (payload tok)
     \* ":emph"
@@ -38,8 +57,8 @@
 (defrule introduce-decorator-calls
   [state t1 t2 t3]
   tt
-  [_ :maybe-sugar (:or :default
-                       [:block _]) :maybe-sugar]
+  [_ :maybe-magic (:or :default
+                       [:block _]) :maybe-magic]
   (if (= (payload t1) (payload t3))
     (if-let [fname (decorator-fname t1)]
       (concat [nil]

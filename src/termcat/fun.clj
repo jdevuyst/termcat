@@ -1,6 +1,7 @@
 (ns termcat.fun
   (:require [clojure.core.reducers :as r]
-            [termcat.term :refer :all]))
+            [termcat.term :refer :all]
+            [termcat.util :as u]))
 
 (defn html-constant [code]
   (fn [] [(token :html code)]))
@@ -9,6 +10,20 @@
   (fn [x] (concat [(token :html (str \< tag \>))]
                   (.terms (center x))
                   [(token :html (str \< \/ tag \>))])))
+
+(defn html-link [text url]
+  [(token :html "<a href='")
+   url
+   (token :html "'>")
+   text
+   (token :html "</a>")])
+
+(defn html-image [alt-text url]
+  [(token :html "<img src='")
+   url
+   (token :html "' alt='")
+   alt-text
+   (token :html "'>")])
 
 (def fun-map {":par" (html-constant "<p>")
               ":section" (html-wrapper "h1")
@@ -29,6 +44,8 @@
                                                          (.terms (center x))))
                                                  xs)
                                          [(token :html "</ol>")]))
+              ":link" html-link
+              ":img" html-image
               ":emph" (html-wrapper "em")
               ":strong" (html-wrapper "strong")
               ":underline" (html-wrapper "u")

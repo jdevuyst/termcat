@@ -19,8 +19,7 @@
               (token :html "<span class='termcat_error'>")
               (token :html (escape (payload t1)))
               (token :html "</span>")]
-  [_ :whitespace] [nil (token :html (escape (or (payload t1)
-                                                \space)))]
+  [_ :whitespace] [nil (token :html \space)]
   [_ :html] [nil t1]
   [_ _] [nil (token :html (escape (payload t1)))])
 

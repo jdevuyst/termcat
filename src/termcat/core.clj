@@ -40,6 +40,7 @@
           (rewrite sugar/introduce-section-calls)
           (rewrite sugar/introduce-blockquote-calls)
           (rewrite sugar/introduce-bullet-list-calls)
+          (rewrite sugar/introduce-link-calls)
           (rewrite sugar/introduce-decorator-calls)
           (rewrite lambda/introduce-fun-calls)
           (rewrite lambda/evaluate-fun-calls)
