@@ -141,3 +141,9 @@ tt
                                    [nil t1 t2])
   [_ _ _ :maybe-magic] (if (= (payload t3) "%%")
                          [nil t1 t2 (token :html)]))
+
+(defrule dedelimit-chevron-orphans
+  [state t1 t2]
+  tt
+  [_ :whitespace [:rdelim :chevron]] [nil t1 (token :default (payload t2))]
+  [_ [:ldelim :chevron] :whitespace] [nil (token :default (payload t1)) t2])
