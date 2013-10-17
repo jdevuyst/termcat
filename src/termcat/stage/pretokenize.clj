@@ -19,7 +19,8 @@
          #{\<} (ldelim-t :chevron)
          #{\>} (rdelim-t :chevron)
          #{\. \, \: \; \!} :maybe-fun
-         #{\# \* \+ \- \_ \%} :maybe-magic
+         #{\` \' \-} :maybe-typographic
+         #{\# \* \_ \%} :maybe-magic
          :default)
        c))
 

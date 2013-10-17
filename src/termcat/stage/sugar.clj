@@ -65,3 +65,34 @@
               (fun/fun-call-seq fname (if (block? t2)
                                         (center t2)
                                         (fragment t2)))))))
+
+(defrule introduce-typographic-dashes
+  [state t1 t2 t3]
+  tt
+  [_
+   :maybe-typographic
+   :maybe-typographic
+   :maybe-typographic] (if (= \-
+                              (payload t1)
+                              (payload t2)
+                              (payload t3))
+                         [nil (token :default \—)])
+  [_
+   :maybe-typographic
+   :maybe-typographic _] (if (= \-
+                                (payload t1)
+                                (payload t2)) [nil (token :default \–) t3]))
+
+(defrule introduce-typographic-quotes
+  [state t1 t2]
+  tt
+  [_
+   :maybe-typographic
+   :maybe-typographic] (if (= (payload t1) (payload t2))
+                         (case (payload t1)
+                           \` [nil (token :default \“)]
+                           \' [nil (token :default \”)]
+                           \- [nil (token :default \–)]
+                           nil))
+  [_ :maybe-typographic _] (cond (= \` (payload t1)) [nil (token :default \‘) t2]
+                                 (= \' (payload t1)) [nil (token :default \’) t2]))

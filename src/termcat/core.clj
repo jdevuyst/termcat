@@ -43,6 +43,8 @@
           (rewrite sugar/introduce-bullet-list-calls)
           (rewrite sugar/introduce-link-calls)
           (rewrite sugar/introduce-decorator-calls)
+          (rewrite sugar/introduce-typographic-dashes)
+          (rewrite sugar/introduce-typographic-quotes)
           (rewrite lambda/introduce-fun-calls)
           (rewrite lambda/evaluate-fun-calls)
           print-fragment
