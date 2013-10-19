@@ -4,7 +4,13 @@
             [termcat.rewrite :refer :all]))
 
 (defn escape [s]
-  (cond (string? s) (apply str (for [c s] (case c \< "&lt;" \> "&gt;" \& "&amp;" c)))
+  (cond (string? s) (apply str (for [c s]
+                                 (case c
+                                   \< "&lt;"
+                                   \> "&gt;"
+                                   \& "&amp;"
+                                   \' "&apos;"
+                                   \" "&quot;" c)))
         (char? s) (escape (str s))
         :else ""))
 
