@@ -142,8 +142,49 @@ tt
   [_ _ _ :maybe-magic] (if (= (payload t3) "%%")
                          [nil t1 t2 (token :html)]))
 
-(defrule dedelimit-chevron-orphans
+(defrule remove-chevron-orphans
   [state t1 t2]
   tt
   [_ :whitespace [:rdelim :chevron]] [nil t1 (token :default (payload t2))]
   [_ [:ldelim :chevron] :whitespace] [nil (token :default (payload t1)) t2])
+
+(defrule introduce-typographic-dashes
+  [state t1 t2 t3]
+  tt
+  [_
+   :maybe-typographic
+   :maybe-typographic
+   :maybe-typographic] (if (= \-
+                              (payload t1)
+                              (payload t2)
+                              (payload t3))
+                         [nil (token :default \—)])
+  [_
+   :maybe-typographic
+   :maybe-typographic _] (if (= \-
+                                (payload t1)
+                                (payload t2)) [nil (token :default \–) t3]))
+
+(defrule introduce-typographic-quotes
+  [state t1 t2]
+  tt
+  [_
+   :maybe-typographic
+   :maybe-typographic] (if (= (payload t1) (payload t2))
+                         (case (payload t1)
+                           \` [nil (token :default \“)]
+                           \' [nil (token :default \”)]
+                           \- [nil (token :default \–)]
+                           nil))
+  [_ :maybe-typographic _] (cond (= \` (payload t1)) [nil (token :default \‘) t2]
+                                 (= \' (payload t1)) [nil (token :default \’) t2]))
+
+(defrule remove-magic-tokens
+  [state t1 t2 t3]
+  tt
+  [_ :default (:or :maybe-magic
+                   :maybe-fun) :default] [nil
+                                          t1
+                                          (token :default
+                                                 (payload t2))
+                                          t3])
