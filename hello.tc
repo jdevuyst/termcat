@@ -38,7 +38,7 @@ Hi, this is termcat.
 
 \fin.
 
-:numberedlist
+:numbered-list
 - a
 - b
 
@@ -50,4 +50,4 @@ Hi, this is termcat.
 
 So [this](http://example.com) is a link.
 
-E = {<a, n, n'> :subseteq I :times N :times N | Pa \and n < n'}
+E ~~=~~ {<a, n, n'> ~:subseteq~ I ~:times~ N ~:times~ N ~~|~~ Pa \and n ~<~ n'}

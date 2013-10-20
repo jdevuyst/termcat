@@ -65,3 +65,17 @@
               (fun/fun-call-seq fname (if (block? t2)
                                         (center t2)
                                         (fragment t2)))))))
+
+(defrule introduce-typographic-dashes
+  [state t1 t2 t3]
+  tt
+  [_ :dash :dash :dash] [nil (token :default \—)]
+  [_ :dash :dash _] [nil (token :default \–) t3])
+
+(defrule introduce-typographic-quotes
+  [state t1 t2]
+  tt
+  [_ :left-quote :left-quote] [nil (token :default \“)]
+  [_ :right-quote :right-quote] [nil (token :default \”)]
+  [_ :left-quote _] [nil (token :default \‘) t2]
+  [_ :right-quote _] [nil (token :default \’) t2])

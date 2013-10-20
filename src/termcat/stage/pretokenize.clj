@@ -19,13 +19,15 @@
          #{\<} (ldelim-t :chevron)
          #{\>} (rdelim-t :chevron)
          #{\. \, \: \; \!} :maybe-fun
-         #{\` \' \-} :maybe-typographic
+         #{\-} :dash
+         #{\`} :left-quote
+         #{\'} :right-quote
          #{\# \* \_ \%} :maybe-magic
          :default)
        c))
 
-(defn map-file [filename]
-  (->> (slurp filename)
+(defn map-to-tokens [s]
+  (->> s
        (r/map char-to-token)
        r/foldcat
        fragmentcat))

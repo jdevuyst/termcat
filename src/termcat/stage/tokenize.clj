@@ -98,12 +98,12 @@ tt
 [state t1 t2]
 tt
 [{:in-bullet true} _ nil] (letfn [(unwind [state2]
-                                           (if (nil? state2)
-                                             nil
-                                             (cons (token [:rdelim (:item-type state2)])
-                                                   (unwind (:prev-state state2)))))]
+                                          (if (nil? state2)
+                                            nil
+                                            (cons (token [:rdelim (:item-type state2)])
+                                                  (unwind (:prev-state state2)))))]
                             (cons nil
-                                 (unwind state)))
+                                  (unwind state)))
 [{:in-bullet true} _ (:or :emptyline
                           [:rdelim :indent])] [(:prev-state state)
                                                t1
@@ -148,43 +148,13 @@ tt
   [_ :whitespace [:rdelim :chevron]] [nil t1 (token :default (payload t2))]
   [_ [:ldelim :chevron] :whitespace] [nil (token :default (payload t1)) t2])
 
-(defrule introduce-typographic-dashes
-  [state t1 t2 t3]
-  tt
-  [_
-   :maybe-typographic
-   :maybe-typographic
-   :maybe-typographic] (if (= \-
-                              (payload t1)
-                              (payload t2)
-                              (payload t3))
-                         [nil (token :default \—)])
-  [_
-   :maybe-typographic
-   :maybe-typographic _] (if (= \-
-                                (payload t1)
-                                (payload t2)) [nil (token :default \–) t3]))
-
-(defrule introduce-typographic-quotes
-  [state t1 t2]
-  tt
-  [_
-   :maybe-typographic
-   :maybe-typographic] (if (= (payload t1) (payload t2))
-                         (case (payload t1)
-                           \` [nil (token :default \“)]
-                           \' [nil (token :default \”)]
-                           \- [nil (token :default \–)]
-                           nil))
-  [_ :maybe-typographic _] (cond (= \` (payload t1)) [nil (token :default \‘) t2]
-                                 (= \' (payload t1)) [nil (token :default \’) t2]))
-
 (defrule remove-magic-tokens
   [state t1 t2 t3]
   tt
   [_ :default (:or :maybe-magic
-                   :maybe-fun) :default] [nil
-                                          t1
-                                          (token :default
-                                                 (payload t2))
-                                          t3])
+                   :maybe-fun
+                   :dash) :default] [nil
+                                     (token :default
+                                            (str (payload t1)
+                                                 (payload t2)
+                                                 (payload t3)))])
