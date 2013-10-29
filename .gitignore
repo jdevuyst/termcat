@@ -1,5 +1,5 @@
 pom.xml
-*jar
+*.jar
 /lib/
 /classes/
 /targets/
@@ -10,3 +10,4 @@ termcat.sublime-project
 termcat.sublime-workspace
 hello.html
 .DS_Store
+.nrepl-port

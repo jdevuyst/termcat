@@ -1,5 +1,6 @@
 (ns termcat.term
   (:require [clojure.core.reducers :as r]
+            [clojure.edn :as edn]
             [termcat.rewrite :refer :all]))
 
 (defprotocol ITerm
@@ -9,7 +10,7 @@
   (payload [this]))
 
 (defprotocol IFragment
-  (as-int [this]))
+  (as-number [this]))
 
 (defprotocol IBlock
   (left [this])
@@ -79,7 +80,7 @@
 
 (defn fragmentcat
   ([terms]
-   ;(println :fragmentcat-FAIL (filter #(not (or (token? %) (block? %))) terms))
+   ; (println :fragmentcat-FAIL (filter #(not (or (token? %) (block? %))) terms))
    (assert (reduce (fn [result t]
                      (and result
                           (or (token? t) (block? t))))
@@ -96,6 +97,11 @@
   (assert (delim-pair? left right))
   (assert (fragment? center))
   (Block. left center right))
+
+; (defn transparent-block [center]
+;   (block (ldelim :box)
+;          center
+;          (rdelim :box)))
 
 (defn merge-blocks [b1 b2]
   (assert (block? b1))
@@ -125,24 +131,17 @@
   ITerm
   (tt [this] :fragment)
   IFragment
-  (as-int [this]
+  (as-number [this]
           (let [v (if (= 1 (count (.terms this)))
-                    (read-string
+                    (edn/read-string
                       (payload (first (.terms this)))))]
-            (if (integer? v)
+            (if (number? v)
               v
-              (token :error "Not an integer"))))
+              (token :error "Not a number"))))
   IRewrite
   (rewrite [this rule]
            (fragmentcat
-             (rewrite (->> (r/map #(if (block? %)
-                                     (block (left %)
-                                            (rewrite (center %) rule)
-                                            (right %))
-                                     %)
-                                  (.terms this))
-                           (r/reduce conj []))
-                      rule))))
+             (rewrite (.terms this) rule))))
 
 (extend-type Block
   ITerm
@@ -150,4 +149,9 @@
   IBlock
   (left [this] (.left this))
   (center [this] (.center this))
-  (right [this] (.right this)))
+  (right [this] (.right this))
+  IRewrite
+  (rewrite [this rule]
+           (block (left this)
+                  (rewrite (center this) rule)
+                  (right this))))

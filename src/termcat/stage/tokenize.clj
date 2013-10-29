@@ -6,6 +6,7 @@
   "[:escape \\] + [type payload] -> [:default payload]"
   [state t1 t2]
   tt
+  block?
   [_ :escape _] [nil (token :default (payload t2))])
 
 (defrule merge-tokens
@@ -17,8 +18,13 @@
   This also allows for easier matching later on."
 [state t1 t2]
 tt
+block?
 [_ _ (:or :default
           :whitespace
+          :tilde
+          :dash
+          :left-quote
+          :right-quote
           :maybe-magic)] (if (= (tt t1) (tt t2))
                            [nil
                             (token (tt t1)
@@ -30,6 +36,7 @@ tt
   removed."
 [state t1 t2]
 tt
+block?
 [_ :emptyline :newline] [nil t2]
 [_ :newline :newline] [nil (token :emptyline)])
 
@@ -41,6 +48,7 @@ tt
 {:indent 0}
 [state t1 t2]
 tt
+block?
 [_ _ nil] (concat [nil t1]
                   (for [x (range (/ (:indent state) 2))]
                     (rdelim :indent)))
@@ -61,6 +69,7 @@ tt
   "Removes leading and trailing whitespace."
   [state t1 t2]
   tt
+  block?
   [_
    (:or [:ldelim :indent]
         [:rdelim :indent]
@@ -97,6 +106,7 @@ tt
  :prev-state nil}
 [state t1 t2]
 tt
+block?
 [{:in-bullet true} _ nil] (letfn [(unwind [state2]
                                           (if (nil? state2)
                                             nil
@@ -135,6 +145,7 @@ tt
 (defrule remove-percent-magic
   [state t1 t2 t3]
   tt
+  block?
   [_ :maybe-magic :whitespace :newline] (if (= (payload t1) \%)
                                           [nil])
   [_ :maybe-magic :whitespace _] (if (= (payload t1) \%)
@@ -142,15 +153,27 @@ tt
   [_ _ _ :maybe-magic] (if (= (payload t3) "%%")
                          [nil t1 t2 (token :html)]))
 
-(defrule remove-chevron-orphans
+(defrule undelimit-certain-chevrons
   [state t1 t2]
   tt
-  [_ :whitespace [:rdelim :chevron]] [nil t1 (token :default (payload t2))]
-  [_ [:ldelim :chevron] :whitespace] [nil (token :default (payload t1)) t2])
+  block?
+  [_
+   :whitespace
+   [:rdelim :chevron]] [nil t1 (token :default (payload t2))]
+  [_
+   [:ldelim :chevron]
+   :whitespace] [nil (token :default (payload t1)) t2]
+  [_
+   :tilde
+   [(:or :ldelim :rdelim) :chevron]] [nil t1 (token :default (payload t2))]
+  [_
+   [(:or :ldelim :rdelim) :chevron]
+   :tilde] [nil (token :default (payload t1)) t2])
 
 (defrule remove-magic-tokens
   [state t1 t2 t3]
   tt
+  block?
   [_ :default (:or :maybe-magic
                    :maybe-fun
                    :dash) :default] [nil

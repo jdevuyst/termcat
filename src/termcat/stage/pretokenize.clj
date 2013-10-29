@@ -19,6 +19,7 @@
          #{\<} (ldelim-t :chevron)
          #{\>} (rdelim-t :chevron)
          #{\. \, \: \; \!} :maybe-fun
+         #{\~} :tilde
          #{\-} :dash
          #{\`} :left-quote
          #{\'} :right-quote

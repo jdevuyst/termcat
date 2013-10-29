@@ -5,8 +5,6 @@
 
 ### Subsubsection
 
-Hi, this is termcat.
-
 `quote' - ``quote'' -- ```quote''' --- ````quote''''
 
   This is a
@@ -36,18 +34,24 @@ Hi, this is termcat.
 
     And here's a blockquote **within** a blockquote
 
-\fin.
+
+Termcat supports numbered lists too:
 
 :numbered-list
-- a
-- b
+- one
+- two
+- see?
 
-*(This is an emphasized sentence.)* *((Brackets and emphasized))*
+*(This is an emphasized sentence.)* *((This is an emphasized sentence within parentheses.))*
 
-.identity
+Something random: .identity(.identity(.rand)).
 
-.identity(.identity(.rand))
+[This](http://example.com) is a link.
 
-So [this](http://example.com) is a link.
+E ~~=~~ {<a ~\,~ n ~\,~ n'> ~⊆~ I ~×~ N ~×~ N ~~|~~ Pa \and n ~<~ n'}
 
-E ~~=~~ {<a, n, n'> ~:subseteq~ I ~:times~ N ~:times~ N ~~|~~ Pa \and n ~<~ n'}
+(1 ~=~ 2)
+
+This is a \*test
+
+1 ~+~ a'b''c'''d''''e'''''

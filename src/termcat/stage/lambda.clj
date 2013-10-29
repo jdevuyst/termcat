@@ -7,11 +7,15 @@
 (defrule introduce-fun-calls
   [state t1 t2]
   tt
+  block?
   [_ :maybe-fun :default] [nil (fun/fun-call-head (str (payload t1)
                                                        (payload t2)))])
 
 (defrule evaluate-fun-calls
   [state t1 t2]
   tt
+  block?
   [_ :fun [:block _]] (cons nil (fun/apply-fun t1 t2))
-  [_ :fun _] (cons nil (fun/apply-fun t1 nil)))
+  [_ :fun _] (-> (concat [nil]
+                         (fun/apply-fun t1 nil)
+                         [t2])))

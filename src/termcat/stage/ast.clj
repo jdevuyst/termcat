@@ -32,21 +32,25 @@
 (defrule introduce-delim-errors
   [state t1]
   tt
+  block?
   [_ [(:or :ldelim :rdelim) _]] [nil (token :error (payload t1))])
 
 (defrule fix-bullet-continuations
   [state t1 t2]
   tt
+  block?
   [_ [:block :bullet] [:block :indent]] [nil (merge-blocks t1 t2)])
 
 (defrule convert-newlines-to-whitespace
   [state t1]
   tt
+  block?
   [_ :newline] [nil (token :whitespace)])
 
 (defrule remove-superfluous-whitespace
   [state t1 t2]
   tt
+  block?
   [_ (:or nil
           :emptyline
           [:block :indent]
