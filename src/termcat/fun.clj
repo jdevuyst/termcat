@@ -78,7 +78,7 @@
 ;                        (center x)
 ;                        (rdelim tag))])))
 
-(def fun-map {":box" box
+(def fun-map {;":box" box
               ":par" (html-constant "<p>")
               ":section" (html-wrapper "h1")
               ":subsection" (html-wrapper "h2")

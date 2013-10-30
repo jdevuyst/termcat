@@ -110,13 +110,12 @@
    :maybe-magic
    (:or :default
         [:block _])
-   (:or nil
-        :whitespace)
+   _
    _
    _] (if (= (payload t1) \*)
-        (concat [nil t1]
-                (math/math-cast t3)
-                [t4 t5]))
+        (concat [nil]
+                (math/math-cast t2)
+                [t3 t4 t5]))
   [_
    _
    _
@@ -141,14 +140,19 @@
   tt
   block?
   [_
-   (:or :whitespace nil)
+   :whitespace
    :tilde
-   (:or :default [:block _])
+   _ ; (:or :default [:block _])
    :tilde
-   (:or :whitespace nil)] (if-let [opt (match [(payload t2)
-                                               (payload t4)]
-                                              [\~ \~] []
-                                              ["~~" "~~"] [:wide])]
+   :whitespace] (if-let [opt (concat
+                                         (match (payload t2)
+                                                \~ []
+                                                "~~" [:normal-left]
+                                                "~~~" [:wide-left])
+                                         (match (payload t4)
+                                                \~ []
+                                                "~~" [:normal-right]
+                                                "~~~" [:wide-right]))]
                             [nil (apply math/math-block
                                         (if (block? t3)
                                           (center t3)
@@ -158,13 +162,14 @@
                                         opt)])
   [_
    _
-   (:or :whitespace nil)
-   (:or :default [:block _])
+   _
+   _ ; (:or :default [:block _])
    :tilde
-   (:or :whitespace nil)] (if-let [opt (match (payload t4)
+   :whitespace] (if-let [opt (match (payload t4)
                                               \~ []
-                                              "~~" [:wide])]
-                            [nil t1 (apply math/math-block
+                                              "~~" [:normal-right]
+                                              "~~~" [:wide-right])]
+                            [nil t1 t2 (apply math/math-block
                                            (if (block? t3)
                                              (center t3)
                                              (fragment t3))
@@ -172,13 +177,14 @@
                                            :prefix
                                            opt)])
   [_
-   (:or :whitespace nil)
+   :whitespace
    :tilde
-   (:or :default [:block _])
-   (:or :whitespace nil)
+   _ ; (:or :default [:block _])
+   _
    _] (if-let [opt (match (payload t2)
                           \~ []
-                          "~~" [:wide])]
+                          "~~" [:normal-left]
+                          "~~~" [:wide-left])]
         [nil
          (apply math/math-block
                 (if (block? t3)
@@ -187,7 +193,7 @@
                 :mo
                 :postfix
                 opt)
-         t5]))
+         t4 t5]))
 
 (defrule introduce-typographic-primes
   [state t1 t2]

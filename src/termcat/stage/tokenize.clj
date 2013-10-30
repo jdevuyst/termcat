@@ -9,6 +9,20 @@
   block?
   [_ :escape _] [nil (token :default (payload t2))])
 
+(defrule remove-annotated-tokens
+  [state t1 t2]
+  tt
+  block?
+  [_ :tilde :tilde] nil
+  [_ :tilde (:or :whitespace :newline nil)] nil
+  [_ (:or :whitespace :newline nil) :tilde] nil
+  [_ :tilde [(:or :ldelim
+                  :rdelim) _]] [nil t1 (token :tilded-delim (payload t2))]
+  [_ [(:or :ldelim
+           :rdelim) _] :tilde] [nil (token :tilded-delim (payload t1)) t2]
+  [_ :tilde _] [nil t1 (token :default (payload t2))]
+  [_ _ :tilde] [nil (token :default (payload t1)) t2])
+
 (defrule merge-tokens
   "[type x] + [type y] -> [type xy] for some token types.
 
@@ -153,7 +167,7 @@ block?
   [_ _ _ :maybe-magic] (if (= (payload t3) "%%")
                          [nil t1 t2 (token :html)]))
 
-(defrule undelimit-certain-chevrons
+(defrule fix-chevrons
   [state t1 t2]
   tt
   block?
@@ -168,7 +182,9 @@ block?
    [(:or :ldelim :rdelim) :chevron]] [nil t1 (token :default (payload t2))]
   [_
    [(:or :ldelim :rdelim) :chevron]
-   :tilde] [nil (token :default (payload t1)) t2])
+   :tilde] [nil (token :default (payload t1)) t2]
+  [_ [:ldelim :chevron] _] [nil (ldelim :chevron \⟨) t2]
+  [_ [:rdelim :chevron] _] [nil (rdelim :chevron \⟩) t2])
 
 (defrule remove-magic-tokens
   [state t1 t2 t3]

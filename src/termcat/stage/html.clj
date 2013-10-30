@@ -1,6 +1,7 @@
 (ns termcat.stage.html
   (:require [clojure.core.match :refer (match)]
             [clojure.core.reducers :as r]
+            [clojure.set :as set]
             [termcat.term :refer :all]
             [termcat.rewrite :refer :all]))
 
@@ -35,6 +36,30 @@
                              (rewrite (center t1) introduce-typographic-quotes)
                              (right t1))])
 
+(defn wrap-math-block [t props]
+  (let [tag-name (condp #(contains? %2 %1) props
+                   :mo "mo"
+                   :mi "mi"
+                   :mn "mn"
+                   (assert false))]
+    (concat [(token :html (str \< tag-name
+                               (condp #(contains? %2 %1) props
+                                 :prefix " form=prefix"
+                                 :infix " form=infix"
+                                 :postfix " form=postfix"
+                                 nil)
+                               (condp #(contains? %2 %1) props
+                                 :wide-left " lspace=veryverythickmathspace"
+                                 :normal-left " lspace=thickmathspace"
+                                 nil)
+                               (condp #(contains? %2 %1) props
+                                 :wide-right " rspace=veryverythickmathspace"
+                                 :normal-right " rspace=thickmathspace"
+                                 nil)
+                               \>))]
+            (.terms (center t))
+            [(token :html (str \< \/ tag-name \>))])))
+
 (defrule introduce-math-tags
   {:in-math-tag false}
   [state t1 t2]
@@ -43,7 +68,7 @@
   [
    _
    _
-   [:block (x :guard :msup)]] (concat [{:in-math-tag true} t1]
+   [:block (_ :guard :msup)]] (concat [{:in-math-tag true} t1]
                                     (if-not (:in-math-tag state)
                                       [(token :html "<math>")])
                                     [(token :html "<msup>")]
@@ -58,28 +83,10 @@
                                     [(token :html "</msup>")])
   [_
    _
-   [:block (x :guard :mn)]] (concat [{:in-math-tag true} t1]
+   [:block (x :guard :math)]] (concat [{:in-math-tag true} t1]
                                     (if-not (:in-math-tag state)
                                       [(token :html "<math>")])
-                                    [(token :html "<mn>")]
-                                    (.terms (center t2))
-                                    [(token :html "</mn>")])
-  [_
-   _
-   [:block (x :guard :mo)]] (concat [{:in-math-tag true} t1]
-                                    (if-not (:in-math-tag state)
-                                      [(token :html "<math>")])
-                                    [(token :html "<mo>")]
-                                    (.terms (center t2))
-                                    [(token :html "</mo>")])
-  [_
-   _
-   [:block (x :guard :mi)]] (concat [{:in-math-tag true} t1]
-                                    (if-not (:in-math-tag state)
-                                      [(token :html "<math>")])
-                                    [(token :html "<mi>")]
-                                    (.terms (center t2))
-                                    [(token :html "</mi>")])
+                                    (wrap-math-block t2 x))
   [{:in-math-tag true} _ _] [{:in-math-tag false}
                              t1
                              (token :html "</math>")

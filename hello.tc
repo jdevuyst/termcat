@@ -48,10 +48,10 @@ Something random: .identity(.identity(.rand)).
 
 [This](http://example.com) is a link.
 
-E ~~=~~ {<a ~\,~ n ~\,~ n'> ~⊆~ I ~×~ N ~×~ N ~~|~~ Pa \and n ~<~ n'}
+E ~~=~~ {<a ~,~ n ~,~ n'> ~⊆~ I ~×~ N ~×~ N ~~|~~ Pa \and n ~<~ n'}
 
 (1 ~=~ 2)
 
-This is a \*test
+Math: *abc. More math: *(abc). An interval: (~ x ~,~ y ~].
 
-1 ~+~ a'b''c'''d''''e'''''
+1 ~+~ a'b''c'''d''''e''''' ~+~ 1.5
