@@ -145,37 +145,40 @@
    _ ; (:or :default [:block _])
    :tilde
    :whitespace] (if-let [opt (concat
-                                         (match (payload t2)
-                                                \~ []
-                                                "~~" [:normal-left]
-                                                "~~~" [:wide-left])
-                                         (match (payload t4)
-                                                \~ []
-                                                "~~" [:normal-right]
-                                                "~~~" [:wide-right]))]
-                            [nil (apply math/math-block
-                                        (if (block? t3)
-                                          (center t3)
-                                          (fragment t3))
-                                        :mo
-                                        :infix
-                                        opt)])
+                               (match (payload t2)
+                                      \~ []
+                                      "~~" [:normal-left]
+                                      "~~~" [:wide-left]
+                                      :else nil)
+                               (match (payload t4)
+                                      \~ []
+                                      "~~" [:normal-right]
+                                      "~~~" [:wide-right]
+                                      :else nil))]
+                  [nil (apply math/math-block
+                              (if (block? t3)
+                                (center t3)
+                                (fragment t3))
+                              :mo
+                              :infix
+                              opt)])
   [_
    _
    _
    _ ; (:or :default [:block _])
    :tilde
    :whitespace] (if-let [opt (match (payload t4)
-                                              \~ []
-                                              "~~" [:normal-right]
-                                              "~~~" [:wide-right])]
-                            [nil t1 t2 (apply math/math-block
-                                           (if (block? t3)
-                                             (center t3)
-                                             (fragment t3))
-                                           :mo
-                                           :prefix
-                                           opt)])
+                                    \~ []
+                                    "~~" [:normal-right]
+                                    "~~~" [:wide-right]
+                                    :else nil)]
+                  [nil t1 t2 (apply math/math-block
+                                    (if (block? t3)
+                                      (center t3)
+                                      (fragment t3))
+                                    :mo
+                                    :prefix
+                                    opt)])
   [_
    :whitespace
    :tilde
@@ -184,7 +187,8 @@
    _] (if-let [opt (match (payload t2)
                           \~ []
                           "~~" [:normal-left]
-                          "~~~" [:wide-left])]
+                          "~~~" [:wide-left]
+                          :else nil)]
         [nil
          (apply math/math-block
                 (if (block? t3)

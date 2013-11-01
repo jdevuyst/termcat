@@ -132,16 +132,17 @@
   (tt [this] :fragment)
   IFragment
   (as-number [this]
-          (let [v (if (= 1 (count (.terms this)))
-                    (edn/read-string
-                      (payload (first (.terms this)))))]
-            (if (number? v)
-              v
-              (token :error "Not a number"))))
+             (let [v (if (= 1 (count (.terms this)))
+                       (edn/read-string
+                         (payload (first (.terms this)))))]
+               (if (number? v)
+                 v
+                 (token :error "Not a number"))))
   IRewrite
   (rewrite [this rule]
-           (fragmentcat
-             (rewrite (.terms this) rule))))
+           (let [result (rewrite (.terms this) rule)]
+             (with-meta (fragmentcat result)
+                        (meta result)))))
 
 (extend-type Block
   ITerm
@@ -152,6 +153,8 @@
   (right [this] (.right this))
   IRewrite
   (rewrite [this rule]
-           (block (left this)
-                  (rewrite (center this) rule)
-                  (right this))))
+           (let [result (rewrite (center this) rule)]
+             (with-meta (block (left this)
+                               result
+                               (right this))
+                        (meta result)))))

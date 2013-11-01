@@ -59,7 +59,7 @@ block?
 
   Left delimiters are inserted after empty lines (if applicable) and
   right delimiters are inserted before empty lines (if applicable)"
-{:indent 0}
+(constant-state {:indent 0})
 [state t1 t2]
 tt
 block?
@@ -115,9 +115,9 @@ block?
 
   Like indentation, right delimiter for bullets are inserted in front
   of, not after, :emptylines."
-{:in-bullet false
- :item-type nil
- :prev-state nil}
+(constant-state {:in-bullet false
+                 :item-type nil
+                 :prev-state nil})
 [state t1 t2]
 tt
 block?

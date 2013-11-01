@@ -16,7 +16,7 @@
               nil))
 
 (defrule introduce-typographic-quotes
-  {:in-math-tag false}
+  (constant-state {:in-math-tag false})
   [state t1]
   tt
   nil
@@ -61,42 +61,39 @@
             [(token :html (str \< \/ tag-name \>))])))
 
 (defrule introduce-math-tags
-  {:in-math-tag false}
+  (fn
+    ([] {:in-math-tag false
+         :in-math-recur false})
+    ([x] {:in-math-tag (:in-math-tag x)
+          :in-math-recur (:in-math-tag x)})
+    ([x y] {:in-math-tag (:in-math-tag y)
+            :in-math-recur (:in-math-recur x)}))
   [state t1 t2]
   tt
-  nil
+  block?
   [
    _
    _
-   [:block (_ :guard :msup)]] (concat [{:in-math-tag true} t1]
-                                    (if-not (:in-math-tag state)
-                                      [(token :html "<math>")])
-                                    [(token :html "<msup>")]
-                                    (drop-last (.terms (rewrite (center t2)
-                                                                (fn [& args]
-                                                                  (if (zero? (count args))
-                                                                    (assoc
-                                                                      (introduce-math-tags)
-                                                                      :init-state
-                                                                      {:in-math-tag true})
-                                                                    (apply introduce-math-tags args))))))
-                                    [(token :html "</msup>")])
+   [:block (_ :guard :msup)]] (concat [(assoc state :in-math-tag true)
+                                       t1]
+                                      (if-not (:in-math-tag state)
+                                        [(token :html "<math>")])
+                                      [(token :html "<msup>")]
+                                      (.terms (center t2))
+                                      [(token :html "</msup>")])
   [_
    _
-   [:block (x :guard :math)]] (concat [{:in-math-tag true} t1]
-                                    (if-not (:in-math-tag state)
-                                      [(token :html "<math>")])
-                                    (wrap-math-block t2 x))
-  [{:in-math-tag true} _ _] [{:in-math-tag false}
-                             t1
-                             (token :html "</math>")
-                             t2]
-  [_
-   _
-   [:block _]] [nil t1 (block (left t2)
-                              (rewrite (center t2) introduce-math-tags)
-                              (right t2))])
-
+   [:block (x :guard :math)]] (concat [(assoc state :in-math-tag true)
+                                       t1]
+                                      (if-not (:in-math-tag state)
+                                        [(token :html "<math>")])
+                                      (wrap-math-block t2 x))
+  [{:in-math-tag true
+    :in-math-recur false} _ _] [{:in-math-tag false
+                                 :in-math-recur false}
+                                t1
+                                (token :html "</math>")
+                                t2])
 
 (defn escape [s]
   (cond (string? s) (apply str (for [c s]

@@ -6,7 +6,7 @@
             [termcat.term :refer :all]))
 
 (defn abstract-blocks
-  ([] {:init-state {:distance 0 :stack nil}
+  ([] {:state-fn (constant-state {:distance 0 :stack nil})
        :padding-right 1})
   ([state result tok]
    (cond
