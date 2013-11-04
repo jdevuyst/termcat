@@ -5,6 +5,7 @@
             [termcat.stage.pretokenize :as pretok]
             [termcat.stage.tokenize :as tok]
             [termcat.stage.ast :as ast]
+            [termcat.stage.bind :as bind]
             [termcat.stage.sugar :as sugar]
             [termcat.stage.lambda :as lambda]
             [termcat.stage.html :as html]))
@@ -45,6 +46,7 @@
       (rewrite ast/fix-bullet-continuations)
       (rewrite ast/convert-newlines-to-whitespace)
       (rewrite ast/remove-superfluous-whitespace)
+      (rewrite bind/introduce-bindings)
       (rewrite sugar/introduce-par-calls)
       (rewrite sugar/introduce-section-calls)
       (rewrite sugar/introduce-blockquote-calls)

@@ -42,18 +42,18 @@
                      [(token :html (str \< \/ tag \>))])))
 
 (defn html-link [text url]
-  [(token :html "<a href='")
-   url
-   (token :html "'>")
-   text
-   (token :html "</a>")])
+  (concat [(token :html "<a href='")]
+          (.terms (center url))
+          [(token :html "'>")]
+          (.terms (center text))
+          [(token :html "</a>")]))
 
 (defn html-image [alt-text url]
-  [(token :html "<img src='")
-   url
-   (token :html "' alt='")
-   alt-text
-   (token :html "'>")])
+  (concat [(token :html "<img src='")]
+          (.terms (center url))
+          [(token :html "' alt='")]
+          (.terms (center alt-text))
+          [(token :html "'>")]))
 
 (defn bullet-list [& rows]
   (concat [(token :html "<ul>")]
@@ -128,12 +128,12 @@
   "Returns a sequence of terms that represents a function call.
 
   args is a sequence of fragments."
-  [fname & args]
-  (concat [(fun-call-head fname)]
-          (for [arg args]
-            (block (token [:ldelim :fun-call-seq])
-                   arg
-                   (token [:rdelim :fun-call-seq])))))
+[fname & args]
+(concat [(fun-call-head fname)]
+        (for [arg args]
+          (block (token [:ldelim :fun-call-seq])
+                 arg
+                 (token [:rdelim :fun-call-seq])))))
 
 (defn apply-fun [fun-token arg-token]
   (let [f (payload fun-token)
