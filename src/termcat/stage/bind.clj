@@ -38,14 +38,12 @@
    (:or nil
         :whitespace
         :newline
-        :emptyline
-        [:block _])
+        :emptyline)
    _
    (:or nil
         :whitespace
         :newline
-        :emptyline
-        [:block _])] (if-let [ts (get state (payload t3))]
+        :emptyline)] (if-let [ts (get state (payload t3))]
                        (concat [state t1 t2]
                                ts
                                [t4])))

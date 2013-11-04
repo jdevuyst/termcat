@@ -71,6 +71,6 @@ Something random: .identity(.identity(.rand)).
 
 Math: *abc. More math: *(abc). An interval: (~ x ~,~ y ~].
 
-E = {<a , n , n'> ⊆ I * N ~×~ N | Pa and n < n'}
+E = {<a , n , n'> subseteq I * N * N | Pa and n < n'}
 
 {!bind(aa)(bb)aa[aa]}aa
