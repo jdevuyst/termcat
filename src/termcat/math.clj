@@ -8,9 +8,9 @@
 (defn number-string? [s]
   (number? (edn/read-string s)))
 
-(defn math-term? [t]
+(defn math-opts [t]
   (match (tt t)
-         [:block (_ :guard :math)] true
+         [:block (x :guard :math)] x
          :else false))
 
 (defn math-block [frag & keys]
@@ -19,31 +19,36 @@
            frag
            (rdelim tag))))
 
-(defn math-cast [t]
-  (if (block? t)
-      (if (math-term? t)
-        [t]
-        (concat (if (payload (left t))
-                  [(-> t
-                       left
-                       fragment
-                       (math-block :mo))])
-                (if (.terms (center t))
-                  (math-cast (first (.terms (center t)))))
-                (next (.terms (center t)))
-                (if (payload (right t))
-                  [(-> t
-                       right
-                       fragment
-                       (math-block :mo))])))
-    (let [s (str (payload t))]
-      (if (number-string? s)
-        (-> t
-            fragment
-            (math-block :mn)
-            vector)
-        (->> s
-             (r/map (partial token :default))
-             (r/map fragment)
-             (r/map #(math-block % :mi))
-             r/foldcat)))))
+(defn math-cast
+  ([t] (math-cast t nil))
+  ([t opts]
+   (if (block? t)
+     (if-let [cur-opts (math-opts t)]
+       [(block (ldelim (into cur-opts opts))
+               (center t)
+               (rdelim (into cur-opts opts)))]
+       (concat (if (payload (left t))
+                 [(-> t
+                      left
+                      fragment
+                      (math-block :mo))])
+               (if (.terms (center t))
+                 (math-cast (first (.terms (center t)))
+                            opts))
+               (next (.terms (center t)))
+               (if (payload (right t))
+                 [(-> t
+                      right
+                      fragment
+                      (math-block :mo))])))
+     (let [s (str (payload t))]
+       (if (number-string? s)
+         (-> t
+             fragment
+             (math-block :mn)
+             vector)
+         (->> s
+              (r/map (partial token :default))
+              (r/map fragment)
+              (r/map #(apply math-block % :mi opts))
+              r/foldcat))))))

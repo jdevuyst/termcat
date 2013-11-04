@@ -69,8 +69,14 @@ Something random: .identity(.identity(.rand)).
 
 (1 ~=~ 2)
 
-Math: *abc. More math: *(abc). An interval: (~ x ~,~ y ~].
+Math: *abc. More math: *(abc). An interval: (~ x , y ~].
+
+sin~ x
 
 E = {<a , n , n'> subseteq I * N * N | Pa and n < n'}
 
-{!bind(aa)(bb)aa[aa]}aa
++M = <n , m>
+
+
+
+

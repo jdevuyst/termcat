@@ -43,6 +43,8 @@
                    :mn "mn"
                    (assert false))]
     (concat [(token :html (str \< tag-name
+                               (if (contains? props :script)
+                                 " mathvariant=script")
                                (condp #(contains? %2 %1) props
                                  :prefix " form=prefix"
                                  :infix " form=infix"

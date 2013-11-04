@@ -112,10 +112,14 @@
         [:block _])
    _
    _
-   _] (if (= (payload t1) \*)
-        (concat [nil]
-                (math/math-cast t2)
-                [t3 t4 t5]))
+   _] (case (payload t1)
+        \* (concat [nil]
+                   (math/math-cast t2)
+                   [t3 t4 t5])
+        \+ (concat [nil]
+                   (math/math-cast t2 #{:script})
+                   [t3 t4 t5])
+        nil)
   [_
    _
    _

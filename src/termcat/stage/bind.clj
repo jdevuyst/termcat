@@ -46,4 +46,26 @@
         :emptyline)] (if-let [ts (get state (payload t3))]
                        (concat [state t1 t2]
                                ts
-                               [t4])))
+                               [t4]))
+  [_
+   _
+   _
+   (:or nil
+        :whitespace
+        :newline
+        :emptyline)
+   (:or nil
+        :whitespace
+        :newline
+        :emptyline)] (if-let [strongest-type (if (= (tt t3) (tt t4))
+                                               (tt t3)
+                                               (condp #(contains? %2 %1) (hash-set (tt t3) (tt t4))
+                                                 :emptyline :emptyline
+                                                 :newline :newline
+                                                 nil nil ; skip
+                                                 :whitespace :whitespace))]
+                       [state t1 t2 (token strongest-type
+                                           (str (payload t3)
+                                                (payload t4)))]))
+
+

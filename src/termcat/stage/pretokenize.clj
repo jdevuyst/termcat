@@ -23,7 +23,7 @@
          #{\-} :dash
          #{\`} :left-quote
          #{\'} :right-quote
-         #{\# \* \_ \%} :maybe-magic
+         #{\# \* \+ \_ \%} :maybe-magic
          :default)
        c))
 
