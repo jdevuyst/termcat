@@ -63,39 +63,35 @@
             [(token :html (str \< \/ tag-name \>))])))
 
 (defrule introduce-math-tags
-  (fn
-    ([] {:in-math-tag false
-         :in-math-recur false})
-    ([x] {:in-math-tag (:in-math-tag x)
-          :in-math-recur (:in-math-tag x)})
-    ([x y] {:in-math-tag (:in-math-tag y)
-            :in-math-recur (:in-math-recur x)}))
   [state t1 t2]
   tt
   block?
-  [
-   _
-   _
-   [:block (_ :guard :msup)]] (concat [(assoc state :in-math-tag true)
-                                       t1]
-                                      (if-not (:in-math-tag state)
-                                        [(token :html "<math>")])
-                                      [(token :html "<msup>")]
+  [_ _ [:block (_ :guard :msup)]] (concat [nil
+                                       t1
+                                       (token :open-math)
+                                       (token :html "<msup>")
+                                       (token :already-math)]
                                       (.terms (center t2))
-                                      [(token :html "</msup>")])
-  [_
-   _
-   [:block (x :guard :math)]] (concat [(assoc state :in-math-tag true)
-                                       t1]
-                                      (if-not (:in-math-tag state)
-                                        [(token :html "<math>")])
-                                      (wrap-math-block t2 x))
-  [{:in-math-tag true
-    :in-math-recur false} _ _] [{:in-math-tag false
-                                 :in-math-recur false}
-                                t1
-                                (token :html "</math>")
-                                t2])
+                                      [(token :still-math)
+                                       (token :html "</msup>")
+                                       (token :close-math)])
+  [_ _ [:block (x :guard :math)]] (concat [nil
+                                       t1
+                                       (token :open-math)]
+                                      (wrap-math-block t2 x)
+                                      [(token :close-math)]))
+
+(defrule remove-math-tags
+  [state t1 t2]
+  tt
+  block?
+  [_ :close-math :open-math] [nil]
+  [_ :already-math :open-math] [nil]
+  [_ :already-math _] (assert false)
+  [_ :close-math :still-math] [nil]
+  [_ _ :still-math] (assert false)
+  [_ :close-math _] [nil (token :html "</math>") t2]
+  [_ _ :open-math] [nil t1 (token :html "<math>")])
 
 (defn escape [s]
   (cond (string? s) (apply str (for [c s]

@@ -75,33 +75,6 @@
                                         (center t2)
                                         (fragment t2)))))))
 
-; (defrule box-remaining-magic
-;   [state t1 t2 t3]
-;   tt
-;   block?
-;   [_
-;    _
-;    :default
-;    (:or :left-quote
-;         :right-quote
-;         :maybe-magic)] [nil t1 (transparent-block
-;                                  (fragment t2 t3))]
-;   [_
-;    _
-;    (:or :left-quote
-;         :right-quote
-;         :maybe-magic)
-;    :default] [nil t1 (transparent-block
-;                        (fragment t2 t3))]
-;   [_
-;    [:block :box]
-;    [:block :box]
-;    _] [nil
-;        (transparent-block
-;          (fragmentcat (.terms (center t1))
-;                       (.terms (center t2))))
-;        t3])
-
 (defrule introduce-math-identifiers
   [state t1 t2 t3 t4 t5]
   tt
@@ -137,7 +110,15 @@
    _
    _] (concat [nil t1 t2]
               (math/math-cast t3)
-              [t4 t5]))
+              [t4 t5])
+  [_
+   [:block (_ :guard :math)]
+   [:block _]
+   _
+   _
+   _] (concat [nil t1]
+              (math/math-cast t2)
+              [t3 t4 t5]))
 
 (defrule introduce-math-operators
   [state t1 t2 t3 t4 t5]
