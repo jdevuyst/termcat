@@ -77,9 +77,11 @@ sin~ x
 
 +M = <n , m>
 
+&copy; me
+
 +T[?x]
 <foo bar=baz>
 
-<img src="hello.png">
+\<img src="hello.png">
 
-<b>test</b>
+<span style="background: yellow">test</span>

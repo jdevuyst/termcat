@@ -20,8 +20,20 @@
    (letfn [(segue [new-stage]
                   [{:stage new-stage
                     :acc (conj (:acc state) tok)}
-                   result])]
+                   result])
+           (accept []
+                  [{:acc []}
+                   (->> (conj (:acc state) tok)
+                        (map payload)
+                        (reduce str)
+                        (map (partial token :html))
+                        (into result))])]
      (match [(:stage state) (payload tok)]
+            [nil \\] (segue :escape)
+            [:escape _] [{:acc []} (conj result tok)]
+            [nil \&] (segue :entity)
+            [:entity (_ :guard letter?)] (segue :entity)
+            [:entity \;] (accept)
             [nil \<] (segue :before-tag-name)
             [:before-tag-name \/] (segue :maybe-in-tag-name)
             [(:or :before-tag-name
@@ -49,12 +61,7 @@
             [:in-double-quotes _] (segue :in-double-quotes)
             [(:or :in-tag-name
                   :in-val
-                  :after-val) \>] [{:acc []}
-                                   (->> (conj (:acc state) tok)
-                                        (map payload)
-                                        (reduce str)
-                                        (map (partial token :html))
-                                        (into result))]
+                  :after-val) \>] (accept)
             :else [{:acc []} (conj (into result (:acc state)) tok)]))))
 
 (defrule remove-escape-tokens
