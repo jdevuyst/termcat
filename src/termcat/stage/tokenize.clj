@@ -43,7 +43,9 @@
             [nil \\] (segue :escape)
             [:escape _] (reject)
             [nil \&] (segue :entity)
-            [:entity (_ :guard letter?)] (segue :named-entity)
+            [(:or :entity
+                  :named-entity)
+             (_ :guard letter?)] (segue :named-entity)
             [:entity \#] (segue :maybe-num-entity)
             [:maybe-num-entity \x] (segue :maybe-hex-num-entity)
             [(:or :maybe-num-entity :dec-num-entity)
