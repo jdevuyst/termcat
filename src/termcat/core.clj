@@ -31,6 +31,7 @@
 (defn compile [s]
   (-> s
       pretok/map-to-tokens
+      (rewrite tok/escape-html)
       (rewrite tok/remove-escape-tokens)
       (rewrite tok/remove-annotated-tokens)
       (rewrite tok/merge-tokens)

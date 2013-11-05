@@ -1,6 +1,61 @@
 (ns termcat.stage.tokenize
-  (:require [termcat.term :refer :all]
+  (:require [clojure.core.match :refer (match)]
+            [termcat.term :refer :all]
             [termcat.rewrite :refer :all]))
+
+(def letters (->> (concat (range (int \a)
+                                 (inc (int \z)))
+                          (range (int \A)
+                                 (inc (int \Z))))
+                  (map char)
+                  set))
+
+(defn- letter? [x]
+  (contains? letters x))
+
+(defn escape-html
+  ([] {:state-fn (constant-state {:acc []})
+       :padding-right 1})
+  ([state result tok]
+   (letfn [(segue [new-stage]
+                  [{:stage new-stage
+                    :acc (conj (:acc state) tok)}
+                   result])]
+     (match [(:stage state) (payload tok)]
+            [nil \<] (segue :before-tag-name)
+            [:before-tag-name \/] (segue :maybe-in-tag-name)
+            [(:or :before-tag-name
+                  :maybe-in-tag-name
+                  :in-tag-name)
+             (_ :guard letter?)] (segue :in-tag-name)
+            [:in-tag-name \-] (segue :maybe-in-tag-name)
+            [(:or :in-tag-name
+                  :after-tag-name
+                  :after-val)
+             \space] (segue :after-tag-name)
+            [(:or :after-tag-name
+                  :maybe-in-attr-name
+                  :in-attr-name)
+             (_ :guard letter?)] (segue :in-attr-name)
+            [:in-attr-name \-] (segue :maybe-in-attr-name)
+            [:in-attr-name \=] (segue :before-val)
+            [(:or :before-val
+                  :maybe-in-val
+                  :in-val)
+             (_ :guard letter?)] (segue :in-val)
+            [:in-val \-] (segue :maybe-in-val)
+            [:before-val \"] (segue :in-double-quotes)
+            [:in-double-quotes \"] (segue :after-val)
+            [:in-double-quotes _] (segue :in-double-quotes)
+            [(:or :in-tag-name
+                  :in-val
+                  :after-val) \>] [{:acc []}
+                                   (->> (conj (:acc state) tok)
+                                        (map payload)
+                                        (reduce str)
+                                        (map (partial token :html))
+                                        (into result))]
+            :else [{:acc []} (conj (into result (:acc state)) tok)]))))
 
 (defrule remove-escape-tokens
   "[:escape \\] + [type payload] -> [:default payload]"
@@ -39,10 +94,11 @@ block?
           :dash
           :left-quote
           :right-quote
-          :maybe-magic)] (if (= (tt t1) (tt t2))
-                           [nil
-                            (token (tt t1)
-                                   (str (payload t1) (payload t2)))]))
+          :maybe-magic
+          :html)] (if (= (tt t1) (tt t2))
+                    [nil
+                     (token (tt t1)
+                            (str (payload t1) (payload t2)))]))
 
 (defrule introduce-emptyline-tokens
   "Any two or more successive :newline tokens are replaced by

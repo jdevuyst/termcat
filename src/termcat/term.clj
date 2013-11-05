@@ -98,11 +98,6 @@
   (assert (fragment? center))
   (Block. left center right))
 
-; (defn transparent-block [center]
-;   (block (ldelim :box)
-;          center
-;          (rdelim :box)))
-
 (defn merge-blocks [b1 b2]
   (assert (block? b1))
   (assert (block? b2))
