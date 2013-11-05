@@ -13,6 +13,12 @@
 (defn- letter? [x]
   (contains? letters x))
 
+(defn- digit? [x]
+  (contains? #{\0 \1 \2 \3 \4 \5 \6 \7 \8 \9} x))
+
+(defn- hexdigit? [x]
+  (contains? #{\0 \1 \2 \3 \4 \5 \6 \7 \8 \9 \A \B \C \D \E \a \b \c \d \e} x))
+
 (defn escape-html
   ([] {:state-fn (constant-state {:acc []})
        :padding-right 1})
@@ -37,8 +43,16 @@
             [nil \\] (segue :escape)
             [:escape _] (reject)
             [nil \&] (segue :entity)
-            [:entity (_ :guard letter?)] (segue :entity)
-            [:entity \;] (accept)
+            [:entity (_ :guard letter?)] (segue :named-entity)
+            [:entity \#] (segue :maybe-num-entity)
+            [:maybe-num-entity \x] (segue :maybe-hex-num-entity)
+            [(:or :maybe-num-entity :dec-num-entity)
+             (_ :guard digit?)] (segue :dec-num-entity)
+            [(:or :maybe-hex-num-entity :hex-num-entity)
+             (_ :guard hexdigit?)] (segue :hex-num-entity)
+            [(:or :named-entity
+                  :dec-num-entity
+                  :hex-num-entity) \;] (accept)
             [nil \<] (segue :before-tag-name)
             [:before-tag-name \/] (segue :maybe-in-tag-name)
             [(:or :before-tag-name
