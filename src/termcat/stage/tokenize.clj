@@ -27,10 +27,15 @@
                         (map payload)
                         (reduce str)
                         (map (partial token :html))
-                        (into result))])]
+                        (into result))])
+           (reject []
+                   [{:acc []}
+                    (-> result
+                        (into (:acc state))
+                        (conj tok))])]
      (match [(:stage state) (payload tok)]
             [nil \\] (segue :escape)
-            [:escape _] [{:acc []} (conj result tok)]
+            [:escape _] (reject)
             [nil \&] (segue :entity)
             [:entity (_ :guard letter?)] (segue :entity)
             [:entity \;] (accept)
@@ -62,7 +67,7 @@
             [(:or :in-tag-name
                   :in-val
                   :after-val) \>] (accept)
-            :else [{:acc []} (conj (into result (:acc state)) tok)]))))
+            :else (reject)))))
 
 (defrule remove-escape-tokens
   "[:escape \\] + [type payload] -> [:default payload]"
