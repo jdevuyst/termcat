@@ -227,12 +227,12 @@ block?
                                             (token [:rdelim (:item-type state)])
                                             (token [:ldelim (item-type t2)]
                                                    (payload t2))
-                                            t3]
-                                           [(:prev-state state)
-                                            t1
-                                            (token [:rdelim (:item-type state)])
-                                            t2
                                             t3])
+[{:in-bullet true} :newline _ _] [(:prev-state state)
+                                  t1
+                                  (token [:rdelim (:item-type state)])
+                                  t2
+                                  t3]
 [_ (:or nil
         :newline
         :emptyline
