@@ -38,17 +38,30 @@
                              (repeat doublec (token :default \”)))))
 
 (defrule introduce-typographic-full-stops
-  [state t1 t2]
+  [state t1 t2 t3]
   tt
   text-block?
-  [_ :default :maybe-fun] (if (and (= (payload t2) \.)
-                                   (re-matches #"[^\\.]*"
-                                               (payload t1)))
-                              [nil
-                               t1
-                               (token :html "<span class='full_stop'>")
-                               t2
-                               (token :html "</span>")]))
+  [_ :default :maybe-fun :whitespace] (if (and (= (payload t2) \.)
+                                               (re-matches #"[^\\.]*"
+                                                           (payload t1)))
+                                        [nil
+                                         t1
+                                         (token :html "<span class='full_stop'>")
+                                         t2
+                                         (token :html "</span>")
+                                         t3]))
+
+(defrule introduce-typographic-colons
+  [state t1 t2 t3]
+  tt
+  text-block?
+  [_ :default :maybe-fun :whitespace] (if (= (payload t2) \:)
+                                        [nil
+                                         t1
+                                         (token :html "<span class='colon'>")
+                                         t2
+                                         (token :html "</span>")
+                                         t3]))
 
 (defn wrap-math-block [t props]
   (let [tag-name (condp #(contains? %2 %1) props
@@ -152,7 +165,7 @@
              (token :html "color: white; ")
              (token :html "margin-left: .33ex; ")
              (token :html "margin-right: .33ex }")
-             (token :html ".full_stop {")
+             (token :html ".full_stop, .colon {")
              (token :html "padding-right: .5em }")
              (token :html "</style>")
              (token :html "<script async src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML'></script>")

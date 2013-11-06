@@ -68,6 +68,7 @@
       (rewrite html/introduce-typographic-dashes)
       (rewrite html/introduce-typographic-quotes)
       (rewrite html/introduce-typographic-full-stops)
+      (rewrite html/introduce-typographic-colons)
       (rewrite html/introduce-math-tags)
       (rewrite html/remove-math-tags)
       ; (cond-> *debug* print-fragment)
