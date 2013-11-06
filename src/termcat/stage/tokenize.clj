@@ -253,17 +253,6 @@ block?
 [_ [:ldelim :indent] _ _] [{:in-bullet false :prev-state state} t1 t2 t3]
 [_ [:rdelim :indent] _ _] [(:prev-state state) t1 t2 t3])
 
-(defrule remove-percent-magic
-  [state t1 t2 t3]
-  tt
-  block?
-  [_ :maybe-magic :whitespace :newline] (if (= (payload t1) \%)
-                                          [nil])
-  [_ :maybe-magic :whitespace _] (if (= (payload t1) \%)
-                                   [nil t1 t2])
-  [_ _ _ :maybe-magic] (if (= (payload t3) "%%")
-                         [nil t1 t2 (token :html)]))
-
 (defrule fix-chevrons
   [state t1 t2]
   tt
@@ -294,3 +283,74 @@ block?
                                             (str (payload t1)
                                                  (payload t2)
                                                  (payload t3)))])
+
+(defn css-length? [s]
+  (and (string? s)
+       (re-matches #"[0-9]*\.?[0-9]+(?:px|em|ex|pt)"
+                   s)))
+
+(defrule remove-percent-tokens
+  [state t1 t2 t3]
+  tt
+  block?
+  [_
+   :percent
+   :whitespace
+   :newline] [nil]
+  [_
+   :percent
+   :whitespace
+   _] [nil t1 t2]
+  [_
+   :percent
+   (:or :maybe-magic
+        :dash)
+   :default] (if (and (contains? #{\+ \- \_} (payload t2))
+                      (css-length? (payload t3)))
+               [nil
+                (token :html "<span style='")
+                (token :html (case (payload t2)
+                               \+ "margin-left: "
+                               \- "margin-left: -"
+                               \_ "display: inline-block; width: "))
+                t3
+                (if (= (payload t2) \_)
+                  (token :html "'> </span>")
+                  (token :html "'></span>"))])
+  [_
+   :percent
+   (:or :left-quote
+        :right-quote
+        :double-quote
+        :circumflex
+        :default)
+   _] (let [[c r t] (if (and (= (tt t2) :default)
+                             (string? (payload t2)))
+                      [(first (payload t2))
+                       (subs (payload t2) 1)
+                       t3]
+                      [(payload t2) (str (payload t3)) nil])]
+        (if-let [diacritic (case c
+                             \` (char 0x0300)
+                             \4 (char 0x0300)
+                             \' (char 0x0301)
+                             \2 (char 0x0301)
+                             \^ (char 0x0302)
+                             \1 (char 0x0304)
+                             \" (char 0x0308)
+                             \3 (char 0x030c)
+                             nil)]
+          (conj [nil (token :default (str (first r)
+                                          diacritic
+                                          (subs r 1)))]
+                t))))
+
+(defrule remove-remaining-percent-tokens
+  [state t1 t2]
+  tt
+  block?
+  [_ _ :percent] [nil t1 (token :whitespace)]
+  [_ :whitespace :whitespace] [nil (token :whitespace (str (payload t1)
+                                                           (payload t2)))]
+  [_ :default :default] [nil (token :default (str (payload t1)
+                                                  (payload t2)))])

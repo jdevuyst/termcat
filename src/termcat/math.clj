@@ -6,7 +6,9 @@
             [termcat.util :as u]))
 
 (defn number-string? [s]
-  (number? (edn/read-string s)))
+  (try
+    (number? (edn/read-string s))
+    (catch java.lang.NumberFormatException x false)))
 
 (defn math-opts [t]
   (match (tt t)

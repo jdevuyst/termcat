@@ -128,8 +128,10 @@
   IFragment
   (as-number [this]
              (let [v (if (= 1 (count (.terms this)))
-                       (edn/read-string
-                         (payload (first (.terms this)))))]
+                       (try
+                         (edn/read-string
+                           (payload (first (.terms this))))
+                         (catch java.lang.NumberFormatException x nil)))]
                (if (number? v)
                  v
                  (token :error "Not a number"))))

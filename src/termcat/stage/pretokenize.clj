@@ -18,12 +18,15 @@
          #{\}} (rdelim-t :brace)
          #{\<} (ldelim-t :chevron)
          #{\>} (rdelim-t :chevron)
-         #{\. \, \: \; \!} :maybe-fun
+         #{\%} :percent
          #{\~} :tilde
          #{\-} :dash
          #{\`} :left-quote
          #{\'} :right-quote
-         #{\# \* \+ \_ \%} :maybe-magic
+         #{\"} :double-quote
+         #{\^} :circumflex
+         #{\. \, \: \; \!} :maybe-fun
+         #{\# \* \+ \_} :maybe-magic
          :default)
        c))
 
