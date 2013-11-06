@@ -6,6 +6,24 @@
             [termcat.fun :as fun]
             [termcat.math :as math]))
 
+(defrule introduce-prefix-minus
+  [state t1 t2 t3]
+  tt
+  block?
+  [_
+   (:or nil
+        :newline
+        :emptyline
+        :whitespace)
+   :dash
+   (:or :default
+        [:block _])] (concat [nil
+                              t1
+                              (math/math-block (fragment t2)
+                                               :mo
+                                               :prefix)]
+                             (math/math-cast t3)))
+
 (defrule introduce-par-calls
   [state t1]
   tt

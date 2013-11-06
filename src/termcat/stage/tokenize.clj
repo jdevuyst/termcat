@@ -28,12 +28,12 @@
                     :acc (conj (:acc state) tok)}
                    result])
            (accept []
-                  [{:acc []}
-                   (->> (conj (:acc state) tok)
-                        (map payload)
-                        (reduce str)
-                        (map (partial token :html))
-                        (into result))])
+                   [{:acc []}
+                    (->> (conj (:acc state) tok)
+                         (map payload)
+                         (reduce str)
+                         (map (partial token :html))
+                         (into result))])
            (reject []
                    [{:acc []}
                     (-> result
@@ -202,43 +202,53 @@ block?
 (constant-state {:in-bullet false
                  :item-type nil
                  :prev-state nil})
-[state t1 t2]
+[state t1 t2 t3]
 tt
 block?
-[{:in-bullet true} _ nil] (letfn [(unwind [state2]
-                                          (if (nil? state2)
-                                            nil
-                                            (cons (token [:rdelim (:item-type state2)])
-                                                  (unwind (:prev-state state2)))))]
-                            (cons nil
-                                  (unwind state)))
+[{:in-bullet true} _ nil nil] (letfn [(unwind [state2]
+                                              (if (nil? state2)
+                                                nil
+                                                (cons (token [:rdelim (:item-type state2)])
+                                                      (unwind (:prev-state state2)))))]
+                                (cons nil
+                                      (unwind state)))
 [{:in-bullet true} _ (:or :emptyline
-                          [:rdelim :indent])] [(:prev-state state)
-                                               t1
-                                               (token [:rdelim (:item-type state)])
-                                               t2]
-[{:in-bullet true} :newline _] (if (item-type t2)
-                                 [(assoc state :item-type (item-type t2))
-                                  t1
-                                  (token [:rdelim (:item-type state)])
-                                  (token [:ldelim (item-type t2)]
-                                         (payload t2))]
-                                 [(:prev-state state)
-                                  t1
-                                  (token [:rdelim (:item-type state)])
-                                  t2])
+                          [:rdelim :indent]) _] [(:prev-state state)
+                                                 t1
+                                                 (token [:rdelim (:item-type state)])
+                                                 t2
+                                                 t3]
+[{:in-bullet true} :newline _ (:or :whitespace
+                                   :newline
+                                   :emptyline
+                                   nil)] (if (item-type t2)
+                                           [(assoc state :item-type (item-type t2))
+                                            t1
+                                            (token [:rdelim (:item-type state)])
+                                            (token [:ldelim (item-type t2)]
+                                                   (payload t2))
+                                            t3]
+                                           [(:prev-state state)
+                                            t1
+                                            (token [:rdelim (:item-type state)])
+                                            t2
+                                            t3])
 [_ (:or nil
         :newline
         :emptyline
-        [:ldelim :indent]) _] (if (item-type t2)
-                                [{:in-bullet true
-                                  :item-type (item-type t2)
-                                  :prev-state state}
-                                 t1
-                                 (token [:ldelim (item-type t2)]
-                                        (payload t2))])
-[_ [:ldelim :indent] _] [{:in-bullet false :prev-state state} t1 t2]
-[_ [:rdelim :indent] _] [(:prev-state state) t1 t2])
+        [:ldelim :indent]) _ (:or :whitespace
+                                  :newline
+                                  :emptyline
+                                  nil)] (if (item-type t2)
+                                          [{:in-bullet true
+                                            :item-type (item-type t2)
+                                            :prev-state state}
+                                           t1
+                                           (token [:ldelim (item-type t2)]
+                                                  (payload t2))
+                                           t3])
+[_ [:ldelim :indent] _ _] [{:in-bullet false :prev-state state} t1 t2 t3]
+[_ [:rdelim :indent] _ _] [(:prev-state state) t1 t2 t3])
 
 (defrule remove-percent-magic
   [state t1 t2 t3]

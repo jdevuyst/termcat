@@ -59,7 +59,10 @@ Termcat supports numbered lists too:
 :numbered-list
 - one
 - two
+-
 - see?
+
+-
 
 *(This is an emphasized sentence.)* *((This is an emphasized sentence within parentheses.))*
 
@@ -86,4 +89,6 @@ E = {<a , n , n'> subseteq I * N * N | Pa and n < n'}
 
 <span style="background: yellow">test</span>
 
-nb~sp
+-2
+
+nb~sp -4 -(1 + 3)

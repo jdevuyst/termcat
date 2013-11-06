@@ -48,6 +48,7 @@
       (rewrite ast/convert-newlines-to-whitespace)
       (rewrite ast/remove-superfluous-whitespace)
       (rewrite bind/introduce-bindings)
+      (rewrite sugar/introduce-prefix-minus)
       (rewrite sugar/introduce-par-calls)
       (rewrite sugar/introduce-nbsp-calls)
       (rewrite sugar/introduce-section-calls)
