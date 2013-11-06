@@ -41,27 +41,34 @@
   [state t1 t2 t3]
   tt
   text-block?
-  [_ :default :maybe-fun :whitespace] (if (and (= (payload t2) \.)
-                                               (re-matches #"[^\\.]*"
-                                                           (payload t1)))
-                                        [nil
-                                         t1
-                                         (token :html "<span class='full_stop'>")
-                                         t2
-                                         (token :html "</span>")
-                                         t3]))
+  [_ (:or :default
+          [:block _])
+   :maybe-fun
+   :whitespace] (if (and (= (payload t2) \.)
+                         (or (block? t1)
+                             (re-matches #"[^\\.]*"
+                                         (payload t1))))
+                  [nil
+                   t1
+                   (token :html "<span class='full_stop'>")
+                   t2
+                   (token :html "</span>")
+                   t3]))
 
 (defrule introduce-typographic-colons
   [state t1 t2 t3]
   tt
   text-block?
-  [_ :default :maybe-fun :whitespace] (if (= (payload t2) \:)
-                                        [nil
-                                         t1
-                                         (token :html "<span class='colon'>")
-                                         t2
-                                         (token :html "</span>")
-                                         t3]))
+  [_ (:or :default
+          [:block _])
+   :maybe-fun
+   :whitespace] (if (= (payload t2) \:)
+                  [nil
+                   t1
+                   (token :html "<span class='colon'>")
+                   t2
+                   (token :html "</span>")
+                   t3]))
 
 (defn wrap-math-block [t props]
   (let [tag-name (condp #(contains? %2 %1) props
