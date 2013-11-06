@@ -42,9 +42,12 @@
   [state t1]
   tt
   block?
-  [_ [:block :section]] [nil (fun/fun-call-head ":section") t1]
-  [_ [:block :subsection]] [nil (fun/fun-call-head ":subsection") t1]
-  [_ [:block :subsubsection]] [nil (fun/fun-call-head ":subsubsection") t1])
+  [_ [:block :h1]] [nil (fun/fun-call-head ":h1") t1]
+  [_ [:block :h2]] [nil (fun/fun-call-head ":h2") t1]
+  [_ [:block :h3]] [nil (fun/fun-call-head ":h3") t1]
+  [_ [:block :h4]] [nil (fun/fun-call-head ":h4") t1]
+  [_ [:block :h5]] [nil (fun/fun-call-head ":h5") t1]
+  [_ [:block :h6]] [nil (fun/fun-call-head ":h6") t1])
 
 (defrule introduce-blockquote-calls
   [state t1 t2 t3]

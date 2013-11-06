@@ -186,9 +186,12 @@ block?
   type can be bullet, section, subsection, etcetera."
 (case (payload tok)
   \- :bullet
-  \# :section
-  "##" :subsection
-  "###" :subsubsection
+  \# :h1
+  "##" :h2
+  "###" :h3
+  "####" :h4
+  "#####" :h5
+  "######" :h6
   nil))
 
 (defrule introduce-item-tokens

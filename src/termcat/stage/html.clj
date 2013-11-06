@@ -5,6 +5,10 @@
             [termcat.term :refer :all]
             [termcat.rewrite :refer :all]))
 
+(defn text-block? [x]
+  (and (block? x)
+       (not (:math (second (tt x))))))
+
 (defrule introduce-typographic-dashes
   [state t1]
   tt
@@ -19,7 +23,7 @@
   (constant-state {:in-math-tag false})
   [state t1]
   tt
-  nil
+  text-block?
   [_ :left-quote] (let [length (count (str (payload t1)))
                         doublec (int (/ length 2))
                         also-single (odd? (mod length 2))]
@@ -31,10 +35,20 @@
                          also-single (odd? (mod length 2))]
                      (concat [nil]
                              (if also-single [(token :default \’)])
-                             (repeat doublec (token :default \”))))
-  [_ [:block _]] [nil (block (left t1)
-                             (rewrite (center t1) introduce-typographic-quotes)
-                             (right t1))])
+                             (repeat doublec (token :default \”)))))
+
+(defrule introduce-typographic-full-stops
+  [state t1 t2]
+  tt
+  text-block?
+  [_ :default :maybe-fun] (if (and (= (payload t2) \.)
+                                   (re-matches #"[^\\.]*"
+                                               (payload t1)))
+                              [nil
+                               t1
+                               (token :html "<span class='full_stop'>")
+                               t2
+                               (token :html "</span>")]))
 
 (defn wrap-math-block [t props]
   (let [tag-name (condp #(contains? %2 %1) props
@@ -67,19 +81,19 @@
   tt
   block?
   [_ _ [:block (_ :guard :msup)]] (concat [nil
-                                       t1
-                                       (token :open-math)
-                                       (token :html "<msup>")
-                                       (token :already-math)]
-                                      (.terms (center t2))
-                                      [(token :still-math)
-                                       (token :html "</msup>")
-                                       (token :close-math)])
+                                           t1
+                                           (token :open-math)
+                                           (token :html "<msup>")
+                                           (token :already-math)]
+                                          (.terms (center t2))
+                                          [(token :still-math)
+                                           (token :html "</msup>")
+                                           (token :close-math)])
   [_ _ [:block (x :guard :math)]] (concat [nil
-                                       t1
-                                       (token :open-math)]
-                                      (wrap-math-block t2 x)
-                                      [(token :close-math)]))
+                                           t1
+                                           (token :open-math)]
+                                          (wrap-math-block t2 x)
+                                          [(token :close-math)]))
 
 (defrule remove-math-tags
   [state t1 t2]
@@ -134,10 +148,12 @@
              (token :html "</title>")
              (token :html "<style>")
              (token :html ".termcat_error {")
-             (token :html "background: red;")
-             (token :html "color: white;")
-             (token :html "margin-left: .33ex;")
+             (token :html "background: red; ")
+             (token :html "color: white; ")
+             (token :html "margin-left: .33ex; ")
              (token :html "margin-right: .33ex }")
+             (token :html ".full_stop {")
+             (token :html "padding-right: .5em }")
              (token :html "</style>")
              (token :html "<script async src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML'></script>")
              (token :html "</head>")
