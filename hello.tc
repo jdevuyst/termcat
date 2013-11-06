@@ -73,7 +73,7 @@ Math: *abc. More math: *(abc). An interval: (~ x , y ~].
 
 sin~ x
 
-<marquee>E = {<a , n , n'> subseteq I * N * N | Pa and n < n'}</marquee>
+E = {<a , n , n'> subseteq I * N * N | Pa and n < n'}
 
 +M = <n , m>
 
@@ -85,3 +85,5 @@ sin~ x
 \<img src="hello.png">
 
 <span style="background: yellow">test</span>
+
+nb~sp

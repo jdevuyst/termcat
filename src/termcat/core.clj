@@ -49,6 +49,7 @@
       (rewrite ast/remove-superfluous-whitespace)
       (rewrite bind/introduce-bindings)
       (rewrite sugar/introduce-par-calls)
+      (rewrite sugar/introduce-nbsp-calls)
       (rewrite sugar/introduce-section-calls)
       (rewrite sugar/introduce-blockquote-calls)
       (rewrite sugar/introduce-bullet-list-calls)

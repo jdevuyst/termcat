@@ -80,6 +80,7 @@
 
 (def fun-map {;":box" box
               ":par" (html-constant "<p>")
+              ":nbsp" (html-constant "&nbsp;")
               ":section" (html-wrapper "h1")
               ":subsection" (html-wrapper "h2")
               ":subsubsection" (html-wrapper "h3")

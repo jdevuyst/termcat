@@ -12,6 +12,14 @@
   block?
   [_ :emptyline] (concat [nil] (fun/fun-call-seq ":par")))
 
+(defrule introduce-nbsp-calls
+  [state t1 t2 t3]
+  tt
+  block?
+  [_ :default :tilde :default] (concat [nil t1]
+                                       (fun/fun-call-seq ":nbsp")
+                                       [t3]))
+
 (defrule introduce-section-calls
   [state t1]
   tt
