@@ -118,6 +118,15 @@
                                           [(token :still-math)
                                            (token :html "</msub>")
                                            (token :close-math)])
+  [_ _ [:block (_ :guard :msubsup)]] (concat [nil
+                                           t1
+                                           (token :open-math)
+                                           (token :html "<msubsup>")
+                                           (token :already-math)]
+                                          (.terms (center t2))
+                                          [(token :still-math)
+                                           (token :html "</msubsup>")
+                                           (token :close-math)])
   [_ _ [:block (_ :guard :mfrac)]] (concat [nil
                                             t1
                                             (token :open-math)

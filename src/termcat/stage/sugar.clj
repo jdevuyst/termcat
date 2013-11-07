@@ -215,21 +215,53 @@
          t4 t5]))
 
 (defrule introduce-msub-msup
-  [state t1 t2 t3]
+  [state t1 t2 t3 t4 t5]
   tt
   block?
   [_
    (:or :default
         [:block _])
-   (:or :circumflex :underscore)
+   :underscore
+   (:or :default
+        [:block _])
+   :circumflex
    (:or :default
         [:block _])] [nil
+                      (math/math-block
+                        (fragment (math/math-row-cast t1)
+                                  (math/math-row-cast t3)
+                                  (math/math-row-cast t5))
+                        :msubsup)]
+  [_
+   (:or :default
+        [:block _])
+   :circumflex
+   (:or :default
+        [:block _])
+   :underscore
+   (:or :default
+        [:block _])] [nil
+                      (math/math-block
+                        (fragment (math/math-row-cast t1)
+                                  (math/math-row-cast t5)
+                                  (math/math-row-cast t3))
+                        :msubsup)]
+  [_
+   (:or :default
+        [:block _])
+   (:or :circumflex :underscore)
+   (:or :default
+        [:block _])
+   _
+   _] [nil
                       (math/math-block
                         (fragment (math/math-row-cast t1)
                                   (math/math-row-cast t3))
                         (case (tt t2)
                           :circumflex :msup
-                          :underscore :msub))])
+                          :underscore :msub))
+                      t4
+                      t5])
 
 (defrule introduce-mfrac
   [state t1 t2 t3]
@@ -253,7 +285,8 @@
   [_
    [:block (:or (_ :guard :mi)
                 (_ :guard :msub)
-                (_ :guard :msup))]
+                (_ :guard :msup)
+                (_ :guard :msubsup))]
    :right-quote] [nil
                   (math/math-block
                     (fragment
