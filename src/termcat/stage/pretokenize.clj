@@ -6,32 +6,45 @@
   "Converts all characters to tokens. Here the term/token-type
   a function from characters to keywords. That is, we guess."
 [c]
-(token (condp contains? c
-         #{\\} :escape
-         #{\space} :whitespace
-         #{\newline} :newline
-         #{\(} (ldelim-t :parenthesis)
-         #{\)} (rdelim-t :parenthesis)
-         #{\[} (ldelim-t :bracket)
-         #{\]} (rdelim-t :bracket)
-         #{\{} (ldelim-t :brace)
-         #{\}} (rdelim-t :brace)
-         #{\<} (ldelim-t :chevron)
-         #{\>} (rdelim-t :chevron)
-         #{\%} :percent
-         #{\~} :tilde
-         #{\-} :dash
-         #{\`} :left-quote
-         #{\'} :right-quote
-         #{\"} :double-quote
-         #{\^} :circumflex
-         #{\. \, \: \; \!} :maybe-fun
-         #{\# \* \+ \_} :maybe-magic
+(token (case c
+         \\ :escape
+         \space :whitespace
+         \newline :newline
+         \( (ldelim-t :parenthesis)
+           \) (rdelim-t :parenthesis)
+         \[ (ldelim-t :bracket)
+           \] (rdelim-t :bracket)
+         \{ (ldelim-t :brace)
+           \} (rdelim-t :brace)
+         \< (ldelim-t :chevron)
+         \> (rdelim-t :chevron)
+         \% :percent
+         \~ :tilde
+         \- :dash
+         \` :left-quote
+         \' :right-quote
+         \" :double-quote
+         \^ :circumflex
+         \. :maybe-fun
+         \, :maybe-fun
+         \: :maybe-fun
+         \; :maybe-fun
+         \! :maybe-fun
+         \# :maybe-magic
+         \* :maybe-magic
+         \+ :maybe-magic
+         \_ :maybe-magic
          :default)
        c))
 
-(defn map-to-tokens [s]
-  (->> s
-       (r/map char-to-token)
-       r/foldcat
+(defn map-to-tokens [code]
+  (->> code
+       (r/reduce (fn [[result pos] c]
+                   [(conj result
+                          (with-meta (char-to-token c)
+                                     {:source-code code
+                                      :source-pos pos}))
+                    (inc pos)])
+                 [[] 0])
+       first
        fragmentcat))
