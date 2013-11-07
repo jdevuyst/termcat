@@ -109,6 +109,33 @@
                                           [(token :still-math)
                                            (token :html "</msup>")
                                            (token :close-math)])
+  [_ _ [:block (_ :guard :msub)]] (concat [nil
+                                           t1
+                                           (token :open-math)
+                                           (token :html "<msub>")
+                                           (token :already-math)]
+                                          (.terms (center t2))
+                                          [(token :still-math)
+                                           (token :html "</msub>")
+                                           (token :close-math)])
+  [_ _ [:block (_ :guard :mfrac)]] (concat [nil
+                                            t1
+                                            (token :open-math)
+                                            (token :html "<mfrac>")
+                                            (token :already-math)]
+                                           (.terms (center t2))
+                                           [(token :still-math)
+                                            (token :html "</mfrac>")
+                                            (token :close-math)])
+  [_ _ [:block (_ :guard :mrow)]] (concat [nil
+                                           t1
+                                           (token :open-math)
+                                           (token :html "<mrow>")
+                                           (token :already-math)]
+                                          (.terms (center t2))
+                                          [(token :still-math)
+                                           (token :html "</mrow>")
+                                           (token :close-math)])
   [_ _ [:block (x :guard :math)]] (concat [nil
                                            t1
                                            (token :open-math)]

@@ -10,6 +10,9 @@
 - subseteq
 - ~⊆~
 !bind
+- +
+- ~+~
+!bind
 - *
 - ~×~
 !bind
@@ -84,8 +87,4 @@ Minus two: -2
 
 <span style="background: yellow">&copy; &#166; &#x00a2; \<img src="hello.png"\></span>
 
-h%'e%'el n%3i h%3ao
-
-t%_1ex%est%+5em%blah!%-1.5ex%?
-
-Hello: there
+((x + 1))|y^z_a a_b^c'

@@ -11,11 +11,11 @@
          \space :whitespace
          \newline :newline
          \( (ldelim-t :parenthesis)
-           \) (rdelim-t :parenthesis)
+         \) (rdelim-t :parenthesis)
          \[ (ldelim-t :bracket)
-           \] (rdelim-t :bracket)
+         \] (rdelim-t :bracket)
          \{ (ldelim-t :brace)
-           \} (rdelim-t :brace)
+         \} (rdelim-t :brace)
          \< (ldelim-t :chevron)
          \> (rdelim-t :chevron)
          \% :percent
@@ -25,6 +25,8 @@
          \' :right-quote
          \" :double-quote
          \^ :circumflex
+         \_ :underscore
+         \| :bar
          \. :maybe-fun
          \, :maybe-fun
          \: :maybe-fun
@@ -33,7 +35,6 @@
          \# :maybe-magic
          \* :maybe-magic
          \+ :maybe-magic
-         \_ :maybe-magic
          :default)
        c))
 

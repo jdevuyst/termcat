@@ -54,3 +54,19 @@
               (r/map fragment)
               (r/map #(apply math-block % :mi opts))
               r/foldcat))))))
+
+(defn math-block? [t]
+  (match (tt t)
+         [:block (_ :guard :math)] true
+         :else false))
+
+(defn math-row-cast [t]
+  (-> (if (and (block? t)
+               (not (math-block? t)))
+        (block (ldelim :math-row-cast)
+               (center t)
+               (rdelim :math-row-cast))
+        t)
+      math-cast
+      fragmentcat
+      (math-block :mrow)))

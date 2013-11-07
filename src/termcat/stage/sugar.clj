@@ -96,7 +96,8 @@
   tt
   block?
   [_ :maybe-magic (:or :default
-                       [:block _]) :maybe-magic]
+                       [:block _]) (:or :underscore
+                                        :maybe-magic)]
   (if (= (payload t1) (payload t3))
     (if-let [fname (decorator-fname t1)]
       (concat [nil]
@@ -213,12 +214,46 @@
                 opt)
          t4 t5]))
 
+(defrule introduce-msub-msup
+  [state t1 t2 t3]
+  tt
+  block?
+  [_
+   (:or :default
+        [:block _])
+   (:or :circumflex :underscore)
+   (:or :default
+        [:block _])] [nil
+                      (math/math-block
+                        (fragment (math/math-row-cast t1)
+                                  (math/math-row-cast t3))
+                        (case (tt t2)
+                          :circumflex :msup
+                          :underscore :msub))])
+
+(defrule introduce-mfrac
+  [state t1 t2 t3]
+  tt
+  block?
+  [_
+   (:or :default
+        [:block _])
+   :bar
+   (:or :default
+        [:block _])] [nil
+                      (math/math-block
+                        (fragment (math/math-row-cast t1)
+                                  (math/math-row-cast t3))
+                        :mfrac)])
+
 (defrule introduce-typographic-primes
   [state t1 t2]
   tt
   block?
   [_
-   [:block (x :guard :mi)]
+   [:block (:or (_ :guard :mi)
+                (_ :guard :msub)
+                (_ :guard :msup))]
    :right-quote] [nil
                   (math/math-block
                     (fragment

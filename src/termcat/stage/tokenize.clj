@@ -304,6 +304,7 @@ block?
   [_
    :percent
    (:or :maybe-magic
+        :underscore
         :dash)
    :default] (if (and (contains? #{\+ \- \_} (payload t2))
                       (css-length? (payload t3)))
@@ -314,7 +315,7 @@ block?
                                \- "margin-left: -"
                                \_ "display: inline-block; width: "))
                 t3
-                (if (= (payload t2) \_)
+                (if (= (tt t2) :underscore)
                   (token :html "'> </span>")
                   (token :html "'></span>"))])
   [_

@@ -60,6 +60,8 @@
       (rewrite sugar/introduce-decorator-calls)
       (rewrite sugar/introduce-math-identifiers)
       (rewrite sugar/introduce-math-operators)
+      (rewrite sugar/introduce-msub-msup)
+      (rewrite sugar/introduce-mfrac)
       (rewrite sugar/introduce-typographic-primes)
       (rewrite sugar/flatten-math-fences)
       (rewrite lambda/introduce-fun-calls)
