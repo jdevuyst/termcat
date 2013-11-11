@@ -81,14 +81,11 @@ sin~ x
 
 E = {<a , n , n'> subseteq I * N * N | Pa and n < n'}
 
-+M = <n , m> and +T[?x]
++M = <n^a_c^b , m> and +T[?x]
 
 Minus two: -2
 
 <span style="background: yellow">&copy; &#166; &#x00a2; \<img src="hello.png"\></span>
 
-((x + 1))|y^z_a
 
-a^b^c^d'
-
-a_b' *a'_b a^c_b' a_b^c'
+#b(A b C)(B)

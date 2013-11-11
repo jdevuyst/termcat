@@ -70,13 +70,12 @@
   block?
   [_ :maybe-fun :default _ _] nil
   [_ _
-   :maybe-fun
+   :bang
    [:block :bracket]
-   [:block :parenthesis]] (if (= (payload t2) \!)
-                            (concat [nil t1]
-                                    (fun/fun-call-seq ":img"
-                                                      (center t3)
-                                                      (center t4))))
+   [:block :parenthesis]] (concat [nil t1]
+                                  (fun/fun-call-seq ":img"
+                                                    (center t3)
+                                                    (center t4)))
   [_ _ _
    [:block :bracket]
    [:block :parenthesis]] (concat [nil t1 t2]
@@ -260,17 +259,20 @@
                   t1
                   (subsup-token
                     (split-base-sub-sup t2)
-                    [nil nil (token :default
-                                    (let [length (-> t3
-                                                     payload
-                                                     str
-                                                     count)]
-                                      (case length
-                                        4 \⁗
-                                        3 \‴
-                                        2 \″
-                                        1 \′
-                                        (apply str (repeat length \′)))))])]
+                    [nil nil (->
+                               (token :default
+                                      (let [length (-> t3
+                                                       payload
+                                                       str
+                                                       count)]
+                                        (case length
+                                          4 \⁗
+                                          3 \‴
+                                          2 \″
+                                          1 \′
+                                          (apply str (repeat length \′)))))
+                               fragment
+                               (math/math-block :mo))])]
   [_
    (:or :default [:block _])
    :underscore

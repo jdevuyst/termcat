@@ -122,6 +122,7 @@ block?
           :dash
           :left-quote
           :right-quote
+          :hash
           :maybe-magic
           :html)] (if (= (tt t1) (tt t2))
                     [nil
@@ -221,16 +222,17 @@ block?
                                                  (token [:rdelim (:item-type state)])
                                                  t2
                                                  t3]
-[{:in-bullet true} :newline _ (:or :whitespace
-                                   :newline
-                                   :emptyline
-                                   nil)] (if (item-type t2)
-                                           [(assoc state :item-type (item-type t2))
-                                            t1
-                                            (token [:rdelim (:item-type state)])
-                                            (token [:ldelim (item-type t2)]
-                                                   (payload t2))
-                                            t3])
+[{:in-bullet true} :newline (:or :dash
+                                 :hash) (:or :whitespace
+                                             :newline
+                                             :emptyline
+                                             nil)] (if (item-type t2)
+                                                     [(assoc state :item-type (item-type t2))
+                                                      t1
+                                                      (token [:rdelim (:item-type state)])
+                                                      (token [:ldelim (item-type t2)]
+                                                             (payload t2))
+                                                      t3])
 [{:in-bullet true} :newline _ _] [(:prev-state state)
                                   t1
                                   (token [:rdelim (:item-type state)])
@@ -296,7 +298,7 @@ block?
   [_
    :percent
    :whitespace
-   :newline] [nil]
+   (:or :newline nil)] [nil]
   [_
    :percent
    :whitespace

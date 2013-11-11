@@ -2,7 +2,15 @@
   (:require [clojure.core.match :refer (match)]
             [clojure.core.reducers :as r]
             [termcat.term :refer :all]
-            [termcat.rewrite :refer :all]))
+            [termcat.rewrite :refer :all]
+            [termcat.fun :as fun]))
+
+(defrule introduce-fun-calls
+  [state t1 t2]
+  tt
+  block?
+  [_ :maybe-fun :default] [nil (fun/fun-call-head (str (payload t1)
+                                                       (payload t2)))])
 
 (defrule introduce-bindings
   (fn
@@ -13,11 +21,10 @@
   tt
   block?
   [_
-   :maybe-fun
+   :bang
    :default
    [:block _]
-   [:block _]] (if (and (= (payload t1) \!)
-                        (= (payload t2) "bind"))
+   [:block _]] (if (= (payload t2) "bind")
                  (case (count (.terms (center t3)))
                    0 [state
                       (token :error "Binding identifier missing")]
@@ -68,4 +75,24 @@
                                            (str (payload t3)
                                                 (payload t4)))]))
 
+(defn create-lambda [arg-name fn-body]
+  (token :fun
+         (fun/unary-fun
+           [arg-val]
+           (.terms (rewrite (fragmentcat
+                              [(token :bang \!)
+                               (token :default "bind")
+                               (block (ldelim :create-lambda)
+                                      (fragment arg-name)
+                                      (rdelim :create-lambda))
+                               arg-val]
+                              (.terms (center fn-body)))
+                            introduce-bindings)))))
 
+(defrule introduce-lambdas
+  [state t1 t2 t3 t4]
+  tt
+  block?
+  [_ (:or :whitespace nil) :hash :default [:block _]]
+  (if (= (payload t2) \#)
+    [nil t1 (create-lambda t3 t4)]))

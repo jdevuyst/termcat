@@ -27,12 +27,12 @@
          \^ :circumflex
          \_ :underscore
          \| :bar
+         \# :hash
+         \! :bang
          \. :maybe-fun
          \, :maybe-fun
          \: :maybe-fun
          \; :maybe-fun
-         \! :maybe-fun
-         \# :maybe-magic
          \* :maybe-magic
          \+ :maybe-magic
          :default)

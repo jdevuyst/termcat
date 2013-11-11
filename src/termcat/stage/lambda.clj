@@ -1,21 +1,20 @@
 (ns termcat.stage.lambda
   (:require [clojure.core.match :refer (match)]
             [termcat.term :refer :all]
-            [termcat.rewrite :refer :all]
-            [termcat.fun :as fun]))
+            [termcat.rewrite :refer :all]))
 
-(defrule introduce-fun-calls
-  [state t1 t2]
-  tt
-  block?
-  [_ :maybe-fun :default] [nil (fun/fun-call-head (str (payload t1)
-                                                       (payload t2)))])
+(defn apply-fun [fun-token arg-token]
+  (let [f (payload fun-token)
+        retval (f arg-token)]
+    (if (string? retval)
+      [(token :error (str retval " – " (:fun-name (meta f))))]
+      retval)))
 
 (defrule evaluate-fun-calls
   [state t1 t2]
   tt
   block?
-  [_ :fun [:block _]] (cons nil (fun/apply-fun t1 t2))
+  [_ :fun [:block _]] (cons nil (apply-fun t1 t2))
   [_ :fun _] (-> (concat [nil]
-                         (fun/apply-fun t1 nil)
+                         (apply-fun t1 nil)
                          [t2])))

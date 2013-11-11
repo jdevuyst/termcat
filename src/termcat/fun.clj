@@ -29,9 +29,6 @@
      (unary-fun [x]
                 [(token :fun (curry-fun (partial f x) (dec n)))]))))
 
-; (defn box [x]
-;   [(transparent-block (center x))])
-
 (defn html-constant [code]
   (constant-fun (token :html code)))
 
@@ -71,14 +68,8 @@
                   rows)
           [(token :html "</ol>")]))
 
-; (defn math-wrapper [& keys]
-;   (let [tag (into #{:math} keys)]
-;     (unary-fun [x]
-;                [(block (ldelim tag)
-;                        (center x)
-;                        (rdelim tag))])))
-
-(def fun-map {;":box" box
+(def fun-map {".identity" (unary-fun [x] (.terms (center x)))
+              ".rand" (constant-fun (token :default (str (rand))))
               ":par" (html-constant "<p>")
               ":nbsp" (html-constant "&nbsp;")
               ":h1" (html-wrapper "h1")
@@ -118,8 +109,6 @@
               ; ":mo-postfix" (math-wrapper :mo :postfix :normal-width)
               ; ":mo-postfix-wide" (math-wrapper :mo :postfix :wide)
               ; ":msup" (math-wrapper :msup)
-              ".identity" (unary-fun [x] (.terms (center x)))
-              ".rand" (constant-fun (token :default (str (rand))))
               })
 
 (defn fun-call-head [fname]
@@ -138,10 +127,3 @@
           (block (token [:ldelim :fun-call-seq])
                  arg
                  (token [:rdelim :fun-call-seq])))))
-
-(defn apply-fun [fun-token arg-token]
-  (let [f (payload fun-token)
-        retval (f arg-token)]
-    (if (string? retval)
-      [(token :error (str retval " – " (:fun-name (meta f))))]
-      retval)))
