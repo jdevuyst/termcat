@@ -214,54 +214,81 @@
                 opt)
          t4 t5]))
 
+(defn split-base-sub-sup [t]
+  (match (tt t)
+         [:block (_ :guard :msub)] [(first (.terms (center t)))
+                                    (second (.terms (center t)))
+                                    nil]
+         [:block (_ :guard :msup)] [(first (.terms (center t)))
+                                    nil
+                                    (second (.terms (center t)))]
+         [:block (_ :guard :msubsup)] [(first (.terms (center t)))
+                                       (second (.terms (center t)))
+                                       (nth (.terms (center t)) 2)]
+         :else [t nil nil]))
+
+(defn subsup-token
+  ([x y]
+   (as-> (map #(->> (vector %1 %2)
+                    (filter (complement nil?)))
+              x
+              y) $
+         (map #(if-not (empty? %)
+                 (->> %
+                      (mapcat math/math-cast)
+                      (apply math/merge-rows)))
+              $)
+         (into [] $)
+         (match $
+                [nil _ _] (assert false)
+                [a nil nil] (assert false)
+                [a nil b] (math/math-block (fragment a b)
+                                           :msup)
+                [a b nil] (math/math-block (fragment a b)
+                                           :msub)
+                [a b c] (math/math-block (fragment a b c)
+                                         :msubsup)))))
+
 (defrule introduce-msub-msup
-  [state t1 t2 t3 t4 t5]
+  [state t1 t2 t3]
   tt
   block?
   [_
-   (:or :default
-        [:block _])
-   :underscore
-   (:or :default
-        [:block _])
-   :circumflex
-   (:or :default
-        [:block _])] [nil
-                      (math/math-block
-                        (fragment (math/math-row-cast t1)
-                                  (math/math-row-cast t3)
-                                  (math/math-row-cast t5))
-                        :msubsup)]
-  [_
-   (:or :default
-        [:block _])
-   :circumflex
-   (:or :default
-        [:block _])
-   :underscore
-   (:or :default
-        [:block _])] [nil
-                      (math/math-block
-                        (fragment (math/math-row-cast t1)
-                                  (math/math-row-cast t5)
-                                  (math/math-row-cast t3))
-                        :msubsup)]
-  [_
-   (:or :default
-        [:block _])
-   (:or :circumflex :underscore)
-   (:or :default
-        [:block _])
    _
-   _] [nil
-                      (math/math-block
-                        (fragment (math/math-row-cast t1)
-                                  (math/math-row-cast t3))
-                        (case (tt t2)
-                          :circumflex :msup
-                          :underscore :msub))
-                      t4
-                      t5])
+   [:block (_ :guard :math)]
+   :right-quote] [nil
+                  t1
+                  (subsup-token
+                    (split-base-sub-sup t2)
+                    [nil nil (token :default
+                                    (let [length (-> t3
+                                                     payload
+                                                     str
+                                                     count)]
+                                      (case length
+                                        4 \⁗
+                                        3 \‴
+                                        2 \″
+                                        1 \′
+                                        (apply str (repeat length \′)))))])]
+  [_
+   (:or :default [:block _])
+   :underscore
+   (:or :default
+        [:block _])] [nil
+                      (subsup-token
+                        (split-base-sub-sup t1)
+                        [nil t3 nil])]
+  [_
+   (:or :default [:block _])
+   :circumflex
+   (:or :default
+        [:block _])] [nil
+                      (subsup-token
+                        (split-base-sub-sup t1)
+                        [nil nil t3])])
+
+
 
 (defrule introduce-mfrac
   [state t1 t2 t3]
@@ -277,39 +304,6 @@
                         (fragment (math/math-row-cast t1)
                                   (math/math-row-cast t3))
                         :mfrac)])
-
-(defrule introduce-typographic-primes
-  [state t1 t2]
-  tt
-  block?
-  [_
-   [:block (:or (_ :guard :mi)
-                (_ :guard :msub)
-                (_ :guard :msup)
-                (_ :guard :msubsup))]
-   :right-quote] [nil
-                  (math/math-block
-                    (fragment
-                      t1
-                      (math/math-block
-                        (fragment
-                          (token :default
-                                 (let [length (-> t2
-                                                  payload
-                                                  str
-                                                  count)]
-                                   (case length
-                                     4 \⁗
-                                     3 \‴
-                                     2 \″
-                                     1 \′
-                                     (apply str (repeat length \′))))))
-                        :mo))
-                    :msup)]
-  [_
-   [:block (x :guard :msup)]
-   :default] (concat [nil t1]
-                     (math/math-cast t2)))
 
 (defrule flatten-math-fences
   [state t1]

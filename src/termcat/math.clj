@@ -3,7 +3,8 @@
             [clojure.core.reducers :as r]
             [clojure.edn :as edn]
             [termcat.term :refer :all]
-            [termcat.util :as u]))
+            [termcat.util :as u]
+            [clojure.pprint]))
 
 (defn number-string? [s]
   (try
@@ -70,3 +71,12 @@
       math-cast
       fragmentcat
       (math-block :mrow)))
+
+(defn merge-rows [& ts]
+  (as-> ts $
+        (mapcat
+          #(match (tt %)
+                  [:block (_ :guard :mrow)] (.terms (center %))
+                  :else [%]) $)
+        (fragmentcat $)
+        (math-block $ :mrow)))
