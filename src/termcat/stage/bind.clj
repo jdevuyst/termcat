@@ -60,7 +60,7 @@
    (:or nil
         :whitespace
         :newline
-        :emptyline)
+        :emtptyline)
    (:or nil
         :whitespace
         :newline
@@ -93,6 +93,6 @@
   [state t1 t2 t3 t4]
   tt
   block?
-  [_ (:or :whitespace nil) :hash :default [:block _]]
+  [_ (:or :whitespace :emptyline nil) :hash :default [:block _]]
   (if (= (payload t2) \#)
     [nil t1 (create-lambda t3 t4)]))
