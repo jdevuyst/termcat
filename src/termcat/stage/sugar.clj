@@ -283,6 +283,14 @@
                                   (math/math-row-cast t3))
                         :mfrac)])
 
+(defrule math-cast-next-token
+  [state t1 t2]
+  tt
+  block?
+  [_ _ (:or :whitespace nil)] nil
+  [_ [:block (_ :guard :math)] _] (concat [nil t1]
+                                        (math/math-cast t2)))
+
 (defrule flatten-math-fences
   [state t1]
   tt
