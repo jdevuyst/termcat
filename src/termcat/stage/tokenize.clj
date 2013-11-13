@@ -153,7 +153,10 @@ block?
                     (rdelim :indent)))
 [_ (:or :newline
         :emptyline) _] (let [indent (if (= (tt t2) :whitespace)
-                                      (count (payload t2))
+                                      (as-> (payload t2) x
+                                            (if (char? x)
+                                              1
+                                              (count x)))
                                       0)
                              diff (/ (- indent (:indent state)) 2)]
                          (concat [{:indent indent}]
