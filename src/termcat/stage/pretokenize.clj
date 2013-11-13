@@ -16,6 +16,8 @@
          \] (rdelim-t :bracket)
          \{ (ldelim-t :brace)
          \} (rdelim-t :brace)
+         \< :less-than
+         \> :greater-than
          \% :percent
          \~ :tilde
          \- :dash

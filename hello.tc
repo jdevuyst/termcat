@@ -74,7 +74,7 @@ sin~ x
 
 E = {<~ a , n , n' ~> subseteq I * N * N | Pa and n < n'}
 
-+M = <n^a_c^b , m> and +T[?x]
++M = <~ n^a_c^b , m ~> and +T[?x]
 
 Minus two: -2
 
