@@ -39,7 +39,6 @@
       (rewrite tok/introduce-indent-tokens)
       (rewrite tok/remove-superfluous-whitespace)
       (rewrite tok/introduce-item-tokens)
-      (rewrite tok/fix-chevrons)
       (rewrite tok/remove-magic-tokens)
       (rewrite tok/remove-percent-tokens)
       (rewrite tok/remove-remaining-percent-tokens)

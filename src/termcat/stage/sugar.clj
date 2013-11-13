@@ -133,11 +133,11 @@
    :maybe-magic
    (:or :default
         [:block _])] (case (payload t4)
-        \* (concat [nil t1 t2 t3]
-                   (math/math-cast t5))
-        \+ (concat [nil t1 t2 t3]
-                   (math/math-cast t5 #{:script}))
-        nil)
+                       \* (concat [nil t1 t2 t3]
+                                  (math/math-cast t5))
+                       \+ (concat [nil t1 t2 t3]
+                                  (math/math-cast t5 #{:script}))
+                       nil)
   [_
    _
    _
@@ -330,20 +330,19 @@
   [_
    [:block (:or :parenthesis
                 :bracket
-                :brace
-                :chevron)]] (let [subts (-> t1
-                                            center
-                                            .terms)]
-                              (match [(tt (first subts))
-                                      (tt (last subts))]
-                                     [[:block (_ :guard :math)]
-                                      [:block (_ :guard :math)]]
-                                     (concat [nil
-                                              (math/math-block
-                                                (fragment (left t1))
-                                                :mo)]
-                                             subts
-                                             [(math/math-block
-                                                (fragment (right t1))
-                                                :mo)])
-                                     :else nil)))
+                :brace)]] (let [subts (-> t1
+                                          center
+                                          .terms)]
+                            (match [(tt (first subts))
+                                    (tt (last subts))]
+                                   [[:block (_ :guard :math)]
+                                    [:block (_ :guard :math)]]
+                                   (concat [nil
+                                            (math/math-block
+                                              (fragment (left t1))
+                                              :mo)]
+                                           subts
+                                           [(math/math-block
+                                              (fragment (right t1))
+                                              :mo)])
+                                   :else nil)))

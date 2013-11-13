@@ -255,25 +255,6 @@ block?
 [_ [:ldelim :indent] _ _] [{:in-bullet false :prev-state state} t1 t2 t3]
 [_ [:rdelim :indent] _ _] [(:prev-state state) t1 t2 t3])
 
-(defrule fix-chevrons
-  [state t1 t2]
-  tt
-  block?
-  [_
-   :whitespace
-   [:rdelim :chevron]] [nil t1 (token :default (payload t2))]
-  [_
-   [:ldelim :chevron]
-   :whitespace] [nil (token :default (payload t1)) t2]
-  [_
-   :tilde
-   [(:or :ldelim :rdelim) :chevron]] [nil t1 (token :default (payload t2))]
-  [_
-   [(:or :ldelim :rdelim) :chevron]
-   :tilde] [nil (token :default (payload t1)) t2]
-  [_ [:ldelim :chevron] _] [nil (ldelim :chevron \⟨) t2]
-  [_ [:rdelim :chevron] _] [nil (rdelim :chevron \⟩) t2])
-
 (defrule remove-magic-tokens
   [state t1 t2 t3]
   tt
