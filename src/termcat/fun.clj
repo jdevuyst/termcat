@@ -71,7 +71,6 @@
 (def fun-map {".identity" (unary-fun [x] (.terms (center x)))
               ".rand" (constant-fun (token :default (str (rand))))
               ":par" (html-constant "<p>")
-              ":nbsp" (html-constant "&nbsp;")
               ":h1" (html-wrapper "h1")
               ":h2" (html-wrapper "h2")
               ":h3" (html-wrapper "h3")

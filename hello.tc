@@ -82,12 +82,4 @@ Minus two: -2
 
 !id(#x(x%#))
 
-prefix~ *abc
-
-            ->
-             ->
-              ->
-               ->
-                ->
-
 id(a)(b)(c)

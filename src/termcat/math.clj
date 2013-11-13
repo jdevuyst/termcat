@@ -9,7 +9,7 @@
 (defn number-string? [s]
   (try
     (number? (edn/read-string s))
-    (catch java.lang.NumberFormatException x false)))
+    (catch java.lang.Exception x false)))
 
 (defn math-opts [t]
   (match (tt t)
@@ -26,6 +26,7 @@
   ([t] (math-cast t nil))
   ([t opts]
    (cond
+     (= (tt t) :fun) [t]
      (= (tt t) :text) [t]
      (block? t) (if-let [cur-opts (math-opts t)]
                   [(block (ldelim (into cur-opts opts))

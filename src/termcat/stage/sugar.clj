@@ -28,15 +28,9 @@
   [state t1]
   tt
   block?
-  [_ :emptyline] (concat [nil] (fun/fun-call-seq ":par")))
-
-(defrule introduce-nbsp-calls
-  [state t1 t2 t3]
-  tt
-  block?
-  [_ :default :tilde :default] (concat [nil t1]
-                                       (fun/fun-call-seq ":nbsp")
-                                       [t3]))
+  [_ :emptyline] (concat [nil (token :whitespace nil)]
+                         (fun/fun-call-seq ":par")
+                         [(token :whitespace nil)]))
 
 (defrule introduce-section-calls
   [state t1]
@@ -50,38 +44,42 @@
   [_ [:block :h6]] [nil (fun/fun-call-head ":h6") t1])
 
 (defrule introduce-blockquote-calls
-  [state t1 t2 t3]
+  [state t1]
   tt
   block?
-  [_ :maybe-fun :default _] nil
-  [_ _ _ [:block :indent]] [nil t1 t2 (fun/fun-call-head ":quotation") t3])
+  [_ [:block :indent]] [nil (fun/fun-call-head ":quotation") t1])
 
 (defrule introduce-bullet-list-calls
-  [state t1 t2 t3]
+  [state t1 t2]
   tt
   block?
-  [_ :maybe-fun :default _] nil
-  [_ _ [:block :bullet] _] nil
-  [_ _ _ [:block :bullet]] [nil t1 t2 (fun/fun-call-head ":bullet-list") t3])
+  [_ [:block :bullet] _] nil
+  [_ _ [:block :bullet]] [nil t1 (fun/fun-call-head ":bullet-list") t2])
 
 (defrule introduce-link-calls
-  [state t1 t2 t3 t4]
+  [state t1 t2 t3 t4 t5]
   tt
   block?
-  [_ :maybe-fun :default _ _] nil
-  [_ _
+  [_
+   (:or :whitespace nil)
    :bang
    [:block :bracket]
-   [:block :parenthesis]] (concat [nil t1]
+   [:block :parenthesis]
+   (:or :whitespace nil)] (concat [nil t1]
                                   (fun/fun-call-seq ":img"
                                                     (center t3)
-                                                    (center t4)))
-  [_ _ _
+                                                    (center t4))
+                                  [t5])
+  [_
+   _
+   (:or :whitespace nil)
    [:block :bracket]
-   [:block :parenthesis]] (concat [nil t1 t2]
+   [:block :parenthesis]
+   (:or :whitespace nil)] (concat [nil t1 t2]
                                   (fun/fun-call-seq ":link"
                                                     (center t3)
-                                                    (center t4))))
+                                                    (center t4))
+                                  [t5]))
 
 (defn decorator-fname [tok]
   (case (payload tok)
@@ -91,19 +89,25 @@
     nil))
 
 (defrule introduce-decorator-calls
-  [state t1 t2 t3]
+  [state t1 t2 t3 t4 t5]
   tt
   block?
-  [_ (:or :underscore
-          :maybe-magic) (:or :default
-                             [:block _]) (:or :underscore
-                                              :maybe-magic)]
-  (if (= (payload t1) (payload t3))
-    (if-let [fname (decorator-fname t1)]
-      (concat [nil]
-              (fun/fun-call-seq fname (if (block? t2)
-                                        (center t2)
-                                        (fragment t2)))))))
+  [_
+   (:or :whitespace nil)
+   (:or :underscore
+        :maybe-magic)
+   (:or :default
+        [:block _])
+   (:or :underscore
+        :maybe-magic)
+   (:or :whitespace nil)]
+  (if (= (payload t2) (payload t4))
+    (if-let [fname (decorator-fname t2)]
+      (concat [nil t1]
+              (fun/fun-call-seq fname (if (block? t3)
+                                        (center t3)
+                                        (fragment t3)))
+              [t5]))))
 
 (defn text-cast [t]
   (if (block? t)
@@ -117,118 +121,73 @@
     (token :text (payload t))))
 
 (defrule introduce-math-identifiers
-  [state t1 t2 t3 t4 t5]
+  [state t1 t2]
   tt
   block?
-  [_
-   _
-   _
-   _
-   :double-quote
-   (:or :default
-        [:block _])] [nil t1 t2 t3 (text-cast t5)]
-  [_
-   _
-   _
-   _
-   :maybe-magic
-   (:or :default
-        [:block _])] (case (payload t4)
-                       \* (concat [nil t1 t2 t3]
-                                  (math/math-cast t5))
-                       \+ (concat [nil t1 t2 t3]
-                                  (math/math-cast t5 #{:script}))
-                       nil)
-  [_
-   _
-   _
-   (:or :default
-        [:block _])
-   :whitespace
-   :tilde] (concat [nil t1 t2]
-                   (math/math-cast t3)
-                   [t4 t5])
-  [_
-   :tilde
-   :whitespace
-   (:or :default
-        [:block _])
-   _
-   _] (concat [nil t1 t2]
-              (math/math-cast t3)
-              [t4 t5])
-  [_
-   [:block (_ :guard :math)]
-   [:block _]
-   _
-   _
-   _] (concat [nil t1]
-              (math/math-cast t2)
-              [t3 t4 t5]))
+  [_ :double-quote _] [nil (text-cast t2)]
+  [_ :maybe-magic _] (case (payload t1)
+                       \* (concat [nil]
+                                  (math/math-cast t2))
+                       \+ (concat [nil]
+                                  (math/math-cast t2 #{:script}))
+                       nil))
 
 (defrule introduce-math-operators
-  [state t1 t2 t3 t4 t5]
+  [state t1 t2 t3 t4 t5 t6 t7]
   tt
   block?
-  [_
-   :whitespace
-   :tilde
-   _ ; (:or :default [:block _])
-   :tilde
-   :whitespace] (if-let [opt (concat
-                               (match (payload t2)
-                                      \~ []
-                                      "~~" [:normal-left]
-                                      "~~~" [:wide-left]
-                                      :else nil)
-                               (match (payload t4)
-                                      \~ []
-                                      "~~" [:normal-right]
-                                      "~~~" [:wide-right]
-                                      :else nil))]
-                  [nil (apply math/math-block
-                              (if (block? t3)
-                                (center t3)
-                                (fragment t3))
-                              :mo
-                              :infix
-                              opt)])
-  [_
-   _
-   _
-   _ ; (:or :default [:block _])
-   :tilde
-   :whitespace] (if-let [opt (match (payload t4)
-                                    \~ []
-                                    "~~" [:normal-right]
-                                    "~~~" [:wide-right]
-                                    :else nil)]
-                  [nil t1 t2 (apply math/math-block
-                                    (if (block? t3)
-                                      (center t3)
-                                      (fragment t3))
-                                    :mo
-                                    :prefix
-                                    opt)])
-  [_
-   :whitespace
-   :tilde
-   _ ; (:or :default [:block _])
-   _
-   _] (if-let [opt (match (payload t2)
-                          \~ []
-                          "~~" [:normal-left]
-                          "~~~" [:wide-left]
-                          :else nil)]
-        [nil
-         (apply math/math-block
-                (if (block? t3)
-                  (center t3)
-                  (fragment t3))
-                :mo
-                :postfix
-                opt)
-         t4 t5]))
+  [_ _ :whitespace :tilde _ :tilde :whitespace _]
+  (if-let [opt (concat (match (payload t3)
+                              \~ []
+                              "~~" [:normal-left]
+                              "~~~" [:wide-left]
+                              :else nil)
+                       (match (payload t5)
+                              \~ []
+                              "~~" [:normal-right]
+                              "~~~" [:wide-right]
+                              :else nil))]
+    (concat [nil]
+            (math/math-cast t1)
+            [(apply math/math-block
+                    (if (block? t4)
+                      (center t4)
+                      (fragment t4))
+                    :mo
+                    :infix
+                    opt)]
+            (math/math-cast t7)))
+  [_ _ :whitespace :tilde _ _ _ _]
+  (if-let [opt (match (payload t3)
+                      \~ []
+                      "~~" [:normal-right]
+                      "~~~" [:wide-right]
+                      :else nil)]
+    (concat [nil]
+            (math/math-cast t1)
+            [(apply math/math-block
+                    (if (block? t4)
+                      (center t4)
+                      (fragment t4))
+                    :mo
+                    :postfix
+                    opt)]
+            [t5 t6 t7]))
+  [_ _ _ _ _ :tilde :whitespace _]
+  (if-let [opt (match (payload t5)
+                      \~ []
+                      "~~" [:normal-left]
+                      "~~~" [:wide-left]
+                      :else nil)]
+    (concat [nil t1 t2 t3]
+            [(apply math/math-block
+                    (if (block? t4)
+                      (center t4)
+                      (fragment t4))
+                    :mo
+                    :prefix
+                    opt)]
+            (math/math-cast t7))))
 
 (defn split-base-sub-sup [t]
   (match (tt t)
@@ -347,3 +306,9 @@
                                               (fragment (right t1))
                                               :mo)])
                                    :else nil)))
+
+(defrule introduce-nbsp-entities
+  [state t1 t2 t3]
+  tt
+  block?
+  [_ _ :tilde _] [nil t1 (token :html "&nbsp;") t3])
