@@ -154,13 +154,15 @@ block?
                   (for [x (range (/ (:indent state) 2))]
                     (rdelim :indent)))
 [_ (:or :newline
-        :emptyline) _] (let [indent (if (= (tt t2) :whitespace)
-                                      (as-> (payload t2) x
-                                            (if (char? x)
-                                              1
-                                              (count x)))
+        :emptyline) _] (let [indent (if (and (= (tt t2) :whitespace)
+                                             (string? (payload t2)))
+                                      (-> t2
+                                          payload
+                                          count
+                                          (/ 2)
+                                          int)
                                       0)
-                             diff (/ (- indent (:indent state)) 2)]
+                             diff (- indent (:indent state))]
                          (concat [{:indent indent}]
                                  (for [x (range (- diff))]
                                    (rdelim :indent))

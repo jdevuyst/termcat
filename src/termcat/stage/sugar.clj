@@ -94,9 +94,10 @@
   [state t1 t2 t3]
   tt
   block?
-  [_ :maybe-magic (:or :default
-                       [:block _]) (:or :underscore
-                                        :maybe-magic)]
+  [_ (:or :underscore
+          :maybe-magic) (:or :default
+                             [:block _]) (:or :underscore
+                                              :maybe-magic)]
   (if (= (payload t1) (payload t3))
     (if-let [fname (decorator-fname t1)]
       (concat [nil]
