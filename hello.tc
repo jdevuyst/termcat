@@ -1,26 +1,19 @@
 ![Termcat logo](hello.png)
 
-!bind
-- =
+!=
 - ~=~
-!bind
-- ,
-- ~,~
-!bind
-- subseteq
-- ~⊆~
-!bind
-- +
-- ~+~
-!bind
-- *
-- ~×~
-!bind
-- |
-- ~~|~~
-!bind
-- \<
-- ~<~
+!,
+  ~,~
+!subseteq
+  ~⊆~
+!+
+  ~+~
+!*
+  ~×~
+!|
+  ~~|~~
+!<
+  ~<~
 
 # Section
 ## Subsection
@@ -87,4 +80,6 @@ Minus two: -2
 
 <span style="background: yellow">&copy; &#166; &#x00a2; \<img src="hello.png"\></span>
 
-#b(A b C)(B)
+!id(#x(x%#))
+
+id(a)(b)(c)

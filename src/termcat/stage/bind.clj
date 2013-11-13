@@ -6,11 +6,15 @@
             [termcat.fun :as fun]))
 
 (defrule introduce-fun-calls
-  [state t1 t2]
+  [state t1 t2 t3]
   tt
   block?
-  [_ :maybe-fun :default] [nil (fun/fun-call-head (str (payload t1)
-                                                       (payload t2)))])
+  [_
+   (:or nil :whitespace :newline :emptyline)
+   (:or :maybe-fun
+        :colon)
+   :default] [nil t1 (fun/fun-call-head (str (payload t2)
+                                             (payload t3)))])
 
 (defrule introduce-bindings
   (fn
@@ -20,37 +24,35 @@
   [state t1 t2 t3 t4]
   tt
   block?
-  [_
-   :bang
-   :default
-   [:block _]
-   [:block _]] (if (= (payload t2) "bind")
-                 (case (count (.terms (center t3)))
-                   0 [state
-                      (token :error "Binding identifier missing")]
-                   1 [(assoc
-                        state
-                        (-> t3
-                            center
-                            .terms
-                            first
-                            payload)
-                        (-> t4
-                            center
-                            .terms))]
-                   [state (token :error "Malformed binding identifier")]))
   [_ _ _ [:block _] _] nil
   [_
+   (:or nil
+        :whitespace
+        :newline
+        :emptyline
+        [:block _])
+   :bang
+   _
+   [:block _]] [(assoc
+                  state
+                  (payload t3)
+                  (-> t4
+                      center
+                      .terms))
+                t1]
+  [_
    _
    (:or nil
         :whitespace
         :newline
-        :emptyline)
+        :emptyline
+        [:block _])
    _
    (:or nil
         :whitespace
         :newline
-        :emptyline)] (if-let [ts (get state (payload t3))]
+        :emptyline
+        [:block _])] (if-let [ts (get state (payload t3))]
                        (concat [state t1 t2]
                                ts
                                [t4]))
@@ -66,7 +68,7 @@
         :newline
         :emptyline)] (if-let [strongest-type (if (= (tt t3) (tt t4))
                                                (tt t3)
-                                               (condp #(contains? %2 %1) (hash-set (tt t3) (tt t4))
+                                               (condp #(contains? %2 %1) (hash-set (tt t2) (tt t3))
                                                  :emptyline :emptyline
                                                  :newline :newline
                                                  nil nil ; skip
@@ -75,24 +77,34 @@
                                            (str (payload t3)
                                                 (payload t4)))]))
 
-(defn create-lambda [arg-name fn-body]
-  (token :fun
-         (fun/unary-fun
-           [arg-val]
-           (.terms (rewrite (fragmentcat
-                              [(token :bang \!)
-                               (token :default "bind")
-                               (block (ldelim :create-lambda)
-                                      (fragment arg-name)
-                                      (rdelim :create-lambda))
-                               arg-val]
-                              (.terms (center fn-body)))
-                            introduce-bindings)))))
+(defn call-lambda [arg-name fn-body arg-val]
+  (-> [(token :bang \!)
+       (-> arg-name
+           center
+           .terms
+           first)
+       arg-val
+       (token :bang \!)
+       (token :default \#)
+       (block (ldelim :create-lambda)
+              (fragment (token :fun (fun/curry-fun call-lambda 3))
+                        arg-name
+                        fn-body)
+              (rdelim :create-lambda))]
+      (fragmentcat (.terms (center fn-body)))
+      (rewrite introduce-bindings)
+      .terms))
 
 (defrule introduce-lambdas
-  [state t1 t2 t3 t4]
+  [state t1 t2 t3]
   tt
   block?
-  [_ (:or :whitespace :emptyline nil) :hash :default [:block _]]
-  (if (= (payload t2) \#)
-    [nil t1 (create-lambda t3 t4)]))
+  [_ _ [:block _] _] nil
+  [_ :hash _ [:block _]]
+  (if (= (payload t1) \#)
+    [nil
+     (token :fun (fun/curry-fun call-lambda 3))
+     (block (ldelim :introduce-lambdas)
+            (fragment t2)
+            (rdelim :introduce-lambdas))
+     t3]))

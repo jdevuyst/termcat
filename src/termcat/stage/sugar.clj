@@ -104,23 +104,39 @@
                                         (center t2)
                                         (fragment t2)))))))
 
+(defn text-cast [t]
+  (if (block? t)
+    (block (left t)
+           (->> t
+                center
+                .terms
+                (map text-cast)
+                fragmentcat)
+           (right t))
+    (token :text (payload t))))
+
 (defrule introduce-math-identifiers
   [state t1 t2 t3 t4 t5]
   tt
   block?
   [_
+   _
+   _
+   _
+   :double-quote
+   (:or :default
+        [:block _])] [nil t1 t2 t3 (text-cast t5)]
+  [_
+   _
+   _
+   _
    :maybe-magic
    (:or :default
-        [:block _])
-   _
-   _
-   _] (case (payload t1)
-        \* (concat [nil]
-                   (math/math-cast t2)
-                   [t3 t4 t5])
-        \+ (concat [nil]
-                   (math/math-cast t2 #{:script})
-                   [t3 t4 t5])
+        [:block _])] (case (payload t4)
+        \* (concat [nil t1 t2 t3]
+                   (math/math-cast t5))
+        \+ (concat [nil t1 t2 t3]
+                   (math/math-cast t5 #{:script}))
         nil)
   [_
    _

@@ -61,14 +61,13 @@
   text-block?
   [_ (:or :default
           [:block _])
-   :maybe-fun
-   :whitespace] (if (= (payload t2) \:)
-                  [nil
-                   t1
-                   (token :html "<span class='colon'>")
-                   t2
-                   (token :html "</span>")
-                   t3]))
+   :colon
+   :whitespace] [nil
+                 t1
+                 (token :html "<span class='colon'>")
+                 t2
+                 (token :html "</span>")
+                 t3])
 
 (defn wrap-math-block [t props]
   (let [tag-name (condp #(contains? %2 %1) props
@@ -119,14 +118,14 @@
                                            (token :html "</msub>")
                                            (token :close-math)])
   [_ _ [:block (_ :guard :msubsup)]] (concat [nil
-                                           t1
-                                           (token :open-math)
-                                           (token :html "<msubsup>")
-                                           (token :already-math)]
-                                          (.terms (center t2))
-                                          [(token :still-math)
-                                           (token :html "</msubsup>")
-                                           (token :close-math)])
+                                              t1
+                                              (token :open-math)
+                                              (token :html "<msubsup>")
+                                              (token :already-math)]
+                                             (.terms (center t2))
+                                             [(token :still-math)
+                                              (token :html "</msubsup>")
+                                              (token :close-math)])
   [_ _ [:block (_ :guard :mfrac)]] (concat [nil
                                             t1
                                             (token :open-math)

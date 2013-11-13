@@ -29,9 +29,9 @@
          \| :bar
          \# :hash
          \! :bang
+         \: :colon
          \. :maybe-fun
          \, :maybe-fun
-         \: :maybe-fun
          \; :maybe-fun
          \* :maybe-magic
          \+ :maybe-magic
