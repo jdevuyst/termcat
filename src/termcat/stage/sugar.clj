@@ -7,12 +7,15 @@
             [termcat.math :as math]))
 
 (defrule introduce-par-calls
-  [state t1]
+  [state t1 t2 t3]
   tt
   block?
-  [_ :emptyline] (concat [nil (token :whitespace nil)]
-                         (fun/fun-call-seq ":par")
-                         [(token :whitespace nil)]))
+  [_ _ :emptyline _] (concat [nil]
+                             (if-not (= (tt t1) :whitespace)
+                               [(token :whitespace nil)])
+                             (fun/fun-call-seq ":par")
+                             (if-not (= (tt t3) :whitespace)
+                               [(token :whitespace nil)])))
 
 (defrule introduce-section-calls
   [state t1]
