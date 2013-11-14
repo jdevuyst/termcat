@@ -13,8 +13,9 @@
    (:or nil :whitespace :newline :emptyline)
    (:or :maybe-fun
         :colon)
-   :default] [nil t1 (fun/fun-call-head (str (payload t2)
-                                             (payload t3)))])
+   :default]
+  [nil t1 (fun/fun-call-head (str (payload t2)
+                                  (payload t3)))])
 
 (defrule introduce-bindings
   (fn
@@ -24,61 +25,53 @@
   [state t1 t2 t3 t4]
   tt
   block?
-  [_ _ _ [:block _] _] nil
-  [_
-   (:or nil
-        :whitespace
-        :newline
-        :emptyline
-        [:block _])
-   :bang
-   _
-   [:block _]] [(assoc
-                  state
-                  (payload t3)
-                  (-> t4
-                      center
-                      .terms))
-                t1]
-  [_
-   (:or nil
-        :whitespace
-        :newline
-        :emptyline)
-   :comma
-   _
-   (:or nil
-        :whitespace
-        :newline
-        :emptyline
-        [:block _])] (if-let [ts (get state (payload t3))]
-                       (concat [state t1]
-                               ts
-                               [t4]))
-  [_
-   _
-   (:or nil
-        :whitespace
-        :newline
-        :emptyline)
-   _
-   (:or nil
-        :whitespace
-        :newline
-        :emptyline)] (if-let [ts (get state (payload t3))]
-                       (if-not (= :fun (tt (first ts)))
-                         (concat [state t1 t2]
-                                 ts
-                                 [t4])))
-  [_ _
-   (:or nil
-        :whitespace
-        :newline
-        :emptyline) :default [:block _]] (if-let [ts (get state (payload t3))]
-                                           (if (= :fun (tt (first ts)))
-                                             (concat [state t1 t2]
-                                                     ts
-                                                     [t4]))))
+  [_ _ _ [:block _] _]
+  nil
+
+  [_ (:or nil
+          :whitespace
+          :newline
+          :emptyline
+          [:block _]) :bang _ [:block _]]
+  [(assoc state
+     (payload t3)
+     (-> t4
+         center
+         .terms))
+   t1]
+
+  [_ _ :comma _ _]
+  (if-let [ts (get state (payload t3))]
+    (concat [state t1]
+            ts
+            [t4]))
+
+  [_ _ _ :default [:block _]]
+  (if-let [ts (get state (payload t3))]
+    (if (= :fun (tt (first ts)))
+      (concat [state t1 t2]
+              ts
+              [t4])))
+
+  [_ _ _ :default _]
+  (if-let [ts (get state (payload t3))]
+    (if-not (= :fun (tt (first ts)))
+      (concat [state t1 t2]
+              ts
+              [t4])))
+
+  [_ _ (:or nil
+            :whitespace
+            :newline
+            :emptyline) _ (:or nil
+                               :whitespace
+                               :newline
+                               :emptyline)]
+  (if-let [ts (get state (payload t3))]
+    (if-not (= :fun (tt (first ts)))
+      (concat [state t1 t2]
+              ts
+              [t4]))))
 
 (defn call-lambda [arg-name fn-body arg-val]
   (-> [(token :bang \!)
