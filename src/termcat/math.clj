@@ -29,6 +29,7 @@
           :dash [(math-block (fragment t) :mo)]
           :fun [t]
           :text [t]
+          :right-quote [t]
           [:block (_ :guard :math)] [t]
           [:block _] (if-let [cur-opts (math-opts t)]
                        [(block (ldelim (into cur-opts opts))
