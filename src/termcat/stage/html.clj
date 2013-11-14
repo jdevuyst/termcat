@@ -99,6 +99,7 @@
   [state t1 t2]
   tt
   block?
+  [_ _ [:block (_ :guard :text)]] nil
   [_ _ [:block (_ :guard :msup)]] (concat [nil
                                            t1
                                            (token :open-math)
@@ -185,7 +186,8 @@
               (token :html "<span class='termcat_error'>")
               (token :html (escape (payload t1)))
               (token :html "</span>")]
-  [_ :whitespace] [nil (token :html \space)]
+  [_ :whitespace] (if (payload t1)
+                    [nil (token :html \space)])
   [_ :html] [nil t1]
   [_ _] [nil (token :html (escape (payload t1)))])
 

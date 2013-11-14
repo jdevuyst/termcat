@@ -6,24 +6,6 @@
             [termcat.fun :as fun]
             [termcat.math :as math]))
 
-(defrule introduce-prefix-minus
-  [state t1 t2 t3]
-  tt
-  block?
-  [_
-   (:or nil
-        :newline
-        :emptyline
-        :whitespace)
-   :dash
-   (:or :default
-        [:block _])] (concat [nil
-                              t1
-                              (math/math-block (fragment t2)
-                                               :mo
-                                               :prefix)]
-                             (math/math-cast t3)))
-
 (defrule introduce-par-calls
   [state t1]
   tt
@@ -109,28 +91,25 @@
                                         (fragment t3)))
               [t5]))))
 
-(defn text-cast [t]
-  (if (block? t)
-    (block (left t)
-           (->> t
-                center
-                .terms
-                (map text-cast)
-                fragmentcat)
-           (right t))
-    (token :text (payload t))))
-
-(defrule introduce-math-identifiers
+(defrule remove-manual-casts
   [state t1 t2]
   tt
   block?
-  [_ :double-quote _] [nil (text-cast t2)]
-  [_ :maybe-magic _] (case (payload t1)
-                       \* (concat [nil]
-                                  (math/math-cast t2))
-                       \+ (concat [nil]
-                                  (math/math-cast t2 #{:script}))
-                       nil))
+  [_ _ :whitespace] nil
+  [_ :double-quote _] [nil (math/math-block
+                             (if (block? t2)
+                               (center t2)
+                               (fragment t2))
+                             :text)]
+  [_ :maybe-magic _] (let [ts (if (block? t2)
+                                (.terms (center t2))
+                                [t2])]
+                       (case (payload t1)
+                         \* (concat [nil]
+                                    (mapcat math/math-cast ts))
+                         \+ (concat [nil]
+                                    (mapcat #(math/math-cast % #{:script}) ts))
+                         nil)))
 
 (defrule introduce-math-operators
   [state t1 t2 t3 t4 t5 t6 t7]
@@ -287,9 +266,9 @@
   [state t1 t2]
   tt
   block?
-  [_ _ (:or :whitespace nil)] nil
-  [_ [:block (_ :guard :math)] _] (concat [nil t1]
-                                        (math/math-cast t2)))
+  [_ [:block (_ :guard :math)] (:or :default [:block _])]
+  (concat [nil t1]
+          (math/math-cast t2)))
 
 (defrule flatten-math-fences
   [state t1]

@@ -55,27 +55,7 @@
         [:block _])] (if-let [ts (get state (payload t3))]
                        (concat [state t1 t2]
                                ts
-                               [t4]))
-  [_
-   _
-   _
-   (:or nil
-        :whitespace
-        :newline
-        :emtptyline)
-   (:or nil
-        :whitespace
-        :newline
-        :emptyline)] (if-let [strongest-type (if (= (tt t3) (tt t4))
-                                               (tt t3)
-                                               (condp #(contains? %2 %1) (hash-set (tt t2) (tt t3))
-                                                 :emptyline :emptyline
-                                                 :newline :newline
-                                                 nil nil ; skip
-                                                 :whitespace :whitespace))]
-                       [state t1 t2 (token strongest-type
-                                           (str (payload t3)
-                                                (payload t4)))]))
+                               [t4])))
 
 (defn call-lambda [arg-name fn-body arg-val]
   (-> [(token :bang \!)
@@ -108,3 +88,22 @@
             (fragment t2)
             (rdelim :introduce-lambdas))
      t3]))
+
+(defrule remove-superfluous-whitespace
+  [state t1 t2]
+  tt
+  block?
+  [_ (:or nil
+          :whitespace
+          :newline
+          :emptyline) (:or nil
+                           :whitespace
+                           :newline
+                           :emptyline)]
+  (if-let [strongest-type (condp #(contains? %2 %1) (hash-set (tt t1) (tt t2))
+                            :emptyline :emptyline
+                            :newline :newline
+                            nil nil ; skip
+                            :whitespace :whitespace)]
+    [nil t1 t2 (token strongest-type
+                      (str (payload t1) (payload t2)))]))

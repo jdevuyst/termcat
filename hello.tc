@@ -8,7 +8,7 @@
   ~⊆~
 !+
   ~+~
-!*
+k!*
   ~×~
 !|
   ~~|~~
@@ -76,10 +76,12 @@ E = {<~ a , n , n' ~> subseteq I * N * N | Pa and n < n'}
 
 +M = <~ n^a_c^b , m ~> and +T[?x]
 
-Minus two: -2
+Minus two: x = -2
 
-<span style="background: yellow">&copy; &#166; &#x00a2; \<img src="hello.png"\></span>
+<span style="background: yellow">&copy; &#166; &#x00a2; \<img src=\"hello.png\"\></span>
 
 !id(#x(x%#))
 
 id(a)(b)(c)
+
+"foo! "(foo bar)

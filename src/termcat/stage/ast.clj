@@ -45,7 +45,7 @@
   [state t1]
   tt
   block?
-  [_ :newline] [nil (token :whitespace)])
+  [_ :newline] [nil (token :whitespace \newline)])
 
 (defrule remove-superfluous-whitespace
   [state t1 t2]
