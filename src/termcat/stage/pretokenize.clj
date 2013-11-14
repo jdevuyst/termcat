@@ -30,6 +30,7 @@
          \# :hash
          \! :bang
          \: :colon
+         \, :comma
          \. :maybe-fun
          \* :maybe-magic
          \+ :maybe-magic

@@ -1,7 +1,7 @@
 ![Termcat logo](hello.png)
 
 !=
-- ~=~
+  ~=~
 !,
   ~,~
 !subseteq
@@ -80,9 +80,15 @@ Minus two: x = -2
 
 <span style="background: yellow">&copy; &#166; &#x00a2; \<img src=\"hello.png\"\></span>
 
-!id(#x(x%#))
+!id(#x(x%,#))
 
 id(a)(b)(c)
+
+id%(a)(b)(c)
+
+,*(a)
+
+=(a)
 
 "foo! "(foo bar)
 

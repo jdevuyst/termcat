@@ -41,6 +41,21 @@
                       .terms))
                 t1]
   [_
+   (:or nil
+        :whitespace
+        :newline
+        :emptyline)
+   :comma
+   _
+   (:or nil
+        :whitespace
+        :newline
+        :emptyline
+        [:block _])] (if-let [ts (get state (payload t3))]
+                       (concat [state t1]
+                               ts
+                               [t4]))
+  [_
    _
    (:or nil
         :whitespace
@@ -51,13 +66,19 @@
         :whitespace
         :newline
         :emptyline)] (if-let [ts (get state (payload t3))]
-                       (concat [state t1 t2]
-                               ts
-                               [t4]))
-  [_ _ _ :default _] (if-let [ts (get state (payload t3))]
-                       (concat [state t1 t2]
-                               ts
-                               [t4])))
+                       (if-not (= :fun (tt (first ts)))
+                         (concat [state t1 t2]
+                                 ts
+                                 [t4])))
+  [_ _
+   (:or nil
+        :whitespace
+        :newline
+        :emptyline) :default [:block _]] (if-let [ts (get state (payload t3))]
+                                           (if (= :fun (tt (first ts)))
+                                             (concat [state t1 t2]
+                                                     ts
+                                                     [t4]))))
 
 (defn call-lambda [arg-name fn-body arg-val]
   (-> [(token :bang \!)
