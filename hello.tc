@@ -76,7 +76,7 @@ E = {<~ a , n , n' ~> subseteq I * N * N | Pa and n < n'}
 
 +M = <~ n^a_c^b , m ~> and +T[?x]
 
-Minus two: x = -2
+a%+2em%b
 
 <span style="background: yellow">&copy; &#166; &#x00a2; \<img src=\"hello.png\"\></span>
 
@@ -84,11 +84,12 @@ Minus two: x = -2
 
 id(a)(b)(c)
 
+a = "b
+
 id%(a)(b)(c)
 
-,*(a)
+one---two -- three
 
-=(a)
+Minus two: x = -2
 
-"foo! "(foo bar)
-
+asdf

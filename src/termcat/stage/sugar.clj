@@ -10,12 +10,13 @@
   [state t1 t2 t3]
   tt
   block?
-  [_ _ :emptyline _] (concat [nil]
+  [_ _ :emptyline _] (concat [nil t1]
                              (if-not (= (tt t1) :whitespace)
                                [(token :whitespace nil)])
                              (fun/fun-call-seq ":par")
                              (if-not (= (tt t3) :whitespace)
-                               [(token :whitespace nil)])))
+                               [(token :whitespace nil)])
+                             [t3]))
 
 (defrule introduce-section-calls
   [state t1]
@@ -66,33 +67,38 @@
                                                     (center t4))
                                   [t5]))
 
-(defn decorator-fname [tok]
-  (case (payload tok)
-    \* ":emph"
-    "**" ":strong"
-    \_ ":underline"
-    nil))
+(defn wrap-term [tag-name t]
+  (concat
+    [(token :html (str \< tag-name \>))]
+    (if (block? t)
+      (.terms (center t))
+      [t])
+    [(token :html (str "</" tag-name \>))]))
 
-(defrule introduce-decorator-calls
-  [state t1 t2 t3 t4 t5]
+(defrule remove-decorators
+  [state t1 t2 t3 t4 t5 t6 t7]
   tt
   block?
-  [_
-   (:or :whitespace nil)
-   (:or :underscore
-        :maybe-magic)
-   (:or :default
-        [:block _])
-   (:or :underscore
-        :maybe-magic)
+  [_ _ (:or :whitespace nil)
+   :underscore _ :underscore
+   (:or :whitespace nil) _]
+  (concat [nil t1 t2]
+          (wrap-term "u" t4)
+          [t6 t7])
+
+  [_ _ (:or :whitespace nil)
+   :asterisk _ :asterisk
+   (:or :whitespace nil) _]
+  (concat [nil t1 t2]
+          (wrap-term "em" t4)
+          [t6 t7])
+
+  [_ (:or :whitespace nil)
+   :asterisk :asterisk _ :asterisk :asterisk
    (:or :whitespace nil)]
-  (if (= (payload t2) (payload t4))
-    (if-let [fname (decorator-fname t2)]
-      (concat [nil t1]
-              (fun/fun-call-seq fname (if (block? t3)
-                                        (center t3)
-                                        (fragment t3)))
-              [t5]))))
+  (concat [nil t1]
+          (wrap-term "strong" t4)
+          [t7]))
 
 (defrule remove-manual-casts
   [state t1 t2]
@@ -104,15 +110,16 @@
                                (center t2)
                                (fragment t2))
                              :text)]
-  [_ :maybe-magic _] (let [ts (if (block? t2)
-                                (.terms (center t2))
-                                [t2])]
-                       (case (payload t1)
-                         \* (concat [nil]
-                                    (mapcat math/math-cast ts))
-                         \+ (concat [nil]
-                                    (mapcat #(math/math-cast % #{:script}) ts))
-                         nil)))
+  [_ :asterisk _] (let [ts (if (block? t2)
+                             (.terms (center t2))
+                             [t2])]
+                    (concat [nil]
+                            (mapcat math/math-cast ts)))
+  [_ :asterisk _] (let [ts (if (block? t2)
+                             (.terms (center t2))
+                             [t2])]
+                    (concat [nil]
+                            (mapcat #(math/math-cast % #{:script}) ts))))
 
 (defrule introduce-math-operators
   [state t1 t2 t3 t4 t5 t6 t7]

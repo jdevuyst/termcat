@@ -32,8 +32,8 @@
          \: :colon
          \, :comma
          \. :maybe-fun
-         \* :maybe-magic
-         \+ :maybe-magic
+         \* :asterisk
+         \+ :plus
          :default)
        c))
 

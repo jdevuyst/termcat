@@ -125,7 +125,6 @@ block?
           :left-quote
           :right-quote
           :hash
-          :maybe-magic
           :html)] (if (= (tt t1) (tt t2))
                     [nil
                      (token (tt t1)
@@ -266,13 +265,21 @@ block?
   [state t1 t2 t3]
   tt
   block?
-  [_ :default (:or :maybe-magic
-                   :maybe-fun
-                   :dash) :default] [nil
-                                     (token :default
-                                            (str (payload t1)
-                                                 (payload t2)
-                                                 (payload t3)))])
+  [_ _ (:or :whitespace
+            :newline
+            :emptyline
+            [:block _]
+            [:ldelim _]
+            [:rdelim _]
+            :percent
+            :circumflex
+            :underscore) _] nil
+  [_ :default _ :default] (if-not (and (= (tt t2) :dash)
+                                       (string? (payload t2)))
+                            [nil (token :default
+                                        (str (payload t1)
+                                             (payload t2)
+                                             (payload t3)))]))
 
 (defn css-length? [s]
   (and (string? s)
@@ -293,11 +300,10 @@ block?
    _] [nil t1 t2]
   [_
    :percent
-   (:or :maybe-magic
+   (:or :plus
         :underscore
         :dash)
-   :default] (if (and (contains? #{\+ \- \_} (payload t2))
-                      (css-length? (payload t3)))
+   :default] (if (css-length? (payload t3))
                [nil
                 (token :html "<span style='")
                 (token :html (case (payload t2)
