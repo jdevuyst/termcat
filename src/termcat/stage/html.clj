@@ -209,6 +209,7 @@
              (token :html "font-family: helvetica, sans-serif; ")
              (token :html "font-weight: lighter } ")
              (token :html "body { ")
+             (token :html "font-family: 'STIXGeneral Regular'; ")
              (token :html "background: white; ")
              (token :html "margin: 0 auto; ")
              (token :html "padding: 2em 1em; ")
