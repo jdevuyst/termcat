@@ -115,7 +115,7 @@
                              [t2])]
                     (concat [nil]
                             (mapcat math/math-cast ts)))
-  [_ :asterisk _] (let [ts (if (block? t2)
+  [_ :plus _] (let [ts (if (block? t2)
                              (.terms (center t2))
                              [t2])]
                     (concat [nil]
