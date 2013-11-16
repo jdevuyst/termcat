@@ -1,19 +1,26 @@
 ![Termcat logo](hello.png)
 
-!=
-  ~=~
-!,
-  ~,~
-!subseteq
-  ~⊆~
-!+
-  ~+~
-!*
-  ~×~
-!|
-  ~~|~~
-!<
-  ~<~
+!bind
+- =
+- ~=~
+!bind
+- ,
+- ~,~
+!bind
+- subseteq
+- ~⊆~
+!bind
+- +
+- ~+~
+!bind
+- *
+- ~×~
+!bind
+- |
+- ~~|~~
+!bind
+- <
+- ~<~
 
 # Section
 ## Subsection
@@ -82,7 +89,7 @@ a%+2em%b
 
 <span style="background: yellow">&copy; &#166; &#x00a2; \<img src=\"hello.png\"\></span>
 
-!id(#x(x%,#))
+!id(#x(x%,recur))
 
 id(a)(b)(c)
 

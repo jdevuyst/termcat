@@ -22,56 +22,66 @@
     ([] nil)
     ([x] x)
     ([x y] x))
-  [state t1 t2 t3 t4]
+  [state t1 t2 t3 t4 t5]
   tt
   block?
-  [_ _ _ [:block _] _]
-  nil
-
   [_ (:or nil
           :whitespace
           :newline
           :emptyline
-          [:block _]) :bang _ [:block _]]
-  [(assoc state
-     (payload t3)
-     (-> t4
-         center
-         .terms))
-   t1]
+          [:block _]) :bang :default [:block _] [:block _]]
+  (if (= (payload t3) "bind")
+    (let [ts (-> t4
+                 center
+                 .terms)
+          name (as-> (first ts) $
+                     (if $ (payload $)))]
+      (if (and (= 1 (count ts))
+               (or (char? name) (string? name)))
+        [(assoc state name (.terms (center t5)))
+         t1]
+        (token :error
+               [state t1
+                (apply str
+                       "bind: not a valid name — "
+                       ts)]))))
 
-  [_ _ :comma _ _]
-  (if-let [ts (get state (payload t3))]
-    (concat [state t1]
+
+  [_ _ _ _ [:block _] _]
+  nil
+
+  [_ _ _ :comma _ _]
+  (if-let [ts (get state (payload t4))]
+    (concat [state t1 t2]
             ts
-            [t4]))
+            [t5]))
 
-  [_ _ _ :default [:block _]]
-  (if-let [ts (get state (payload t3))]
+  [_ _ _ _ :default [:block _]]
+  (if-let [ts (get state (payload t4))]
     (if (= :fun (tt (first ts)))
-      (concat [state t1 t2]
+      (concat [state t1 t2 t3]
               ts
-              [t4])))
+              [t5])))
 
-  [_ _ _ :default _]
-  (if-let [ts (get state (payload t3))]
+  [_ _ _ _ :default _]
+  (if-let [ts (get state (payload t4))]
     (if-not (= :fun (tt (first ts)))
-      (concat [state t1 t2]
+      (concat [state t1 t2 t3]
               ts
-              [t4])))
+              [t5])))
 
-  [_ _ (:or nil
-            :whitespace
-            :newline
-            :emptyline) _ (:or nil
-                               :whitespace
-                               :newline
-                               :emptyline)]
-  (if-let [ts (get state (payload t3))]
+  [_ _ _ (:or nil
+              :whitespace
+              :newline
+              :emptyline) _ (:or nil
+                                 :whitespace
+                                 :newline
+                                 :emptyline)]
+  (if-let [ts (get state (payload t4))]
     (if-not (= :fun (tt (first ts)))
-      (concat [state t1 t2]
+      (concat [state t1 t2 t3]
               ts
-              [t4]))))
+              [t5]))))
 
 (defn call-lambda [arg-name fn-body arg-val]
   (-> [(token :bang \!)
@@ -81,7 +91,7 @@
            first)
        arg-val
        (token :bang \!)
-       (token :default \#)
+       (token :default "recur")
        (block (ldelim :create-lambda)
               (fragment (token :fun (fun/curry-fun call-lambda 3))
                         arg-name
