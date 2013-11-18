@@ -172,13 +172,11 @@
         [:block _])
    :bar
    (:or :default
-        [:block _])] (do (println :frac)
-
-                       [nil
+        [:block _])] [nil
                         (math/math-block
                           (fragment (math/math-row-cast t1)
                                     (math/math-row-cast t3))
-                          :mfrac)]))
+                          :mfrac)])
 
 (defrule math-cast-next-token
   [state t1 t2]

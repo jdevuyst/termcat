@@ -78,6 +78,7 @@
       (rewrite html/introduce-typographic-full-stops)
       (rewrite html/introduce-typographic-colons)
       (rewrite html/introduce-math-tags)
+      (rewrite html/introduce-mtext-tags)
       (rewrite html/remove-math-tags)
       (cond-> *debug* print-fragment)
       (rewrite html/to-html-tokens)

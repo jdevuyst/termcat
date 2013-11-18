@@ -103,8 +103,6 @@ one---two -- three
 
 !bind(moo)(foo bar baz) *moo*
 
-p^y^z'_a_b|(abc)
-
 p^{yz}'_{ab}
 
-x = -2
+p^y^z'_a_b|(a b c)
