@@ -26,7 +26,7 @@
   ([t] (math-cast t nil))
   ([t opts]
    (match (tt t)
-          :dash [(math-block (fragment t) :mo)]
+          :dash [(math-block (fragment t) :mo :prefix)]
           :fun [t]
           :text [t]
           :right-quote [t]

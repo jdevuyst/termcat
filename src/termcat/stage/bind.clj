@@ -52,23 +52,23 @@
 
   [_ _ _ :comma _ _]
   (if-let [ts (get state (payload t4))]
-    (concat [state t1 t2]
-            ts
-            [t5]))
+    [state t1 t2
+     (token :identifier ts)
+     t5])
 
   [_ _ _ _ :default [:block _]]
   (if-let [ts (get state (payload t4))]
     (if (= :fun (tt (first ts)))
-      (concat [state t1 t2 t3]
-              ts
-              [t5])))
+      [state t1 t2 t3
+       (token :identifier ts)
+       t5]))
 
   [_ _ _ _ :default _]
   (if-let [ts (get state (payload t4))]
     (if-not (= :fun (tt (first ts)))
-      (concat [state t1 t2 t3]
-              ts
-              [t5])))
+      [state t1 t2 t3
+       (token :identifier ts)
+       t5]))
 
   [_ _ _ (:or nil
               :whitespace
@@ -79,40 +79,25 @@
                                  :emptyline)]
   (if-let [ts (get state (payload t4))]
     (if-not (= :fun (tt (first ts)))
-      (concat [state t1 t2 t3]
-              ts
-              [t5]))))
+      [state t1 t2 t3
+       (token :identifier ts)
+       t5])))
 
-(defn call-lambda [arg-name fn-body arg-val]
-  (-> [(token :bang \!)
-       (-> arg-name
-           center
-           .terms
-           first)
-       arg-val
-       (token :bang \!)
-       (token :default "recur")
-       (block (ldelim :create-lambda)
-              (fragment (token :fun (fun/curry-fun call-lambda 3))
-                        arg-name
-                        fn-body)
-              (rdelim :create-lambda))]
-      (fragmentcat (.terms (center fn-body)))
-      (rewrite introduce-bindings)
-      .terms))
-
-(defrule introduce-lambdas
-  [state t1 t2 t3]
+(defrule expand-bindings
+  [state t1]
   tt
   block?
-  [_ _ [:block _] _] nil
-  [_ :hash _ [:block _]]
-  (if (= (payload t1) \#)
+  [_ :identifier] (cons nil (payload t1)))
+
+(defrule introduce-lambdas
+  [state t1 t2 t3 t4]
+  tt
+  block?
+  [_ :period :default [:block _] [:block _]]
+  (if (= (payload t1) "fn")
     [nil
-     (token :fun (fun/curry-fun call-lambda 3))
-     (block (ldelim :introduce-lambdas)
-            (fragment t2)
-            (rdelim :introduce-lambdas))
+     (token :fun (fn [& args]
+                   ))
      t3]))
 
 (defrule remove-superfluous-whitespace

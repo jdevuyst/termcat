@@ -98,3 +98,13 @@ a = "b
 id%(a)(b)(c)
 
 one---two -- three
+
+.fn(a b)(b a)(x y)
+
+!bind(moo)(foo bar baz) *moo*
+
+p^y^z'_a_b|(abc)
+
+p^{yz}'_{ab}
+
+x = -2
