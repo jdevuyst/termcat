@@ -80,9 +80,9 @@
                                (if (contains? props :script)
                                  " mathvariant=script")
                                (condp #(contains? %2 %1) props
-                                 :prefix " form=prefix"
+                                 :prefix " form=prefix lspace=0em"
                                  :infix " form=infix"
-                                 :postfix " form=postfix"
+                                 :postfix " form=postfix rspace=0em"
                                  nil)
                                (condp #(contains? %2 %1) props
                                  :wide-left " lspace=veryverythickmathspace"
