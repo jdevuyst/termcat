@@ -4,7 +4,8 @@
             [clojure.set :as set]
             [clojure.string :as string]
             [termcat.term :refer :all]
-            [termcat.rewrite :refer :all]))
+            [termcat.rewrite :refer :all]
+            [termcat.math :as math]))
 
 (defn text-block? [x]
   (and (block? x)
@@ -70,6 +71,15 @@
                  (token :html "</span>")
                  t3])
 
+(defrule remove-error-tokens
+  [state t1]
+  tt
+  block?
+  [_ :error] [nil (math/math-block
+                    (fragment (token :default
+                                     (payload t1)))
+                    :error)])
+
 (defn wrap-math-block [t props]
   (let [tag-name (condp #(contains? %2 %1) props
                    :mo "mo"
@@ -101,6 +111,15 @@
   tt
   block?
   [_ _ [:block (_ :guard :text)]] nil
+  [_ _ [:block (_ :guard :error)]] (concat [nil
+                                           t1
+                                           (token :open-math)
+                                           (token :html "<merror>")
+                                           (token :html "<mtext>")]
+                                          (.terms (center t2))
+                                          [(token :html "</mtext>")
+                                           (token :html "</merror>")
+                                           (token :close-math)])
   [_ _ [:block (_ :guard :msup)]] (concat [nil
                                            t1
                                            (token :open-math)
@@ -236,11 +255,6 @@
              (token :html "margin: 0 auto; ")
              (token :html "padding: 2.5em; ")
              (token :html "max-width: 50em } ")
-             (token :html ".termcat_error { ")
-             (token :html "background: red; ")
-             (token :html "color: white; ")
-             (token :html "margin-left: .33ex; ")
-             (token :html "margin-right: .33ex } ")
              (token :html ".full_stop, .colon {")
              (token :html "padding-right: .5em } ")
              (token :html "</style>")

@@ -77,6 +77,7 @@
       (rewrite html/introduce-typographic-quotes)
       (rewrite html/introduce-typographic-full-stops)
       (rewrite html/introduce-typographic-colons)
+      (rewrite html/remove-error-tokens)
       (rewrite html/introduce-math-tags)
       (rewrite html/introduce-mtext-tags)
       (rewrite html/remove-math-tags)
