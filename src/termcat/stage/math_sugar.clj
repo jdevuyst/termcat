@@ -1,6 +1,7 @@
 (ns termcat.stage.math-sugar
   (:require [clojure.core.match :refer (match)]
             [clojure.core.reducers :as r]
+            [clojure.string :as string]
             [termcat.term :refer :all]
             [termcat.rewrite :refer :all]
             [termcat.fun :as fun]
@@ -108,7 +109,7 @@
                       (mapcat math/math-cast)
                       (apply math/merge-rows)))
               $)
-         (into [] $)
+         (vec $)
          (match $
                 [nil _ _] (assert false)
                 [a nil nil] (assert false)
@@ -141,7 +142,7 @@
                                           3 \‴
                                           2 \″
                                           1 \′
-                                          (apply str (repeat length \′)))))
+                                          (string/join (repeat length \′)))))
                                fragment
                                (math/math-block :mo))])]
   [_

@@ -216,8 +216,7 @@ block?
 tt
 block?
 [{:in-bullet true} _ nil nil] (letfn [(unwind [state2]
-                                              (if (nil? state2)
-                                                nil
+                                              (when-not (nil? state2)
                                                 (cons (token [:rdelim (:item-type state2)])
                                                       (unwind (:prev-state state2)))))]
                                 (cons nil

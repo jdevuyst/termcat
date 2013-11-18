@@ -23,7 +23,7 @@
        [(token :fun (curry-fun (partial f x)))]
        (f))))
   ([f n]
-   (assert (> n 0))
+   (assert (pos? n))
    (if (= n 1)
      (unary-fun [x] (f x))
      (unary-fun [x]
