@@ -45,7 +45,7 @@
   text-block?
   [_ (:or :default
           [:block _])
-   :maybe-fun
+   :period
    :whitespace] (if (and (= (payload t2) \.)
                          (or (block? t1)
                              (re-matches #"[^\\.]*"

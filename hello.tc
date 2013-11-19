@@ -99,10 +99,10 @@ id%(a)(b)(c)
 
 one---two -- three
 
-.fn(a b)(b a)(x y)
-
 !bind(moo)(foo bar baz) *moo*
 
 p^{yz}'_{ab}
 
 p^y^z'_a_b|(a b c)
+
+.fn(a b)(b a)(x)(y)

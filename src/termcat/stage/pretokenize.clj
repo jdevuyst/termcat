@@ -31,7 +31,7 @@
          \! :bang
          \: :colon
          \, :comma
-         \. :maybe-fun
+         \. :period
          \* :asterisk
          \+ :plus
          :default)

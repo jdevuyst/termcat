@@ -29,6 +29,8 @@
          (println indent (token-to-string t)))))
    frag))
 
+; (print (apply str (repeat 1000 \newline)))
+
 (defn compile [s]
   (-> s
       pretok/map-to-tokens
@@ -48,8 +50,9 @@
       (rewrite ast/fix-bullet-continuations)
       (rewrite ast/convert-newlines-to-whitespace)
       (rewrite ast/remove-superfluous-whitespace)
-      (rewrite bind/introduce-fun-calls)
       (rewrite bind/introduce-lambdas)
+      (cond-> *debug* print-fragment)
+      (rewrite bind/introduce-fun-calls)
       (rewrite bind/introduce-bindings)
       (rewrite sugar/introduce-par-calls)
       (rewrite sugar/introduce-section-calls)
@@ -57,6 +60,8 @@
       (rewrite sugar/introduce-bullet-list-calls)
       (rewrite sugar/introduce-link-calls)
       (rewrite sugar/remove-decorators)
+      (rewrite lambda/evaluate-fun-calls)
+      (rewrite bind/introduce-bindings)
       (rewrite bind/expand-bindings)
       ; (cond-> *debug* print-fragment)
       (rewrite lambda/evaluate-fun-calls)
@@ -81,7 +86,7 @@
       (rewrite html/introduce-math-tags)
       (rewrite html/introduce-mtext-tags)
       (rewrite html/remove-math-tags)
-      (cond-> *debug* print-fragment)
+      ; (cond-> *debug* print-fragment)
       (rewrite html/to-html-tokens)
       (rewrite html/introduce-boilerplate)
       html/to-string))
