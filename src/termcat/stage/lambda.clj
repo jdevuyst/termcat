@@ -15,6 +15,7 @@
   tt
   block?
   [_ :fun [:block _]] (cons nil (apply-fun t1 t2))
-  [_ :fun _] (-> (concat [nil]
-                         (apply-fun t1 nil)
-                         [t2])))
+  [_ :fun (:or :whitespace :newline :emptyline)] ; not on nil!
+  (-> (concat [nil]
+              (apply-fun t1 nil)
+              [t2])))
