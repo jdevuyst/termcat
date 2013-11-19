@@ -76,6 +76,9 @@
   [state t1 t2 t3 t4 t5]
   tt
   block?
+  [_ _ _ _ _ :arg]
+  [(dissoc state (payload t5)) t1 t2 t3 t4 t5]
+
   [_ (:or nil
           :whitespace
           :newline
@@ -91,12 +94,14 @@
                (or (char? name) (string? name)))
         [(assoc state name (.terms (center t5)))
          t1]
-        (token :error
-               [state t1
-                (apply str
-                       "bind: not a valid name — "
-                       ts)]))))
-
+        [state t1 (token :error
+                         (apply str
+                                "bind: not a valid name — "
+                                name
+                                (if (> (count ts) 1)
+                                  (str " (and "
+                                       (dec (count ts))
+                                       " more tokens)"))))])))
 
   [_ _ _ _ [:block _] _]
   nil

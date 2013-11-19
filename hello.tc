@@ -105,4 +105,8 @@ p^{yz}'_{ab}
 
 p^y^z'_a_b|(a b c)
 
+!bind(a)(b)
+
 .fn(a b)(b a)(x)(y)
+
+.map(.fn(el)(el%>))(1)(2)(3)(4)(5)

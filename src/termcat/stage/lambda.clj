@@ -5,7 +5,7 @@
 
 (defn apply-fun [fun-token arg-token]
   (let [f (payload fun-token)
-        retval (f arg-token)]
+        retval (f fun-token arg-token)]
     (if (string? retval)
       [(token :error (str retval " – " (:fun-name (meta f))))]
       retval)))

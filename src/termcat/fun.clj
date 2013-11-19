@@ -5,20 +5,21 @@
 
 (defmacro constant-fun [& body]
   (let [x (gensym 'constant-fun-x)]
-    `(fn [~x]
+    `(fn [self# ~x]
        (if ~x
          [~@body ~x]
          [~@body]))))
 
 (defmacro unary-fun [[x] & body]
-  `(fn [~x]
+  `(fn [self# ~x]
      (if ~x
        (do ~@body)
-       "Missing function argument(s)")))
+       ;"Missing function argument(s)"
+       [self#])))
 
 (defn curry-fun
   ([f]
-   (fn [x]
+   (fn [self x]
      (if x
        [(token :fun (curry-fun (partial f x)))]
        (f))))
@@ -68,6 +69,17 @@
                   rows)
           [(token :html "</ol>")]))
 
+(defn map-fn [lambda & args]
+  (let [x (mapcat (fn [x y] (concat [(token :whitespace)] x [y]))
+                  (repeat (.terms (center lambda)))
+                  args)]
+    (println :map x)
+    x))
+
+; (defn reduce-fn [lambda & args]
+;   (concat (interleave (repeat (.terms (center lambda)))
+;                       (map vector args))))
+
 (def fun-map {".identity" (unary-fun [x] (.terms (center x)))
               ".rand" (constant-fun (token :default (str (rand))))
               ":par" (html-constant "<p>")
@@ -85,6 +97,8 @@
               ":emph" (html-wrapper "em")
               ":strong" (html-wrapper "strong")
               ":underline" (html-wrapper "u")
+              ".map" (curry-fun map-fn)
+              ; ".reduce" (curry-fun reduce-fn)
               ; ":union" (constant-fun (token [:math :op] "⋃"))
               ; ":intersection" (constant-fun (token [:math :op] "⋂"))
               ; ":times" (constant-fun (token [:math :op] "×"))
