@@ -14,8 +14,7 @@
   `(fn [self# ~x]
      (if ~x
        (do ~@body)
-       ;"Missing function argument(s)"
-       [self#])))
+       [(token :error "Missing function argument(s)")])))
 
 (defn curry-fun
   ([f]
@@ -73,12 +72,18 @@
   (let [x (mapcat (fn [x y] (concat [(token :whitespace)] x [y]))
                   (repeat (.terms (center lambda)))
                   args)]
-    (println :map x)
     x))
 
-; (defn reduce-fn [lambda & args]
-;   (concat (interleave (repeat (.terms (center lambda)))
-;                       (map vector args))))
+(defn reduce-fn [lambda result]
+  [(token :fun (fn [self new-el]
+                 (if (nil? new-el)
+                   [result]
+                   [(token :fun (curry-fun reduce-fn 2))
+                    lambda
+                    (block (ldelim :reduce-fn)
+                           (fragmentcat (-> lambda center .terms)
+                                        [result new-el])
+                           (rdelim :reduce-fn))])))])
 
 (def fun-map {".identity" (unary-fun [x] (.terms (center x)))
               ".rand" (constant-fun (token :default (str (rand))))
@@ -98,6 +103,7 @@
               ":strong" (html-wrapper "strong")
               ":underline" (html-wrapper "u")
               ".map" (curry-fun map-fn)
+              ".reduce" (curry-fun reduce-fn 2)
               ; ".reduce" (curry-fun reduce-fn)
               ; ":union" (constant-fun (token [:math :op] "⋃"))
               ; ":intersection" (constant-fun (token [:math :op] "⋂"))
