@@ -32,80 +32,88 @@
 ; (print (apply str (repeat 1000 \newline)))
 
 (defn compile [s]
-  (-> s
-      pretok/map-to-tokens
-      (rewrite tok/escape-html)
-      (rewrite tok/remove-escape-tokens)
-      (rewrite tok/remove-annotated-tokens)
-      (rewrite tok/merge-tokens)
-      (rewrite tok/introduce-emptyline-tokens)
-      (rewrite tok/introduce-indent-tokens)
-      (rewrite tok/remove-superfluous-whitespace)
-      (rewrite tok/introduce-item-tokens)
-      (rewrite tok/remove-magic-tokens)
-      (rewrite tok/remove-percent-tokens)
-      (rewrite tok/remove-remaining-percent-tokens)
-      (rewrite ast/abstract-blocks)
-      (rewrite ast/introduce-delim-errors)
-      (rewrite ast/fix-bullet-continuations)
-      (rewrite ast/convert-newlines-to-whitespace)
-      (rewrite ast/remove-superfluous-whitespace)
-      (rewrite bind/introduce-lambdas)
-      (rewrite bind/introduce-fun-calls)
-      (rewrite bind/introduce-bindings)
-      (rewrite sugar/introduce-par-calls)
-      (rewrite sugar/introduce-section-calls)
-      (rewrite sugar/introduce-blockquote-calls)
-      (rewrite sugar/introduce-bullet-list-calls)
-      (rewrite sugar/introduce-link-calls)
-      (rewrite sugar/remove-decorators)
-      (rewrite lambda/evaluate-fun-calls)
-      (rewrite bind/introduce-bindings)
-      (rewrite bind/expand-bindings)
-      (rewrite lambda/evaluate-fun-calls)
-      (rewrite bind/introduce-bindings)
-      (rewrite bind/expand-bindings)
-      (rewrite lambda/evaluate-fun-calls)
-      (rewrite bind/introduce-bindings)
-      (rewrite bind/expand-bindings)
-      (rewrite lambda/evaluate-fun-calls)
-      (rewrite bind/introduce-bindings)
-      (rewrite bind/expand-bindings)
-      (rewrite lambda/evaluate-fun-calls)
-      (rewrite bind/introduce-bindings)
-      (rewrite bind/expand-bindings)
-      (rewrite lambda/evaluate-fun-calls)
-      (rewrite bind/introduce-bindings)
-      (rewrite bind/expand-bindings)
-      (rewrite lambda/evaluate-fun-calls)
-      (rewrite bind/introduce-bindings)
-      (rewrite bind/expand-bindings)
-      (rewrite lambda/evaluate-fun-calls)
-      (rewrite bind/introduce-bindings)
-      (rewrite bind/expand-bindings)
-      (rewrite lambda/evaluate-fun-calls)
-      (cond-> *debug* print-fragment)
-      (rewrite bind/remove-superfluous-whitespace)
-      (rewrite lambda/evaluate-fun-calls)
-      (rewrite math-sugar/remove-manual-casts)
-      (rewrite math-sugar/introduce-math-operators)
-      (rewrite math-sugar/introduce-msub-msup)
-      (rewrite math-sugar/introduce-mfrac)
-      (rewrite math-sugar/math-cast-next-token)
-      (rewrite math-sugar/flatten-math-fences)
-      (rewrite math-sugar/introduce-nbsp-entities)
-      (rewrite html/introduce-typographic-dashes)
-      (rewrite html/introduce-typographic-quotes)
-      (rewrite html/introduce-typographic-full-stops)
-      (rewrite html/introduce-typographic-colons)
-      (rewrite html/remove-error-tokens)
-      (rewrite html/introduce-math-tags)
-      (rewrite html/introduce-mtext-tags)
-      (rewrite html/remove-math-tags)
-      ; (cond-> *debug* print-fragment)
-      (rewrite html/to-html-tokens)
-      (rewrite html/introduce-boilerplate)
-      html/to-string))
+  (as-> s $
+        (pretok/map-to-tokens $)
+        (reduce (fn [x y]
+                  (if (= y :TRACE)
+                    (do (print-fragment x)
+                      x)
+                    (rewrite x y)))
+                $
+                [tok/escape-html
+                           tok/remove-escape-tokens
+                           tok/remove-annotated-tokens
+                           tok/merge-tokens
+                           tok/introduce-emptyline-tokens
+                           tok/introduce-indent-tokens
+                           tok/remove-superfluous-whitespace
+                           tok/introduce-item-tokens
+                           tok/remove-magic-tokens
+                           tok/remove-percent-tokens
+                           tok/remove-remaining-percent-tokens
+                           ast/abstract-blocks
+                           ast/introduce-delim-errors
+                           ast/fix-bullet-continuations
+                           ast/convert-newlines-to-whitespace
+                           ast/remove-superfluous-whitespace
+                           bind/introduce-lambdas
+                           bind/introduce-fun-calls
+                           bind/introduce-bindings
+                           sugar/introduce-par-calls
+                           sugar/introduce-section-calls
+                           sugar/introduce-blockquote-calls
+                           sugar/introduce-bullet-list-calls
+                           sugar/introduce-link-calls
+                           sugar/remove-decorators
+                           lambda/evaluate-fun-calls
+                           bind/introduce-bindings
+                           bind/expand-bindings
+                           lambda/evaluate-fun-calls
+
+                           bind/introduce-bindings
+                           bind/expand-bindings
+                           lambda/evaluate-fun-calls
+                           bind/introduce-bindings
+                           bind/expand-bindings
+                           lambda/evaluate-fun-calls
+                           bind/introduce-bindings
+                           bind/expand-bindings
+                           lambda/evaluate-fun-calls
+                           bind/introduce-bindings
+                           bind/expand-bindings
+                           lambda/evaluate-fun-calls
+                           bind/introduce-bindings
+                           bind/expand-bindings
+                           lambda/evaluate-fun-calls
+                           bind/introduce-bindings
+                           bind/expand-bindings
+                           lambda/evaluate-fun-calls
+                           bind/introduce-bindings
+                           bind/expand-bindings
+                           lambda/evaluate-fun-calls
+                           bind/remove-superfluous-whitespace
+                           lambda/evaluate-fun-calls
+
+                           :TRACE
+
+                           math-sugar/remove-manual-casts
+                           math-sugar/introduce-math-operators
+                           math-sugar/introduce-msub-msup
+                           math-sugar/introduce-mfrac
+                           math-sugar/math-cast-next-token
+                           math-sugar/flatten-math-fences
+                           math-sugar/introduce-nbsp-entities
+                           html/introduce-typographic-dashes
+                           html/introduce-typographic-quotes
+                           html/introduce-typographic-full-stops
+                           html/introduce-typographic-colons
+                           html/remove-error-tokens
+                           html/introduce-math-tags
+                           html/introduce-mtext-tags
+                           html/remove-math-tags
+                           html/to-html-tokens
+                           html/introduce-boilerplate])
+        (html/to-string $)))
 
 (->> (slurp "hello.tc")
      compile
