@@ -26,6 +26,26 @@
            .terms
            (drop arg-count)))))
 
+(defn make-lambda [args body]
+  [(token :fun
+          (fun/curry-fun call-lambda
+                         (->> args
+                              center
+                              .terms
+                              (filter #(not= (tt %) :whitespace))
+                              count
+                              inc)))
+   (block (ldelim :lambda)
+          (fragmentcat (->> args
+                            center
+                            .terms
+                            (filter #(not= (tt %) :whitespace))
+                            (map (fn [x] (token :arg (payload x)))))
+                       (->> body
+                            center
+                            .terms))
+          (rdelim :lambda))])
+
 (defrule introduce-lambdas
   [state t1 t2 t3 t4 t5]
   tt
@@ -33,28 +53,11 @@
   [_ (:or nil :whitespace :emptyline :newline)
    :period :default [:block _] [:block _]]
   (if (= "fn" (payload t3))
-    [nil
-     (if (or (= (tt t1) :emptyline)
-             (payload t1))
-       t1)
-     (token :fun
-            (fun/curry-fun call-lambda
-                           (->> t4
-                                center
-                                .terms
-                                (filter #(not= (tt %) :whitespace))
-                                count
-                                inc)))
-     (block (ldelim :lambda)
-            (fragmentcat (->> t4
-                              center
-                              .terms
-                              (filter #(not= (tt %) :whitespace))
-                              (map (fn [x] (token :arg (payload x)))))
-                         (->> t5
-                              center
-                              .terms))
-            (rdelim :lambda))]))
+    (concat [nil
+             (if (or (= (tt t1) :emptyline)
+                     (payload t1))
+               t1)]
+            (make-lambda t4 t5))))
 
 (defrule introduce-fun-calls
   [state t1 t2 t3]
@@ -62,8 +65,7 @@
   block?
   [_
    (:or nil :whitespace :newline :emptyline)
-   (:or :period
-        :colon)
+   (:or :period :colon)
    :default]
   [nil t1 (fun/fun-call-head (str (payload t2)
                                   (payload t3)))])
