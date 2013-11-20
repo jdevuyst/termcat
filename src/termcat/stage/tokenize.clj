@@ -290,6 +290,11 @@ block?
   tt
   block?
   [_
+   _
+   :percent
+   :percent] [nil t1 (token :whitespace)
+              (token :default) (token :whitespace)]
+  [_
    :percent
    :whitespace
    (:or :newline nil)] [nil]
