@@ -127,8 +127,9 @@ block?
           :hash
           :html)] (if (= (tt t1) (tt t2))
                     [nil
-                     (token (tt t1)
-                            (str (payload t1) (payload t2)))]))
+                     (with-meta (token (tt t1)
+                                       (str (payload t1) (payload t2)))
+                                (assoc (meta t1) :rpos (-> t2 meta :rpos)))]))
 
 (defrule introduce-emptyline-tokens
   "Any two or more successive :newline tokens are replaced by
@@ -138,7 +139,8 @@ block?
 tt
 block?
 [_ :emptyline :newline] [nil t2]
-[_ :newline :newline] [nil (token :emptyline)])
+[_ :newline :newline] [nil (with-meta (token :emptyline)
+                                      (meta t1))])
 
 (defrule introduce-indent-tokens
   "Introduces [:ldelim :indent] and [:rdelim :indent] tokens.
@@ -151,7 +153,10 @@ tt
 block?
 [_ _ nil] (concat [nil t1]
                   (for [x (range (/ (:indent state) 2))]
-                    (rdelim :indent)))
+                    (with-meta (rdelim :indent)
+                               (reduce #(update-in %1 [%2] inc)
+                                       (meta t1)
+                                       [:lpos :rpos]))))
 [_ (:or :newline
         :emptyline) _] (let [indent (if (and (= (tt t2) :whitespace)
                                              (string? (payload t2)))
@@ -164,10 +169,12 @@ block?
                              diff (- indent (:indent state))]
                          (concat [{:indent indent}]
                                  (for [x (range (- diff))]
-                                   (rdelim :indent))
+                                   (with-meta (rdelim :indent)
+                                              (meta t1)))
                                  (if t1 [t1])
                                  (for [x (range diff)]
-                                   (ldelim :indent))
+                                   (with-meta (ldelim :indent)
+                                              (meta t1)))
                                  [t2])))
 
 (defrule remove-superfluous-whitespace

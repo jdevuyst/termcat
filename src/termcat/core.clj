@@ -19,7 +19,11 @@
    (assert (fragment? frag))
    (letfn [(token-to-string [t]
                             (assert (token? t))
-                            (str [(tt t) (payload t)]))]
+                            (str [(tt t) (payload t)]
+                                 (let [lpos (-> t meta :lpos)
+                                       rpos (-> t meta :rpos)]
+                                   (if (or lpos rpos)
+                                     (str " :: " lpos "-" rpos)))))]
      (doseq [t (.terms frag)]
        (if (block? t)
          (let [new-indent (str indent "  ")]
@@ -57,20 +61,23 @@
                  ast/fix-bullet-continuations
                  ast/convert-newlines-to-whitespace
                  ast/remove-superfluous-whitespace
+
                  bind/introduce-lambdas
                  bind/introduce-fun-calls
                  bind/introduce-bindings
+
                  sugar/introduce-par-calls
                  sugar/introduce-section-calls
                  sugar/introduce-blockquote-calls
                  sugar/introduce-bullet-list-calls
                  sugar/introduce-link-calls
                  sugar/remove-decorators
-                 lambda/evaluate-fun-calls
-                 bind/introduce-bindings
-                 bind/expand-bindings
-                 lambda/evaluate-fun-calls
 
+                 lambda/evaluate-fun-calls
+                 bind/introduce-bindings
+                 bind/expand-bindings
+
+                 lambda/evaluate-fun-calls
                  bind/introduce-bindings
                  bind/expand-bindings
                  lambda/evaluate-fun-calls
@@ -92,11 +99,15 @@
                  bind/introduce-bindings
                  bind/expand-bindings
                  lambda/evaluate-fun-calls
-                 bind/remove-superfluous-whitespace
+                 bind/introduce-bindings
+                 bind/expand-bindings
                  lambda/evaluate-fun-calls
+                 bind/introduce-bindings
+                 bind/expand-bindings
 
                  :TRACE
 
+                 bind/remove-superfluous-whitespace
                  math-sugar/remove-manual-casts
                  math-sugar/introduce-math-operators
                  math-sugar/introduce-msub-msup

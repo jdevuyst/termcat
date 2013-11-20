@@ -42,8 +42,9 @@
        (r/reduce (fn [[result pos] c]
                    [(conj result
                           (with-meta (char-to-token c)
-                                     {:source-code code
-                                      :source-pos pos}))
+                                     {:src code
+                                      :lpos pos
+                                      :rpos pos}))
                     (inc pos)])
                  [[] 0])
        first

@@ -105,6 +105,8 @@ p^{yz}'_{ab}
 
 p^y^z'_a_b|(a b c)
 
+*(p')^a
+
 !bind(a)(b)
 
 .fn(a b)(b a)(x)(y)
@@ -112,3 +114,37 @@ p^y^z'_a_b|(a b c)
 .map(.fn(el)(el%>))(1)(2)(3)(4)(5)
 
 .reduce(.fn(x y)(y x))(1)(2)(3)(4)(5)%%
+
+.fn(z)(z)(X)
+
+-----
+
+x z
+
+-----
+
+!bind
+- DEMO
+- .fn
+  - SRC RESULT
+  - [ SRC yields DEST ]
+
+START<pre style="background: green">%.lit(
+  - *a*
+  - .fn(x)(x)(test)
+)</pre>END
+
+START<pre style="background: green">%.apply(.nth(0))(.litfork(
+  - *a*
+  - .fn(x)(x)(test)
+))</pre>END
+
+START<pre style="background: green">%.apply(.nth(1))(.litfork(
+  - *a*
+  - .fn(x)(x)(test)
+))</pre>END
+
+
+.nth(4)(a)(b)
+
+  x

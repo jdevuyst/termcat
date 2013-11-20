@@ -39,32 +39,44 @@
                      [(token :html (str \< \/ tag \>))])))
 
 (defn html-link [text url]
-  (concat [(token :html "<a href='")]
+  (concat [(token :html "<a href='")
+           (token :whitespace)]
           (.terms (center url))
-          [(token :html "'>")]
+          [(token :whitespace)
+           (token :html "'>")
+           (token :whitespace)]
           (.terms (center text))
-          [(token :html "</a>")]))
+          [(token :whitespace)
+           (token :html "</a>")]))
 
 (defn html-image [alt-text url]
-  (concat [(token :html "<img src='")]
+  (concat [(token :html "<img src='")
+           (token :whitespace)]
           (.terms (center url))
-          [(token :html "' alt='")]
+          [(token :whitespace)
+           (token :html "' alt='")
+           (token :whitespace)]
           (.terms (center alt-text))
-          [(token :html "'>")]))
+          [(token :whitespace)
+           (token :html "'>")]))
 
 (defn bullet-list [& rows]
   (concat [(token :html "<ul>")]
           (mapcat (fn [x]
-                    (cons (token :html "<li>")
-                          (.terms (center x))))
+                    (concat [(token :html "<li>")
+                             (token :whitespace)]
+                            (.terms (center x))
+                            [(token :whitespace)]))
                   rows)
           [(token :html "</ul>")]))
 
 (defn numbered-list [& rows]
   (concat [(token :html "<ol>")]
           (mapcat (fn [x]
-                    (cons (token :html "<li>")
-                          (.terms (center x))))
+                    (concat [(token :html "<li>")
+                             (token :whitespace)]
+                            (.terms (center x))
+                            [(token :whitespace)]))
                   rows)
           [(token :html "</ol>")]))
 
@@ -85,6 +97,40 @@
                                         [result new-el])
                            (rdelim :reduce-fn))])))])
 
+(defn block-source [block-t]
+  (let [lpos (-> block-t left meta :lpos)
+        rpos (-> block-t right meta :rpos)
+        src (-> block-t left meta :src)]
+    (if (and lpos rpos)
+      (token :default (subs src (inc lpos) rpos))
+      (token :error "Source code not found"))))
+
+(defn lit [src]
+  [(block-source src)])
+
+(defn litfork [src]
+  [(block (ldelim :litfork)
+          (fragment (block-source src))
+          (rdelim :litfork))
+   src])
+
+(defn nth-fn [n]
+  [(token :fun
+          (curry-fun (fn [& args]
+                       (try (->> n
+                                 center
+                                 as-number
+                                 (nth args)
+                                 center
+                                 .terms)
+                         (catch java.lang.IndexOutOfBoundsException ex
+                           [])))))])
+
+(defn apply-fn [f arg]
+  (concat (mapcat #(-> % center .terms)
+                  [f arg])
+          [(token :whitespace)]))
+
 (def fun-map {".identity" (unary-fun [x] (.terms (center x)))
               ".rand" (constant-fun (token :default (str (rand))))
               ":par" (html-constant "<p>")
@@ -104,6 +150,10 @@
               ":underline" (html-wrapper "u")
               ".map" (curry-fun map-fn)
               ".reduce" (curry-fun reduce-fn 2)
+              ".lit" (curry-fun lit 1)
+              ".litfork" (curry-fun litfork 1)
+              ".nth" (curry-fun nth-fn 1)
+              ".apply" (curry-fun apply-fn 2)
               ; ".reduce" (curry-fun reduce-fn)
               ; ":union" (constant-fun (token [:math :op] "⋃"))
               ; ":intersection" (constant-fun (token [:math :op] "⋂"))

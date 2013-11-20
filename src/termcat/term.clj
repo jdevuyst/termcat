@@ -129,8 +129,12 @@
   (as-number [this]
              (let [v (if (= 1 (count (.terms this)))
                        (try
-                         (edn/read-string
-                           (payload (first (.terms this))))
+                         (-> this
+                             .terms
+                             first
+                             payload
+                             str
+                             edn/read-string)
                          (catch java.lang.NumberFormatException x nil)))]
                (if (number? v)
                  v
