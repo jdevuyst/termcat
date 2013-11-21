@@ -10,7 +10,7 @@
   (payload [this]))
 
 (defprotocol IFragment
-  (as-number [this]))
+  (ednval [this]))
 
 (defprotocol IBlock
   (left [this])
@@ -126,19 +126,17 @@
   ITerm
   (tt [this] :fragment)
   IFragment
-  (as-number [this]
-             (let [v (if (= 1 (count (.terms this)))
-                       (try
-                         (-> this
-                             .terms
-                             first
-                             payload
-                             str
-                             edn/read-string)
-                         (catch java.lang.NumberFormatException x nil)))]
-               (if (number? v)
-                 v
-                 (token :error "Not a number"))))
+  (ednval [this]
+          (if (= 1 (count (.terms this)))
+            (try
+              (-> this
+                  .terms
+                  first
+                  payload
+                  str
+                  edn/read-string)
+              (catch java.lang.Exception x
+                  nil))))
   IRewrite
   (rewrite [this rule]
            (let [result (rewrite (.terms this) rule)]

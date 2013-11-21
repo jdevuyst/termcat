@@ -1,7 +1,33 @@
 (ns termcat.fun
   (:require [clojure.core.reducers :as r]
+            [clojure.string :as string]
             [termcat.term :refer :all]
             [termcat.util :as u]))
+
+(defn tval [t pred]
+  (-> t
+      center
+      ednval
+      (as-> $ (if (pred $)
+                $
+                (do
+                  (println "Wrong type.")
+                  (println "\tSource:"
+                           (->> t
+                                center
+                                .terms
+                                (map payload)
+                                (map str)
+                                string/join))
+                  (println "\tEDN value:" $)
+                  (println "\tPredicate:" pred)
+                  (throw (java.lang.Exception.
+                           "Wrong type")))))))
+
+(defmacro protect [& expr]
+  `(try ~@expr
+     (catch java.lang.Exception x#
+       [(token :error (.getMessage x#))])))
 
 (defmacro constant-fun [& body]
   (let [x (gensym 'constant-fun-x)]
@@ -117,19 +143,24 @@
 (defn nth-fn [n]
   [(token :fun
           (curry-fun (fn [& args]
-                       (try (->> n
-                                 center
-                                 as-number
-                                 (nth args)
-                                 center
-                                 .terms)
-                         (catch java.lang.IndexOutOfBoundsException ex
-                           [])))))])
+                       (protect (-> n
+                                    (as-> $
+                                          (tval $ integer?)
+                                          (nth args $))
+                                    center
+                                    .terms)))))])
 
 (defn apply-fn [f arg]
   (concat (mapcat #(-> % center .terms)
                   [f arg])
           [(token :whitespace)]))
+
+(defn plus [x y]
+  (protect (->> (+ (tval x number?)
+                   (tval y number?))
+                str
+                (token :default)
+                vector)))
 
 (def fun-map {".identity" (unary-fun [x] (.terms (center x)))
               ".rand" (constant-fun (token :default (str (rand))))
@@ -155,6 +186,7 @@
               ".nth" (curry-fun nth-fn 1)
               ".apply" (curry-fun apply-fn 2)
               ".eq?" (curry-fun (comp vector #(token :default %) str =) 2)
+              ".plus" (curry-fun plus 2)
               ; ".reduce" (curry-fun reduce-fn)
               ; ":union" (constant-fun (token [:math :op] "⋃"))
               ; ":intersection" (constant-fun (token [:math :op] "⋂"))

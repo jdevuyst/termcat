@@ -127,3 +127,7 @@ p^y^z'_a_b|(a b c)
 .eq?(test)(test) .eq?(this)(that)
 
 .fn(a b)(b a)(1)(2)(3)
+
+.nth(aa)%%
+
+.plus(1)(2)
