@@ -154,6 +154,7 @@
               ".litfork" (curry-fun litfork 1)
               ".nth" (curry-fun nth-fn 1)
               ".apply" (curry-fun apply-fn 2)
+              ".eq?" (curry-fun (comp vector #(token :default %) str =) 2)
               ; ".reduce" (curry-fun reduce-fn)
               ; ":union" (constant-fun (token [:math :op] "⋃"))
               ; ":intersection" (constant-fun (token [:math :op] "⋂"))
