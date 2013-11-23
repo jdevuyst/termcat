@@ -162,6 +162,21 @@
                 (token :default)
                 vector)))
 
+(defn range-fn [start end]
+  (protect (->> (range (tval start integer?) (tval end integer?))
+                (map str)
+                (map #(block (ldelim :range)
+                             (fragment (token :default %))
+                             (rdelim :range))))))
+
+(defn if-fn [t1 t2 t3]
+  (protect (->> (if (tval t1 #(or (= % true)
+                                  (= % false)))
+                  t2
+                  t3)
+                center
+                .terms)))
+
 (def fun-map {".identity" (unary-fun [x] (.terms (center x)))
               ".rand" (constant-fun (token :default (str (rand))))
               ":par" (html-constant "<p>")
@@ -187,6 +202,8 @@
               ".apply" (curry-fun apply-fn 2)
               ".eq?" (curry-fun (comp vector #(token :default %) str =) 2)
               ".plus" (curry-fun plus 2)
+              ".range" (curry-fun range-fn 2)
+              ".if" (curry-fun if-fn 3)
               ; ".reduce" (curry-fun reduce-fn)
               ; ":union" (constant-fun (token [:math :op] "⋃"))
               ; ":intersection" (constant-fun (token [:math :op] "⋂"))

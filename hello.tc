@@ -130,4 +130,12 @@ p^y^z'_a_b|(a b c)
 
 .nth(aa)%%
 
-.plus(1)(2)
+.plus(1)(\-2)
+
+.range(10)(20)
+
+.if(true)(this)(that)
+
+.if(x)(this)(that)
+
+.if(false)(this)(that)
