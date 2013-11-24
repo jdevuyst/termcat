@@ -162,6 +162,13 @@
                 (token :default)
                 vector)))
 
+(defn greater-than [x y]
+  (protect (->> (> (tval x number?)
+                   (tval y number?))
+                str
+                (token :default)
+                vector)))
+
 (defn range-fn [start end]
   (protect (->> (range (tval start integer?) (tval end integer?))
                 (map str)
@@ -201,7 +208,8 @@
               ".nth" (curry-fun nth-fn 1)
               ".apply" (curry-fun apply-fn 2)
               ".eq?" (curry-fun (comp vector #(token :default %) str =) 2)
-              ".plus" (curry-fun plus 2)
+              ".add" (curry-fun plus 2)
+              ".gt?" (curry-fun greater-than 2)
               ".range" (curry-fun range-fn 2)
               ".if" (curry-fun if-fn 3)
               ; ".reduce" (curry-fun reduce-fn)

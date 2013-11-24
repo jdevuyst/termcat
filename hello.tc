@@ -130,8 +130,6 @@ p^y^z'_a_b|(a b c)
 
 .nth(aa)%%
 
-.plus(1)(\-2)
-
 .range(10)(20)
 
 .if(true)(this)(that)
@@ -139,3 +137,7 @@ p^y^z'_a_b|(a b c)
 .if(x)(this)(that)
 
 .if(false)(this)(that)
+
+.add(1)(\-2)
+
+.gt?(3)(2)
