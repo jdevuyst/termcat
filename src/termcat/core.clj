@@ -105,8 +105,6 @@
                  bind/introduce-bindings
                  bind/expand-bindings
 
-                 :TRACE
-
                  bind/remove-superfluous-whitespace
                  math-sugar/remove-manual-casts
                  math-sugar/introduce-math-operators
@@ -115,6 +113,9 @@
                  math-sugar/math-cast-next-token
                  math-sugar/flatten-math-fences
                  math-sugar/introduce-nbsp-entities
+
+                 :TRACE
+
                  html/introduce-typographic-dashes
                  html/introduce-typographic-quotes
                  html/introduce-typographic-full-stops

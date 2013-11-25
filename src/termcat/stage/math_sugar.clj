@@ -107,7 +107,10 @@
          (map #(if-not (empty? %)
                  (->> %
                       (mapcat math/math-cast)
-                      (apply math/merge-rows)))
+                      (apply math/merge-rows
+                             (math/math-block
+                                    (fragment (token :html "&InvisibleComma;"))
+                                    :mo))))
               $)
          (vec $)
          (match $

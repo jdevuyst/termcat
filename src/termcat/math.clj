@@ -77,11 +77,13 @@
       fragmentcat
       (math-block :mrow)))
 
-(defn merge-rows [& ts]
+(defn merge-rows [sep & ts]
   (as-> ts $
-        (mapcat
+        (map
           #(match (tt %)
                   [:block (_ :guard :mrow)] (.terms (center %))
                   :else [%]) $)
+        (interpose [sep] $)
+        (apply concat $)
         (fragmentcat $)
         (math-block $ :mrow)))
