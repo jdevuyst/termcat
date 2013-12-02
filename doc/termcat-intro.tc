@@ -18,6 +18,19 @@ The syntax for titles is the same as in Markdown.
 
 So are the syntax for *emphasis* (\*emphasis*), _underline_ (\_underline_), and [links](http://example.com) (\[links\](http://example.com)). Caveat: To emphasize or underline more than one word, it's necessary to enclose the text fragment in a block. Parentheses can be used for this purpose: \*\*(This is strong text)\*\* renders as **(This is strong text)**%.
 
+Bullet lists can be created by starting a line with a hyphen followed by a space.
+
+  - Item 1
+  - Item 2
+  - Bullet items can consist of multiple paragraphs.
+
+    Simply indent subsequent lines with two extra spaces.
+
+    - Bullet lists can also be nested
+      - Once more the trick is to indent the nested lists with two extra spaces.
+
+By default, blocks of text that are indented with two spaces are considered blockquotes.
+
 The syntax !\[alt text\](filename.png) includes an image in the document.
 
   ![Termcat](hello.png)
