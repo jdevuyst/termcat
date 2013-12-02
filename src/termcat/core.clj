@@ -128,7 +128,7 @@
                  html/introduce-boilerplate])
         (html/to-string $)))
 
-(->> (slurp "hello.tc")
+(->> (slurp "doc/termcat-intro.tc")
      compile
-     (spit "hello.html")
+     (spit "doc/termcat-intro.html")
      time)

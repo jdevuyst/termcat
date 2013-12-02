@@ -49,7 +49,7 @@
    :whitespace] (if (and (= (payload t2) \.)
                          (or (block? t1)
                              (re-matches #"[^\\.]*"
-                                         (payload t1))))
+                                         (str (payload t1)))))
                   [nil
                    t1
                    (token :html "<span class='full_stop'>")

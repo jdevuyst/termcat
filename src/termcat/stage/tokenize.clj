@@ -279,7 +279,9 @@ block?
             [:rdelim _]
             :percent
             :circumflex
-            :underscore) _] nil
+            :underscore
+            :left-quote
+            :right-quote) _] nil
   [_ :default _ :default] (if-not (and (= (tt t2) :dash)
                                        (string? (payload t2)))
                             [nil (token :default

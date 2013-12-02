@@ -1,0 +1,41 @@
+# The Termcat Markup Language
+
+!bind(TO)(→)
+
+Termcat is a markup language for scientific writing and web publishing.
+
+Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the user-friendly syntax for titles, lists, links, emphasis, and so on. Termcat aims to be more powerful, however. Like LaTeX, Termcat is fully programmable and it also comes with special syntax for typographic features that are difficult to unlock using plain Markdown or HTML.
+
+## The basics
+
+The syntax for titles is the same as in Markdown.
+
+  %\# This is a document title
+
+  \## This is a section title
+
+  \### This is a subsection title
+
+So are the syntax for *emphasis* (\*emphasis*), _underline_ (\_underline_), and [links](http://example.com) (\[links\](http://example.com)). Caveat: To emphasize or underline more than one word, it's necessary to enclose the text fragment in a block. Parentheses can be used for this purpose: \*\*(This is strong text)\*\* renders as **(This is strong text)**%.
+
+The syntax !\[alt text\](filename.png) includes an image in the document.
+
+  ![Termcat](hello.png)
+
+Upright single quotes \' render as right quotes ' (or apostrophes) and backticks \` render as left quotes `. Termcat automatically inserts extra horizontal whitespace after periods and colons, but o.c. not after acronyms.
+Long dashes can be included using double (-\-/--) or triple (---) hyphens.
+
+There's special syntax for diactritics: r\%\^ole TO r%^ole, zo\%\"even TO zo%"even, n\%\'ee TO n%'ee, n\%\`eh TO n%`eh. Users of p%1iny%1in can also use the notation \%1e, \%2e, \%3e, \%4e for %1e, %2e, %3e, and %4e.
+
+It's possible to change the space between characters: l\%-2pt\%ess is m\%+0.4ex\%ore TO l%-2pt%ess is m%+0.4ex%ore. Similarly, spaces of variable width can be created using%_1em%the%_1em%syntax%_1em%\%\_1em.
+
+## Some things you should know
+
+
+
+## Math
+
+
+
+## Bindings and functions
+

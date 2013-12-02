@@ -8,6 +8,5 @@ pom.xml
 .lein-repl-history
 termcat.sublime-project
 termcat.sublime-workspace
-hello.html
 .DS_Store
 .nrepl-port
