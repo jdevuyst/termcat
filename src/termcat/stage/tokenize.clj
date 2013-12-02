@@ -280,6 +280,7 @@ block?
             :percent
             :circumflex
             :underscore
+            :tilde
             :left-quote
             :right-quote) _] nil
   [_ :default _ :default] (if-not (and (= (tt t2) :dash)
@@ -306,7 +307,7 @@ block?
   [_
    :percent
    :whitespace
-   (:or :newline nil)] [nil]
+   (:or :newline :emptyline [:ldelim _] [:block _] nil)] [nil]
   [_
    :percent
    :whitespace

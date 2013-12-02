@@ -17,11 +17,10 @@
                                (center t2)
                                (fragment t2))
                              :text)]
-  [_ :asterisk _] (let [ts (if (block? t2)
-                             (.terms (center t2))
-                             [t2])]
-                    (concat [nil]
-                            (mapcat math/math-cast ts)))
+  [_ :asterisk _] (cons nil (if (block? t2)
+                              [(math/math-block (center t2)
+                                                :mi)]
+                              (math/math-cast t2)))
   [_ :plus _] (let [ts (if (block? t2)
                          (.terms (center t2))
                          [t2])]
@@ -109,8 +108,8 @@
                       (mapcat math/math-cast)
                       (apply math/merge-rows
                              (math/math-block
-                                    (fragment (token :html "&InvisibleComma;"))
-                                    :mo))))
+                               (fragment (token :html "&InvisibleComma;"))
+                               :mo))))
               $)
          (vec $)
          (match $
@@ -177,10 +176,10 @@
    :bar
    (:or :default
         [:block _])] [nil
-                        (math/math-block
-                          (fragment (math/math-row-cast t1)
-                                    (math/math-row-cast t3))
-                          :mfrac)])
+                      (math/math-block
+                        (fragment (math/math-row-cast t1)
+                                  (math/math-row-cast t3))
+                        :mfrac)])
 
 (defrule math-cast-next-token
   [state t1 t2]

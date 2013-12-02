@@ -52,7 +52,7 @@
                                          (str (payload t1)))))
                   [nil
                    t1
-                   (token :html "<span class='full_stop'>")
+                   (token :html "<span class='wide_punctuation_mark'>")
                    t2
                    (token :html "</span>")
                    t3]))
@@ -63,10 +63,10 @@
   text-block?
   [_ (:or :default
           [:block _])
-   :colon
+   (:or :colon :bang :question-mark)
    :whitespace] [nil
                  t1
-                 (token :html "<span class='colon'>")
+                 (token :html "<span class='wide_punctuation_mark'>")
                  t2
                  (token :html "</span>")
                  t3])
@@ -255,7 +255,7 @@
              (token :html "margin: 0 auto; ")
              (token :html "padding: 2.5em; ")
              (token :html "max-width: 50em } ")
-             (token :html ".full_stop, .colon {")
+             (token :html ".wide_punctuation_mark {")
              (token :html "padding-right: .5em } ")
              (token :html "</style>")
              (token :html "<script type='text/x-mathjax-config'>")

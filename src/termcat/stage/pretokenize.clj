@@ -29,6 +29,7 @@
          \| :bar
          \# :hash
          \! :bang
+         \? :question-mark
          \: :colon
          \, :comma
          \. :period
