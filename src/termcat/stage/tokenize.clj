@@ -245,6 +245,7 @@ block?
                                                       (token [:ldelim (item-type t2)]
                                                              (payload t2))
                                                       t3])
+[{:in-bullet true} :newline [:rdelim _] _] nil ; make sure next rule terminates
 [{:in-bullet true} :newline _ _] [(:prev-state state)
                                   t1
                                   (token [:rdelim (:item-type state)])

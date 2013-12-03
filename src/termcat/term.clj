@@ -1,6 +1,7 @@
 (ns termcat.term
   (:require [clojure.core.reducers :as r]
             [clojure.edn :as edn]
+            [termcat.rewrite2 :as rw]
             [termcat.rewrite :refer :all]))
 
 (defprotocol ITerm
@@ -136,7 +137,7 @@
                   str
                   edn/read-string)
               (catch java.lang.Exception x
-                  nil))))
+                nil))))
   IRewrite
   (rewrite [this rule]
            (let [result (rewrite (.terms this) rule)]
@@ -156,4 +157,12 @@
              (with-meta (block (left this)
                                result
                                (right this))
-                        (meta result)))))
+                        (meta result))))
+  rw/IWrapped
+  (unwrap [orig]
+          (.terms (center orig)))
+  (rewrap [orig result]
+          (block (left orig)
+                 (fragmentcat result)
+                 (right orig))))
+

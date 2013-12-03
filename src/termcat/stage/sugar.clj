@@ -40,6 +40,7 @@
   tt
   block?
   [_ [:block :bullet] _] nil
+  [_ :fun _] nil ; make sure the next line terminates
   [_ _ [:block :bullet]] [nil t1 (fun/fun-call-head ":bullet-list") t2])
 
 (defrule introduce-link-calls

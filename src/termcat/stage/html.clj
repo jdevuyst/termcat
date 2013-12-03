@@ -112,14 +112,14 @@
   block?
   [_ _ [:block (_ :guard :text)]] nil
   [_ _ [:block (_ :guard :error)]] (concat [nil
-                                           t1
-                                           (token :open-math)
-                                           (token :html "<merror>")
-                                           (token :html "<mtext>")]
-                                          (.terms (center t2))
-                                          [(token :html "</mtext>")
-                                           (token :html "</merror>")
-                                           (token :close-math)])
+                                            t1
+                                            (token :open-math)
+                                            (token :html "<merror>")
+                                            (token :html "<mtext>")]
+                                           (.terms (center t2))
+                                           [(token :html "</mtext>")
+                                            (token :html "</merror>")
+                                            (token :close-math)])
   [_ _ [:block (_ :guard :msup)]] (concat [nil
                                            t1
                                            (token :open-math)
@@ -228,49 +228,44 @@
               (token :html (escape (payload t1)))
               (token :html "</span>")]
   [_ :whitespace] (if (payload t1)
-                    [nil (token :html \space)])
-  [_ :html] [nil t1]
+                    [nil (token :html \space)]
+                    [nil])
+  [_ :html] nil
   [_ _] [nil (token :html (escape (payload t1)))])
 
-(defrule introduce-boilerplate
-  [state t1 t2]
-  tt
-  (constantly false)
-  [_ nil _] [nil
-             (token :html "<!DOCTYPE html>")
-             (token :html "<html>")
-             (token :html "<head>")
-             (token :html "<meta charset='utf-8'>")
-             (token :html "<title>")
-             (token :html "A Termcat Document")
-             (token :html "</title>")
-             (token :html "<style>")
-             (token :html "html { background: gray } ")
-             (token :html "h1, h2, h3, h4, h5, h6 { ")
-             (token :html "font-family: helvetica, Arial, sans-serif; ")
-             (token :html "font-weight: lighter } ")
-             (token :html "body { ")
-             (token :html "font-family: 'STIXGeneral Regular', serif; ")
-             (token :html "background: white; ")
-             (token :html "margin: 0 auto; ")
-             (token :html "padding: 2.5em; ")
-             (token :html "max-width: 50em } ")
-             (token :html ".wide_punctuation_mark {")
-             (token :html "padding-right: .5em } ")
-             (token :html "</style>")
-             (token :html "<script type='text/x-mathjax-config'>")
-             (token :html "MathJax.Hub.Config({ ")
-             (token :html "MathML: { ")
-             (token :html "useMathMLspacing: true } });")
-             (token :html "</script>")
-             (token :html "<script async src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML'></script>")
-             (token :html "</head>")
-             (token :html "<body>")
-             t2]
-  [_ _ nil] [nil
-             t1
-             (token :html "</body>")
-             (token :html "</html>")])
+(defn add-boilerplate [l]
+  (concat [(token :html"<!DOCTYPE html>")
+           (token :html"<html>")
+           (token :html"<head>")
+           (token :html"<meta charset='utf-8'>")
+           (token :html"<title>")
+           (token :html"A Termcat Document")
+           (token :html"</title>")
+           (token :html"<style>")
+           (token :html"html { background: gray } ")
+           (token :html"h1, h2, h3, h4, h5, h6 { ")
+           (token :html"font-family: helvetica, Arial, sans-serif; ")
+           (token :html"font-weight: lighter } ")
+           (token :html"body { ")
+           (token :html"font-family: 'STIXGeneral Regular', serif; ")
+           (token :html"background: white; ")
+           (token :html"margin: 0 auto; ")
+           (token :html"padding: 2.5em; ")
+           (token :html"max-width: 50em } ")
+           (token :html".wide_punctuation_mark {")
+           (token :html"padding-right: .5em } ")
+           (token :html"</style>")
+           (token :html"<script type='text/x-mathjax-config'>")
+           (token :html"MathJax.Hub.Config({ ")
+           (token :html"MathML: { ")
+           (token :html"useMathMLspacing: true } });")
+           (token :html"</script>")
+           (token :html"<script async src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML'></script>")
+           (token :html"</head>")
+           (token :html"<body>")]
+          l
+          [(token :html "</body>")
+           (token :html "</html>")]))
 
 (defn to-string [frag]
   (->> frag
