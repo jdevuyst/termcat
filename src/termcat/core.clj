@@ -50,12 +50,13 @@
                               tok/remove-escape-tokens
                               tok/remove-annotated-tokens
                               tok/merge-tokens
+                              tok/remove-magic-tokens)
+                            (rw2/compose-rules
                               tok/remove-percent-tokens
                               tok/introduce-emptyline-tokens
                               tok/introduce-indent-tokens
                               tok/remove-superfluous-whitespace
                               tok/introduce-item-tokens
-                              tok/remove-magic-tokens
                               )]
                            $)
           ; (rewrite $ ast/abstract-blocks)
@@ -114,7 +115,7 @@
 
 ; (def source "[Termcat](https://github.com/jdevuyst/termcat) is a markup language optimized for scientific and technical writing. It compiles to HTML and MathML. To generate PDFs, [Prince](http://www.princexml.com) can be used.")
 
-; (def source "test")
+; (def source "l%-2pt%ess is m%+0.4ex%ore abc def ghi jkl")
 
 (->> ;(concat (repeat 3 nil) source)
      source

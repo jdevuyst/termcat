@@ -131,6 +131,29 @@ block?
                                        (str (payload t1) (payload t2)))
                                 (assoc (meta t1) :rpos (-> t2 meta :rpos)))]))
 
+(defrule remove-magic-tokens
+  [state t1 t2 t3]
+  tt
+  block?
+  [_ _ (:or :whitespace
+            :newline
+            :emptyline
+            [:block _]
+            [:ldelim _]
+            [:rdelim _]
+            :percent
+            :circumflex
+            :underscore
+            :tilde
+            :left-quote
+            :right-quote) _] nil
+  [_ :default _ :default] (if-not (and (= (tt t2) :dash)
+                                       (string? (payload t2)))
+                            [nil (token :default
+                                        (str (payload t1)
+                                             (payload t2)
+                                             (payload t3)))]))
+
 (defn css-length? [s]
   (and (string? s)
        (re-matches #"[0-9]*\.?[0-9]+(?:px|em|ex|pt)"
@@ -143,10 +166,10 @@ block?
   ; [_ _ :percent :percent]
   ; [nil t1 (token :whitespace) (token :default) (token :whitespace)]
 
-  [_ :percent :whitespace (:or :newline nil)]
+  [_ :percent :percent (:or :newline nil)]
   [nil]
 
-  [_ :percent :whitespace _]
+  [_ :percent :percent _]
   [nil t1 t2]
 
   [_  :percent (:or :plus :underscore :dash) :default]
@@ -160,7 +183,8 @@ block?
      t3
      (if (= (tt t2) :underscore)
        (token :html "'> </span>")
-       (token :html "'></span>"))])
+       (token :html "'></span>"))]
+    (println "skipped" t1 t2 t3))
 
   [_ :percent (:or :left-quote
                    :right-quote
@@ -186,8 +210,11 @@ block?
       (conj [nil (token :default (str (first r)
                                       diacritic
                                       (subs r 1)))]
-            t)))
-  [_ :percent _ _] [nil (token :whitespace) t2 t3])
+            t)
+      [nil (token :whitespace) t2 t3]))
+
+  [_ :percent _ _]
+  [nil (token :whitespace) t2 t3])
 
 (defrule introduce-emptyline-tokens
   "Any two or more successive :newline tokens are replaced by
@@ -325,26 +352,3 @@ block?
                                            t3])
 [_ [:ldelim :indent] _ _] [{:in-bullet false :prev-state state} t1 t2 t3]
 [_ [:rdelim :indent] _ _] [(:prev-state state) t1 t2 t3])
-
-(defrule remove-magic-tokens
-  [state t1 t2 t3]
-  tt
-  block?
-  [_ _ (:or :whitespace
-            :newline
-            :emptyline
-            [:block _]
-            [:ldelim _]
-            [:rdelim _]
-            :percent
-            :circumflex
-            :underscore
-            :tilde
-            :left-quote
-            :right-quote) _] nil
-  [_ :default _ :default] (if-not (and (= (tt t2) :dash)
-                                       (string? (payload t2)))
-                            [nil (token :default
-                                        (str (payload t1)
-                                             (payload t2)
-                                             (payload t3)))]))

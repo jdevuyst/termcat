@@ -65,7 +65,7 @@ It's possible to change the space between characters:
   l\%-2pt\%ess is m\%+0.4ex\%ore TO l%-2pt%ess is m%+0.4ex%ore
 Similarly, spaces of variable width can be created using%_1em%the%_1em%syntax%_1em%\%\_1em. Like in LaTeX, tildes can be used for non-breaking spaces: 100\~kg TO 100~kg.
 
-A percent symbol \% followed by a space indicates a comment. A newline signals the end of the comment. % This is a comment
+Two subsequent percent symbols indicate the start of a comment. The comment continues until a newline character is encountered. %% This is a comment
 
 When \% is used in other contexts then it inserts a zero-width space. This space will not make it into the output HTML document. This is useful when you want to trigger syntactic sugar that only works after or before whitespace. For example, type a\%\*\*b\*\*\%c for a%**b**%c.
 

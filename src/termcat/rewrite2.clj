@@ -82,13 +82,14 @@
        (with-meta (rewrap orig-input
                           (persistent! output))
                   {:state state})
-       (match (apply-rule-1 rule state input)
-              [new-state input] (recur new-state
-                                       (rest input)
-                                       (conj! output (first input)))
-              [new-state new-input] (recur state
-                                           new-input
-                                           output))))))
+       (let [[new-state new-input] (apply-rule-1 rule state input)]
+         (if (= input new-input)
+           (recur new-state
+                  (rest input)
+                  (conj! output (first input)))
+           (recur state
+                  new-input
+                  output)))))))
 
 (defn apply-rules [rules input]
   (r/reduce #(apply-rule %2 %1)
@@ -141,7 +142,7 @@
                       result)
                (recur nil orig-rules [orig-state (second result)]))
              (if (not= (second result) input)
-               (recur nil orig-rules result)
+               (recur nil orig-rules [state (second result)])
                (recur (conj prev-rules (first next-rules))
                       (rest next-rules)
                       result)))))))))
@@ -162,10 +163,11 @@
                              ~@body
                              :else nil)]
             (do
-              (comment when (not= (take ~argc (pad input#)) (rest r#))
-                (println :state state#)
-                (println :<= (map ~proj (take ~argc input#)))
-                (println :=> (map ~proj (rest r#))))
+              (when (= :percent (~proj (first input#)))
+                ;comment when (not= (take ~argc (pad input#)) (rest r#))
+                (println "state" state#)
+                (println "<=" (map ~proj (take ~argc input#)))
+                (println "=>" (map ~proj (rest r#))))
 
               [(or (first r#) state#)
                (concat (rest r#)
