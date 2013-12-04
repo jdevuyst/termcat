@@ -59,7 +59,7 @@
                               tok/introduce-item-tokens
                               )]
                            $)
-          ; (rewrite $ ast/abstract-blocks)
+          (rewrite $ ast/abstract-blocks)
           ; (rw2/apply-rules [(rw2/compose-rules
           ;                     ast/introduce-delim-errors
           ;                     ast/fix-bullet-continuations
@@ -89,23 +89,24 @@
           ;                     )
           ;                   ]
           ;                  $)
-          ; (rw2/apply-rules [(rw2/compose-rules
-          ;                     html/introduce-typographic-dashes
-          ;                     html/introduce-typographic-quotes
-          ;                     html/introduce-typographic-full-stops
-          ;                     html/introduce-typographic-colons
-          ;                     html/remove-error-tokens
-          ;                     html/introduce-math-tags
-          ;                     ; html/introduce-mtext-tags
-          ;                     ; html/remove-math-tags
-          ;                     html/to-html-tokens
-          ;                     )]
-          ;                  $)
+          (rw2/apply-rules [(rw2/compose-rules
+                              html/introduce-typographic-dashes
+                              html/introduce-typographic-quotes
+                              html/introduce-typographic-full-stops
+                              html/introduce-typographic-colons
+                              html/remove-error-tokens
+                              html/introduce-math-tags
+                              ; html/introduce-mtext-tags
+                              ; html/remove-math-tags
+                              )]
+                           $)
           (html/add-boilerplate $)
           (fragmentcat $)
-          (do
-            (print-fragment $)
-            $)
+          (print-fragment $)
+          (.terms $)
+          (rw2/apply-rules [html/to-html-tokens]
+                           $)
+          (fragmentcat $)
           (html/to-string $)
           ))))
 ; fix unwind for bullet items

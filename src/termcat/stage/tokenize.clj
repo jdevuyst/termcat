@@ -183,8 +183,7 @@ block?
      t3
      (if (= (tt t2) :underscore)
        (token :html "'> </span>")
-       (token :html "'></span>"))]
-    (println "skipped" t1 t2 t3))
+       (token :html "'></span>"))])
 
   [_ :percent (:or :left-quote
                    :right-quote
