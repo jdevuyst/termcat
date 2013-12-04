@@ -146,7 +146,7 @@
                       (rest next-rules)
                       result)))))))))
 
-(defn pad [l] (concat l (repeat nil)))
+(defn pad [l] (concat l (comment repeat nil)))
 
 (defmacro window [init-state proj [& arg-list] & body]
   (assert (or (nil? init-state) (map? init-state)))
@@ -162,7 +162,7 @@
                              ~@body
                              :else nil)]
             (do
-              (when (not= (take ~argc (pad input#)) (rest r#))
+              (comment when (not= (take ~argc (pad input#)) (rest r#))
                 (println :state state#)
                 (println :<= (map ~proj (take ~argc input#)))
                 (println :=> (map ~proj (rest r#))))
