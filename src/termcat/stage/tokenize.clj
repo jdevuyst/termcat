@@ -280,74 +280,81 @@ block?
         :emptyline)] [nil t2])
 
 (defn item-type [tok]
-  "Returns the item 'type' of the token, if any, or nil. The item
-  type can be bullet, section, subsection, etcetera."
-(case (payload tok)
-  \- :bullet
-  \# :h1
-  "##" :h2
-  "###" :h3
-  "####" :h4
-  "#####" :h5
-  "######" :h6
-  nil))
+  (case (payload tok)
+    \- :bullet
+    \# :h1
+    "##" :h2
+    "###" :h3
+    "####" :h4
+    "#####" :h5
+    "######" :h6
+    nil))
 
 (defrule introduce-item-tokens
-  "Adds [:ldelim :item] tokens in front of dashes at the start of a
-  line. Adds [:rdelim :item] tokens where the bullet ends.
+  (constant-state {:in-bullet false
+                   :item-type nil
+                   :prev-state nil})
+  [state t1 t2 t3]
+  tt
+  block?
+  ; [{:in-bullet true} _ nil nil]
+  ; (letfn [(unwind [state2]
+  ;                 (when-not (nil? state2)
+  ;                   (cons (token [:rdelim (:item-type state2)])
+  ;                         (unwind (:prev-state state2)))))]
+  ;   (cons nil
+  ;         (unwind state)))
 
-  Newline tokens before [:rdelim :item] terms are removed.
+  [{:in-bullet true} :newline (:or :dash
+                                   :hash) (:or :whitespace
+                                               :newline
+                                               :emptyline
+                                               nil)]
+  (if (item-type t2)
+    [(assoc state :item-type (item-type t2))
+     t1
+     (token [:rdelim (:item-type state)])
+     (token [:ldelim (item-type t2)]
+            (payload t2))
+     t3])
 
-  Like indentation, right delimiter for bullets are inserted in front
-  of, not after, :emptylines."
-(constant-state {:in-bullet false
-                 :item-type nil
-                 :prev-state nil})
-[state t1 t2 t3]
-tt
-block?
-[{:in-bullet true} _ nil nil] (letfn [(unwind [state2]
-                                              (when-not (nil? state2)
-                                                (cons (token [:rdelim (:item-type state2)])
-                                                      (unwind (:prev-state state2)))))]
-                                (cons nil
-                                      (unwind state)))
-[{:in-bullet true} _ (:or :emptyline
-                          [:rdelim :indent]) _] [(:prev-state state)
-                                                 t1
-                                                 (token [:rdelim (:item-type state)])
-                                                 t2
-                                                 t3]
-[{:in-bullet true} :newline (:or :dash
-                                 :hash) (:or :whitespace
-                                             :newline
-                                             :emptyline
-                                             nil)] (if (item-type t2)
-                                                     [(assoc state :item-type (item-type t2))
-                                                      t1
-                                                      (token [:rdelim (:item-type state)])
-                                                      (token [:ldelim (item-type t2)]
-                                                             (payload t2))
-                                                      t3])
-[{:in-bullet true} :newline [:rdelim _] _] nil ; make sure next rule terminates
-[{:in-bullet true} :newline _ _] [(:prev-state state)
-                                  t1
-                                  (token [:rdelim (:item-type state)])
-                                  t2
-                                  t3]
-[_ (:or nil
-        :newline
-        :emptyline
-        [:ldelim :indent]) _ (:or :whitespace
-                                  :newline
-                                  :emptyline
-                                  nil)] (if (item-type t2)
-                                          [{:in-bullet true
-                                            :item-type (item-type t2)
-                                            :prev-state state}
-                                           t1
-                                           (token [:ldelim (item-type t2)]
-                                                  (payload t2))
-                                           t3])
-[_ [:ldelim :indent] _ _] [{:in-bullet false :prev-state state} t1 t2 t3]
-[_ [:rdelim :indent] _ _] [(:prev-state state) t1 t2 t3])
+  ; [{:in-bullet true} (:or :newline
+  ;                         :emptyline
+  ;                         [:rdelim :indent]) [:rdelim _] _]
+  ; nil ; make sure the next rule terminates
+
+  [{:in-bullet true} (:or :newline
+                          :emptyline
+                          [:rdelim :indent]) _ _]
+  (if-not (= (tt t2) [:ldelim (:item-type state)]) ; handle recursion
+    [(:prev-state state)
+     (token [:rdelim (:item-type state)])
+     t1
+     t2
+     t3])
+
+  ; [_ _ [:ldelim _] _]
+  ; nil ; don't run next rule twice
+
+  [_ (:or nil
+          :newline
+          :emptyline
+          [:ldelim :indent]
+          [:rdelim _]) _ (:or :whitespace
+                                    :newline
+                                    :emptyline
+                                    nil)]
+  (if (item-type t2)
+    [{:in-bullet true
+      :item-type (item-type t2)
+      :prev-state state}
+     t1
+     (token [:ldelim (item-type t2)]
+            (payload t2))
+     t3])
+
+  [_ [:ldelim :indent] _ _]
+  [{:in-bullet false :prev-state state} t1 t2 t3]
+
+  [_ [:rdelim :indent] _ _]
+  [(:prev-state state) t1 t2 t3])

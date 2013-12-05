@@ -18,6 +18,10 @@ The syntax for titles is the same as in Markdown.
 
 So are the syntax for *emphasis* (\*emphasis\*), _underline_ (\_underline_), and [links](http://example.com) (\[links\](http://example.com)). Caveat: To emphasize or underline more than one word, it's necessary to enclose the text fragment in a block. Parentheses can be used for this purpose: \*\*(This is strong text)\*\* renders as **(This is strong text)**%.
 
+- one item
+- two items
+- three items
+
 Bullet lists can be created by starting a line with a hyphen followed by a space.
 
 Consider the following code:

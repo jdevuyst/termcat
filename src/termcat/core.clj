@@ -57,12 +57,14 @@
                               tok/introduce-indent-tokens
                               tok/remove-superfluous-whitespace
                               tok/introduce-item-tokens
-                              )]
+                              )
+                            ]
                            $)
           (rewrite $ ast/abstract-blocks)
-          (rw2/apply-rules [(rw2/compose-rules
+          (rw2/apply-rules [(rw2/make-recursive
+                              (rw2/compose-rules
           ;                     ast/introduce-delim-errors
-          ;                     ast/fix-bullet-continuations
+                              ; ast/fix-bullet-continuations
           ;                     ast/convert-newlines-to-whitespace
           ;                     ast/remove-superfluous-whitespace
 
@@ -71,7 +73,7 @@
                               ; bind/introduce-bindings
 
                                 sugar/introduce-par-calls
-                              ; sugar/introduce-section-calls
+                                sugar/introduce-section-calls
                               ; sugar/introduce-blockquote-calls
                                 sugar/introduce-bullet-list-calls
                                 sugar/introduce-link-calls
@@ -88,6 +90,9 @@
           ;                     math-sugar/flatten-math-fences
           ;                     math-sugar/introduce-nbsp-entities
                               )
+                              block?
+                               rw2/lexical-scope)
+
                             ]
                            $)
           (rw2/apply-rules [(rw2/compose-rules

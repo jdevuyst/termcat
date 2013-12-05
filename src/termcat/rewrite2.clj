@@ -56,17 +56,17 @@
              ([rule state orig-input]
               (p :apply-rule
                  (loop [state state
-                        input (p :unwrap (unwrap orig-input))
+                        input (unwrap orig-input)
                         output (transient [])]
                    (if (empty? input)
-                     (p :rewrap (rewrap orig-input (persistent! output)))
+                     (rewrap orig-input (persistent! output))
                      (let [[new-state new-input] (apply-rule-1 rule state input)]
                        (if (p :apply-rule-test-eq
                               (= input new-input))
                          (recur new-state
                                 (rest input)
                                 (conj! output (first input)))
-                         (recur state
+                         (recur new-state ; or state?
                                 new-input
                                 output))))))))))
 
@@ -170,10 +170,10 @@
              ;   (recur nil orig-rules [orig-state (second result)]))
              (if-not (p :compose-rules-test-eq
                         (= (second result) input))
-               (recur (p :compose-recalc nil) orig-rules [state (second result)])
+               (recur nil orig-rules result) ; or [state (second result)]?
                (recur (conj prev-rules (first next-rules))
                       (rest next-rules)
-                      (p :compose-next result))))))))))
+                      result)))))))))
 
 (defn pad [l] (concat l (comment repeat nil)))
 
