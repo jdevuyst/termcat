@@ -37,9 +37,9 @@
               result))))))
 
 (def apply-rule-1
-  (identity (p :apply-rule-1 (fn [rule state input]
-                               (or (rule state input)
-                                   [state input])))))
+  (p :apply-rule-1 (fn [rule state input]
+                     (or (rule state input)
+                         [state input]))))
 
 (defprotocol IWrapped
   (unwrap [orig])
@@ -61,19 +61,24 @@
                    (if (empty? input)
                      (rewrap orig-input (persistent! output))
                      (let [[new-state new-input] (apply-rule-1 rule state input)]
-                       (if (p :apply-rule-test-eq
-                              (= input new-input))
-                         (recur new-state
-                                (rest input)
-                                (conj! output (first input)))
-                         (recur new-state ; or state?
-                                new-input
-                                output))))))))))
+                       (recur new-state
+                              (rest new-input)
+                              (conj! output (first new-input)))))))))))
 
 (defn apply-rules [rules input]
   (r/reduce #(apply-rule %2 %1)
             input
             rules))
+
+(defn make-fixpoint [rule]
+  (fn
+    ([] (rule))
+    ([state input]
+     (let [[new-state new-input :as result] (apply-rule-1 rule state input)]
+       ;(print (.payload (first input)))
+       (if (= input new-input)
+         result
+         (recur new-state new-input))))))
 
 (defn abstract-state [rule]
   (fn
@@ -170,7 +175,7 @@
              ;   (recur nil orig-rules [orig-state (second result)]))
              (if-not (p :compose-rules-test-eq
                         (= (second result) input))
-               (recur nil orig-rules result) ; or [state (second result)]?
+               result ;(recur nil orig-rules result) ; or [state (second result)]?
                (recur (conj prev-rules (first next-rules))
                       (rest next-rules)
                       result)))))))))

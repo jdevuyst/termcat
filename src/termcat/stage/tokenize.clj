@@ -127,9 +127,9 @@ block?
           :hash
           :html)] (if (= (tt t1) (tt t2))
                     [nil
-                     (with-meta (token (tt t1)
-                                       (str (payload t1) (payload t2)))
-                                (assoc (meta t1) :rpos (-> t2 meta :rpos)))]))
+                       (with-meta (token (tt t1)
+                                         (str (payload t1) (payload t2)))
+                                  (assoc (meta t1) :rpos (-> t2 meta :rpos)))]))
 
 (defrule remove-magic-tokens
   [state t1 t2 t3]
@@ -341,9 +341,9 @@ block?
           :emptyline
           [:ldelim :indent]
           [:rdelim _]) _ (:or :whitespace
-                                    :newline
-                                    :emptyline
-                                    nil)]
+                              :newline
+                              :emptyline
+                              nil)]
   (if (item-type t2)
     [{:in-bullet true
       :item-type (item-type t2)

@@ -39,6 +39,7 @@
                        [~@args]
                        ~@body)
            rw2/abstract-state
+           ; rw2/make-fixpoint
            ; (rw2/make-recursive ~auto-recur-test
            ;                     ~rw2/lexical-scope)
            ))))
