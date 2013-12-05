@@ -20,25 +20,26 @@
 
 (defn memoize [f]
   (fn [& args]
-    (if-let [result (p :cache-lookup (cache/lookup
-                                       @!*cache*
-                                       [f args]))]
-      (do
-        (p :cache-hit nil)
-        ; (reset! !*cache* (cache/hit @!*cache* :apply-rule-1))
-        result)
-      (let [result (apply f args)]
-        (p :cache-miss
-           (reset! !*cache* (cache/miss
-                              @!*cache*
-                              [f args]
-                              result))
-           result)))))
+    (p :memoize
+       (if-let [result (p :cache-lookup (cache/lookup
+                                          @!*cache*
+                                          [f args]))]
+         (do
+           (p :cache-hit nil)
+           ; (reset! !*cache* (cache/hit @!*cache* :apply-rule-1))
+           result)
+         (let [result (apply f args)]
+           (p :cache-miss
+              (reset! !*cache* (cache/miss
+                                 @!*cache*
+                                 [f args]
+                                 result))
+              result))))))
 
 (def apply-rule-1
   (identity (p :apply-rule-1 (fn [rule state input]
-                              (or (rule state input)
-                                  [state input])))))
+                               (or (rule state input)
+                                   [state input])))))
 
 (defprotocol IWrapped
   (unwrap [orig])
@@ -91,6 +92,7 @@
 (def apply-rule-recursively
   (identity
     (fn [f rule pred scope state input]
+
       (->> input
            (map #(if (pred %)
                    (p :recursive-apply-rule
@@ -108,6 +110,42 @@
                    (apply-rule-recursively f rule pred scope state)
                    (apply-rule-1 rule state))))]
     f))
+
+(defn memoize-truthy [f]
+  (fn [& args]
+    (if-let [result (p :cache-lookup (cache/lookup
+                                       @!*cache*
+                                       [f args]))]
+      (do
+        (p :truthy-hit nil)
+        ; (reset! !*cache* (cache/hit @!*cache* :apply-rule-1))
+        result)
+      (let [result (apply f args)]
+        (if result
+          (p :truthy-store
+             (reset! !*cache* (cache/miss
+                                @!*cache*
+                                [f args]
+                                result))))
+        (do
+          (p
+            :truthy-miss
+            result))))))
+
+; (defn fast= [x y]
+;   (comment memoize-truthy
+;     (fn [x y]
+;       (p :run-fast= nil)
+;              (assert (sequential? x))
+;              (assert (sequential? y))
+;              (or (and (empty? x)
+;                       (empty? y))
+;                  (and (= (first x)
+;                          (first y))
+;                       (fast= (rest x)
+;                              (rest y))))))
+;   (and (= (count x) (count y))
+;        (x y)))
 
 (defn compose-rules [& orig-rules]
   (let [init-state (->> orig-rules

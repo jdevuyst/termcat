@@ -60,7 +60,7 @@
                               )]
                            $)
           (rewrite $ ast/abstract-blocks)
-          ; (rw2/apply-rules [(rw2/compose-rules
+          (rw2/apply-rules [(rw2/compose-rules
           ;                     ast/introduce-delim-errors
           ;                     ast/fix-bullet-continuations
           ;                     ast/convert-newlines-to-whitespace
@@ -68,27 +68,28 @@
 
           ;                     bind/introduce-lambdas
           ;                     bind/introduce-fun-calls
-          ;                     bind/introduce-bindings
+                              ; bind/introduce-bindings
 
-          ;                     sugar/introduce-par-calls
-          ;                     sugar/introduce-section-calls
-          ;                     sugar/introduce-blockquote-calls
-          ;                     sugar/introduce-bullet-list-calls
-          ;                     sugar/introduce-link-calls
-          ;                     sugar/remove-decorators
+                                sugar/introduce-par-calls
+                              ; sugar/introduce-section-calls
+                              ; sugar/introduce-blockquote-calls
+                                sugar/introduce-bullet-list-calls
+                                sugar/introduce-link-calls
+                                sugar/remove-decorators
+                                lambda/evaluate-fun-calls
 
           ;                     bind/remove-superfluous-whitespace
 
           ;                     math-sugar/remove-manual-casts
           ;                     math-sugar/introduce-math-operators
-          ;                     math-sugar/introduce-msub-msup
+                                ; math-sugar/introduce-msub-msup
           ;                     math-sugar/introduce-mfrac
           ;                     math-sugar/math-cast-next-token
           ;                     math-sugar/flatten-math-fences
           ;                     math-sugar/introduce-nbsp-entities
-          ;                     )
-          ;                   ]
-          ;                  $)
+                              )
+                            ]
+                           $)
           (rw2/apply-rules [(rw2/compose-rules
                               html/introduce-typographic-dashes
                               html/introduce-typographic-quotes
@@ -110,6 +111,7 @@
           (html/to-string $)
           ))))
 ; fix unwind for bullet items
+; fix padding at start and end of fragments
 
 
 (def source (slurp "doc/termcat-intro.tc"))
