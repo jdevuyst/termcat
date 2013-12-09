@@ -242,13 +242,11 @@
         diff (- indent (:indent state))]
     (concat [{:indent indent}]
             (for [x (range (- diff))]
-              (with-meta (rdelim :indent
-                                 (str :indent indent :diff diff :tt (tt t2)))
+              (with-meta (rdelim :indent)
                          (meta t1)))
             (if t1 [t1])
             (for [x (range diff)]
-              (with-meta (ldelim :indent
-                                 (str :indent indent :diff diff :tt (tt t2)))
+              (with-meta (ldelim :indent)
                          (meta t1)))
             [t2])))
 

@@ -29,11 +29,6 @@
      :else [(update-in state [:distance] inc)
             (conj result tok)])))
 
-(defrule remove-newlines
-  [state t1 t2]
-  tt
-  block?
-  [_ :newline [:block _]] [state t2])
 
 ; (defrule introduce-delim-errors
 ;   [state t1]
@@ -54,17 +49,20 @@
 ;   block?
 ;   [_ :newline] [nil (token :whitespace \newline)])
 
-; (defrule remove-superfluous-whitespace
-;   [state t1 t2]
-;   tt
-;   block?
-;   [_ (:or nil
-;           :newline
-;           :emptyline
-;           [:block :indent]
-;           [:block :bullet]) :whitespace] [nil t1]
-;   [_ :whitespace (:or nil
-;                       :newline
-;                       :emptyline
-;                       [:block :indent]
-;                       [:block :bullet])] [nil t2])
+(defrule remove-superfluous-whitespace
+  [state t1 t2]
+  tt
+  block?
+  [_ (:or nil
+          :emptyline
+          [:block :indent]
+          [:block :bullet]) (:or :whitespace
+                                 :newline)]
+  [nil t1]
+
+  [_ (:or :whitespace
+          :newline) (:or nil
+                         :emptyline
+                         [:block :indent]
+                         [:block :bullet])]
+  [nil t2])

@@ -11,7 +11,7 @@
     ([x y] x)))
 
 (defmacro defrule [fnname & rdecl]
-  ; currently only supports lexical scope
+  ; Note: auto-recur-test is ignored since refactoring
   (assert (symbol? fnname))
   (let [[doc-str rdecl] (if (string? (first rdecl))
                           [(first rdecl) (next rdecl)]

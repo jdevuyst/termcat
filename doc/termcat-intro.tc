@@ -55,9 +55,9 @@ Long dashes can be included using double (-\-/--) or triple (---) hyphens.
 
 There's special syntax for diactritics:
 - r\%\^ole TO r%^ole
-- zo\%\"even TO zo%"even
 - n\%\'ee TO n%'ee
-- tr\%\`es TO tr%`es
+- Gruy\%\`ere TO Gruy%`ere
+- zo\%\"even TO zo%"even
 
 Users of p%1iny%1in can also use the notation \%1e, \%2e, \%3e, \%4e for %1e, %2e, %3e, and %4e.
 
@@ -80,7 +80,23 @@ For many purposes it doesn't matter how a block is delimited. For instance, a nu
 or
   \:numbered-list(item 1)[item 2]
 and it will render as :numbered-list(item 1)[item 2]
-"- "-<br>"- \~-\~
+
+## Math
+
+Termcat has a novel syntax for mathematics. Rather than having delimiters that indicate the start and end of a mathematical expression, Termcat expects to be told what (i) the identifiers, and what (ii) the operators, functions, and predicates are in an expression.
+
+At least it expects to be told these things for *some* of the expressions that you type. Termcat can be programmed to recognize common operators and identifiers, and it can also draw inferences.
+
+To mark something as a mathematical identifier, prefix it with an asterisk \*: \*a TO *a%. This marks one character. However, when Termcat encounters the expression \*abc then it will infer that *b and *c are also identifiers. The result is *abc%. To turn a word into an identifier, type \*(myvar). This renders as *(myvar)%---as in LaTeX, multi-character indentifiers are not italicized. Mathematical identifiers can also be typeset in a caligraphic font by using \+ instead of \*. Thus, \+M becomes +M.
+
+!bind
+- -
+- ~-~
+
+To use the binary minus operator, type x \~\-\~ y. This yields x - y.
+
+Sounds like a chore? No problem. Simply include the following code at the top of your document:
+  \!bind%<br>"- "-<br>"- \~-\~
 and Termcat will interpret every minus sign surrounded by whitespace on both sides as a binary infix operator.
 
 Predictably, for prefix operators you can type sin\~ x or x \~!. This renders as sin~ x or x ~!.

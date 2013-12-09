@@ -14,10 +14,9 @@
 
 (def ^:dynamic *debug* true)
 
-(defn print-fragment
-  ([frag] (print-fragment frag ""))
-  ([frag indent]
-   (assert (fragment? frag))
+(defn print-tree
+  ([tree] (print-tree tree ""))
+  ([tree indent]
    (letfn [(token-to-string [t]
                             (assert (token? t))
                             (str [(tt t) (payload t)]
@@ -25,16 +24,14 @@
                                        rpos (-> t meta :rpos)]
                                    (if (or lpos rpos)
                                      (str " :: " lpos "-" rpos)))))]
-     (doseq [t (.terms frag)]
+     (doseq [t (rw2/unwrap tree)]
        (if (block? t)
          (let [new-indent (str indent "  ")]
            (println indent \> (token-to-string (left t)))
-           (print-fragment (center t) new-indent)
+           (print-tree t new-indent)
            (println indent \< (token-to-string (right t))))
          (println indent (token-to-string t)))))
-   frag))
-
-; (print (apply str (repeat 1000 \newline)))
+   tree))
 
 (defn compile
   ([s]
@@ -60,19 +57,15 @@
                              tok/remove-superfluous-whitespace
                              tok/introduce-item-tokens]
                             $)
-           (fragmentcat $)
-           ; (print-fragment $)
-           (rewrite $ ast/abstract-blocks)
-           ; (print-fragment $)
-           (.terms $)
+           (-> $ fragmentcat (rewrite ast/abstract-blocks) .terms)
            (rw2/apply-rules [(rw2/make-recursive
                                (rw2/compose-rules
                                  ast/fix-bullet-continuations
-                                 ast/remove-newlines)
+                                 ast/remove-superfluous-whitespace
+                                 )
                                block?
                                rw2/lexical-scope)]
                             $)
-           (-> $ fragmentcat print-fragment .terms)
            (rw2/apply-rules [(rw2/make-recursive
                                (rw2/make-fixpoint
                                  (rw2/compose-rules
@@ -107,7 +100,7 @@
                                rw2/lexical-scope)
                              ]
                             $)
-           ; (-> $ fragmentcat print-fragment .terms)
+           (print-tree $)
            (rw2/apply-rules [(rw2/make-fixpoint
                                (rw2/compose-rules
                                  html/introduce-typographic-dashes
@@ -121,9 +114,6 @@
                                  ))]
                             $)
            (html/add-boilerplate $)
-           (fragmentcat $)
-           ; (print-fragment $)
-           (.terms $)
            (rw2/apply-rules [(rw2/make-recursive
                                (rw2/make-fixpoint
                                  html/to-html-tokens)
@@ -134,19 +124,8 @@
            (html/to-string $)
            ))))
 ; fix unwind for bullet items
-; fix padding at start and end of fragments
 
-
-(def source (slurp "doc/termcat-intro.tc"))
-
-; (def source "abcdef")
-
-; (def source "[Termcat](https://github.com/jdevuyst/termcat) is a markup language optimized for scientific and technical writing. It compiles to HTML and MathML. To generate PDFs, [Prince](http://www.princexml.com) can be used.")
-
-; (def source "l%-2pt%ess is m%+0.4ex%ore abc def ghi jkl")
-
-(->> ;(concat (repeat 3 nil) source)
-     source
+(->> (slurp "doc/termcat-intro.tc")
      compile
      first
      (spit "doc/termcat-intro.html")
