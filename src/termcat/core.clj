@@ -54,16 +54,17 @@
                                  tok/remove-magic-tokens
                                  ))
                              (rw2/make-fixpoint
-                               (rw2/compose-rules
-                                 tok/remove-percent-tokens
-                                 tok/introduce-emptyline-tokens
-                                 tok/introduce-indent-tokens
-                                 tok/remove-superfluous-whitespace
-                                 ))
-                             tok/introduce-item-tokens
-                             ]
+                               tok/remove-percent-tokens)
+                               tok/introduce-emptyline-tokens
+                             tok/introduce-indent-tokens
+                             tok/remove-superfluous-whitespace
+                             tok/introduce-item-tokens]
                             $)
+           (fragmentcat $)
+           (print-fragment $)
            (rewrite $ ast/abstract-blocks)
+           ; (print-fragment $)
+           (.terms $)
            (rw2/apply-rules [(rw2/make-recursive
                                (rw2/make-fixpoint
                                  (rw2/compose-rules
@@ -78,7 +79,7 @@
 
                                    sugar/introduce-par-calls
                                    sugar/introduce-section-calls
-                                   ; sugar/introduce-blockquote-calls
+                                   sugar/introduce-blockquote-calls
                                    sugar/introduce-bullet-list-calls
                                    sugar/introduce-link-calls
                                    sugar/remove-decorators
@@ -98,6 +99,7 @@
                                rw2/lexical-scope)
                              ]
                             $)
+           ; (-> $ fragmentcat print-fragment .terms)
            (rw2/apply-rules [(rw2/make-fixpoint
                                (rw2/compose-rules
                                  html/introduce-typographic-dashes
@@ -121,7 +123,6 @@
                                rw2/narrow-scope)]
                             $)
            (fragmentcat $)
-           (print-fragment $)
            (html/to-string $)
            ))))
 ; fix unwind for bullet items

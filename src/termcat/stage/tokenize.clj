@@ -86,7 +86,6 @@
             :else (reject)))))
 
 (defrule remove-escape-tokens
-  "[:escape \\] + [type payload] -> [:default payload]"
   [state t1 t2]
   tt
   block?
@@ -109,24 +108,18 @@
   [_ _ :tilde] [nil (token :default (payload t1)) t2])
 
 (defrule merge-tokens
-  "[type x] + [type y] -> [type xy] for some token types.
-
-  For some token types we don't want to make a distinction
-  between a single token and a sequences of tokens of that
-  token type. We merge subsequent occurences of such tokens.
-  This also allows for easier matching later on."
-[state t1 t2]
-tt
-block?
-[_ _ (:or :default
-          :whitespace
-          :tilde
-          :dash
-          :left-quote
-          :right-quote
-          :hash
-          :html)] (if (= (tt t1) (tt t2))
-                    [nil
+  [state t1 t2]
+  tt
+  block?
+  [_ _ (:or :default
+            :whitespace
+            :tilde
+            :dash
+            :left-quote
+            :right-quote
+            :hash
+            :html)] (if (= (tt t1) (tt t2))
+                      [nil
                        (with-meta (token (tt t1)
                                          (str (payload t1) (payload t2)))
                                   (assoc (meta t1) :rpos (-> t2 meta :rpos)))]))
@@ -216,68 +209,64 @@ block?
   [nil (token :whitespace) t2 t3])
 
 (defrule introduce-emptyline-tokens
-  "Any two or more successive :newline tokens are replaced by
-  a single :emptyline token. Isolated :newline tokens are not
-  removed."
-[state t1 t2]
-tt
-block?
-[_ :emptyline :newline] [nil t2]
-[_ :newline :newline] [nil (with-meta (token :emptyline)
-                                      (meta t1))])
-
-(defrule introduce-indent-tokens
-  "Introduces [:ldelim :indent] and [:rdelim :indent] tokens.
-
-  Left delimiters are inserted after empty lines (if applicable) and
-  right delimiters are inserted before empty lines (if applicable)"
-(constant-state {:indent 0})
-[state t1 t2]
-tt
-block?
-[_ _ nil] (concat [nil t1]
-                  (for [x (range (/ (:indent state) 2))]
-                    (with-meta (rdelim :indent)
-                               (reduce #(update-in %1 [%2] inc)
-                                       (meta t1)
-                                       [:lpos :rpos]))))
-[_ (:or :newline
-        :emptyline) _] (let [indent (if (and (= (tt t2) :whitespace)
-                                             (string? (payload t2)))
-                                      (-> t2
-                                          payload
-                                          count
-                                          (/ 2)
-                                          int)
-                                      0)
-                             diff (- indent (:indent state))]
-                         (concat [{:indent indent}]
-                                 (for [x (range (- diff))]
-                                   (with-meta (rdelim :indent)
-                                              (meta t1)))
-                                 (if t1 [t1])
-                                 (for [x (range diff)]
-                                   (with-meta (ldelim :indent)
-                                              (meta t1)))
-                                 [t2])))
-
-(defrule remove-superfluous-whitespace
-  "Removes leading and trailing whitespace."
   [state t1 t2]
   tt
   block?
-  [_
-   (:or [:ldelim :indent]
-        [:rdelim :indent]
-        :newline
-        :emptyline)
-   :whitespace] [nil t1]
-  [_
-   :whitespace
-   (:or [:ldelim :indent]
-        [:rdelim :indent]
-        :newline
-        :emptyline)] [nil t2])
+  [_ :emptyline :newline] [nil t2]
+  [_ :newline :newline] [nil (with-meta (token :emptyline)
+                                        (meta t1))])
+
+(defrule introduce-indent-tokens
+  (constant-state {:indent 0})
+  [state t1 t2]
+  tt
+  block?
+  [_ _ nil]
+  (concat [nil t1]
+          (for [x (range (/ (:indent state) 2))]
+            (with-meta (rdelim :indent)
+                       (reduce #(update-in %1 [%2] inc)
+                               (meta t1)
+                               [:lpos :rpos]))))
+
+  [_ (:or :newline
+          :emptyline) _]
+  (let [indent (if (and (= (tt t2) :whitespace)
+                        (string? (payload t2)))
+                 (-> t2
+                     payload
+                     count
+                     (/ 2)
+                     int)
+                 0)
+        diff (- indent (:indent state))]
+    (concat [{:indent indent}]
+            (for [x (range (- diff))]
+              (with-meta (rdelim :indent
+                                 (str :indent indent :diff diff :tt (tt t2)))
+                         (meta t1)))
+            (if t1 [t1])
+            (for [x (range diff)]
+              (with-meta (ldelim :indent
+                                 (str :indent indent :diff diff :tt (tt t2)))
+                         (meta t1)))
+            [t2])))
+
+(defrule remove-superfluous-whitespace
+  [state t1 t2]
+  tt
+  block?
+  [_ (:or [:ldelim :indent]
+          [:rdelim :indent]
+          :newline
+          :emptyline) :whitespace]
+  [nil t1]
+
+  [_ :whitespace (:or [:ldelim :indent]
+                      [:rdelim :indent]
+                      :newline
+                      :emptyline)]
+  [nil t2])
 
 (defn item-type [tok]
   (case (payload tok)

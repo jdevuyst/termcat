@@ -30,10 +30,11 @@
   [_ [:block :h6]] [nil (fun/fun-call-head ":h6") t1])
 
 (defrule introduce-blockquote-calls
-  [state t1]
+  [state t1 t2]
   tt
   block?
-  [_ [:block :indent]] [nil (fun/fun-call-head ":quotation") t1])
+  [_ :fun _] nil ; make sure the next line terminates
+  [_ _ [:block :indent]] [nil t1 (fun/fun-call-head ":quotation") t2])
 
 (defrule introduce-bullet-list-calls
   [state t1 t2]
