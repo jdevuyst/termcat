@@ -29,33 +29,42 @@
      :else [(update-in state [:distance] inc)
             (conj result tok)])))
 
-(defrule introduce-delim-errors
-  [state t1]
+(defrule remove-newlines
+  [state t1 t2]
   tt
   block?
-  [_ [(:or :ldelim :rdelim) _]] [nil (token :error (payload t1))])
+  [_ :newline [:block _]] [state t2])
+
+; (defrule introduce-delim-errors
+;   [state t1]
+;   tt
+;   block?
+;   [_ [(:or :ldelim :rdelim) _]] [nil (token :error (payload t1))])
 
 (defrule fix-bullet-continuations
   [state t1 t2]
   tt
   block?
-  [_ [:block :bullet] [:block :indent]] [nil (merge-blocks t1 t2)])
+  [_ [:block :bullet] [:block :indent]]
+  [nil (merge-blocks t1 t2)])
 
-(defrule convert-newlines-to-whitespace
-  [state t1]
-  tt
-  block?
-  [_ :newline] [nil (token :whitespace \newline)])
+; (defrule convert-newlines-to-whitespace
+;   [state t1]
+;   tt
+;   block?
+;   [_ :newline] [nil (token :whitespace \newline)])
 
-(defrule remove-superfluous-whitespace
-  [state t1 t2]
-  tt
-  block?
-  [_ (:or nil
-          :emptyline
-          [:block :indent]
-          [:block :bullet]) :whitespace] [nil t1]
-  [_ :whitespace (:or nil
-                      :emptyline
-                      [:block :indent]
-                      [:block :bullet])] [nil t2])
+; (defrule remove-superfluous-whitespace
+;   [state t1 t2]
+;   tt
+;   block?
+;   [_ (:or nil
+;           :newline
+;           :emptyline
+;           [:block :indent]
+;           [:block :bullet]) :whitespace] [nil t1]
+;   [_ :whitespace (:or nil
+;                       :newline
+;                       :emptyline
+;                       [:block :indent]
+;                       [:block :bullet])] [nil t2])

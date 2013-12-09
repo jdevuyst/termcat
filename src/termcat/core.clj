@@ -55,16 +55,24 @@
                                  ))
                              (rw2/make-fixpoint
                                tok/remove-percent-tokens)
-                               tok/introduce-emptyline-tokens
+                             tok/introduce-emptyline-tokens
                              tok/introduce-indent-tokens
                              tok/remove-superfluous-whitespace
                              tok/introduce-item-tokens]
                             $)
            (fragmentcat $)
-           (print-fragment $)
+           ; (print-fragment $)
            (rewrite $ ast/abstract-blocks)
            ; (print-fragment $)
            (.terms $)
+           (rw2/apply-rules [(rw2/make-recursive
+                               (rw2/compose-rules
+                                 ast/fix-bullet-continuations
+                                 ast/remove-newlines)
+                               block?
+                               rw2/lexical-scope)]
+                            $)
+           (-> $ fragmentcat print-fragment .terms)
            (rw2/apply-rules [(rw2/make-recursive
                                (rw2/make-fixpoint
                                  (rw2/compose-rules
@@ -75,7 +83,7 @@
 
                                    ;                     bind/introduce-lambdas
                                    ;                     bind/introduce-fun-calls
-                                   ; bind/introduce-bindings
+                                   bind/introduce-bindings
 
                                    sugar/introduce-par-calls
                                    sugar/introduce-section-calls
