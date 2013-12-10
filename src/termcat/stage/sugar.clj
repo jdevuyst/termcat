@@ -59,15 +59,15 @@
                                                     (center t4))
                                   [t5])
   [_
-   _
    (:or :whitespace nil)
    [:block :bracket]
    [:block :parenthesis]
-   (:or :whitespace nil)] (concat [nil t1 t2]
-                                  (fun/fun-call-seq ":link"
-                                                    (center t3)
-                                                    (center t4))
-                                  [t5]))
+   (:or :whitespace nil)
+   _] (concat [nil t1]
+              (fun/fun-call-seq ":link"
+                                (center t2)
+                                (center t3))
+              [t4 t5]))
 
 (defn wrap-term [tag-name t]
   (concat
