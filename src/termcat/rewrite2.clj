@@ -40,23 +40,41 @@
   (unwrap [orig] orig)
   (rewrap [orig result] result))
 
+(defn- pad-1 [v]
+  (-> (cons nil (conj v nil))))
+
+(defn- trim
+  ([v] (trim v 0 (-> v count dec)))
+  ([v lidx ridx]
+   (let [lnil? (nil? (nth v lidx))
+         rnil? (nil? (nth v ridx))]
+     (cond
+       (> lidx ridx)
+       []
+
+       (or lnil? rnil?)
+       (recur v
+              (if lnil? (inc lidx) lidx)
+              (if rnil? (dec ridx) ridx))
+
+       :else
+       (subvec v lidx (inc ridx))))))
+
 (def apply-rule
-  (memoize (fn
-             ([rule orig-input] (apply-rule rule (rule) orig-input))
-             ([rule state orig-input]
-              (loop [state state
-                     input (concat [nil nil nil nil]
-                                   (unwrap orig-input)
-                                   [nil nil nil nil])
-                     output (transient [])]
-                (if (empty? input)
-                  (rewrap orig-input
-                          (vec (filter (complement nil?)
-                                       (persistent! output))))
-                  (let [[new-state new-input] (apply-rule-1 rule state input)]
-                    (recur new-state
-                           (rest new-input)
-                           (conj! output (first new-input))))))))))
+  (memoize
+    (fn
+      ([rule orig-input] (apply-rule rule (rule) orig-input))
+      ([rule state orig-input]
+       (loop [state state
+              input (-> orig-input unwrap pad-1)
+              output (transient [])]
+         (if (empty? input)
+           (rewrap orig-input
+                   (-> output persistent! trim))
+           (let [[new-state new-input] (apply-rule-1 rule state input)]
+             (recur new-state
+                    (rest new-input)
+                    (conj! output (first new-input))))))))))
 
 (defn apply-rules [rules input]
   (r/reduce #(apply-rule %2 %1)
@@ -145,17 +163,12 @@
     `(fn
        ([] ~init-state)
        ([state# input#]
-        (let [[~@arg-list] (cons state# (take ~argc input#))]
+        (let [padded-input# (concat input# (repeat nil))
+              [~@arg-list] (cons state# (take ~argc padded-input#))]
           (if-let [r# (match (vec (cons state#
-                                        (take ~argc (map ~proj input#))))
+                                        (take ~argc (map ~proj padded-input#))))
                              ~@body
                              :else nil)]
-            (do
-              (comment when (= :percent (~proj (first input#)))
-                (println "state" state#)
-                (println "<=" (map ~proj (take ~argc input#)))
-                (println "=>" (map ~proj (rest r#))))
-
-              [(or (first r#) state#)
-               (concat (rest r#)
-                       (drop ~argc input#))])))))))
+            [(or (first r#) state#)
+             (concat (rest r#)
+                     (drop ~argc input#))]))))))
