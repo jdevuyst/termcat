@@ -182,37 +182,37 @@
                                   (math/math-row-cast t3))
                         :mfrac)])
 
-(defrule math-cast-next-token
-  [state t1 t2]
-  tt
-  block?
-  [_ [:block (_ :guard :math)] (:or :default [:block _])]
-  (concat [nil t1]
-          (math/math-cast t2)))
+; (defrule math-cast-next-token
+;   [state t1 t2]
+;   tt
+;   block?
+;   [_ [:block (_ :guard :math)] (:or :default [:block _])]
+;   (concat [nil t1]
+;           (math/math-cast t2)))
 
-(defrule flatten-math-fences
-  [state t1]
-  tt
-  block?
-  [_
-   [:block (:or :parenthesis
-                :bracket
-                :brace)]] (let [subts (-> t1
-                                          center
-                                          .terms)]
-                            (match [(tt (first subts))
-                                    (tt (last subts))]
-                                   [[:block (_ :guard :math)]
-                                    [:block (_ :guard :math)]]
-                                   (concat [nil
-                                            (math/math-block
-                                              (fragment (left t1))
-                                              :mo)]
-                                           subts
-                                           [(math/math-block
-                                              (fragment (right t1))
-                                              :mo)])
-                                   :else nil)))
+; (defrule flatten-math-fences
+;   [state t1]
+;   tt
+;   block?
+;   [_
+;    [:block (:or :parenthesis
+;                 :bracket
+;                 :brace)]] (let [subts (-> t1
+;                                           center
+;                                           .terms)]
+;                             (match [(tt (first subts))
+;                                     (tt (last subts))]
+;                                    [[:block (_ :guard :math)]
+;                                     [:block (_ :guard :math)]]
+;                                    (concat [nil
+;                                             (math/math-block
+;                                               (fragment (left t1))
+;                                               :mo)]
+;                                            subts
+;                                            [(math/math-block
+;                                               (fragment (right t1))
+;                                               :mo)])
+;                                    :else nil)))
 
 (defrule introduce-nbsp-entities
   [state t1 t2 t3]

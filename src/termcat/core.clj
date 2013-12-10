@@ -80,12 +80,12 @@
            (rw2/apply-rules [(rw2/make-recursive
                                (rw2/make-fixpoint
                                  (rw2/compose-rules
-                                   ;                     ast/introduce-delim-errors
-                                   ;                     ast/convert-newlines-to-whitespace
-                                   ;                     ast/remove-superfluous-whitespace
+                                   ; ast/introduce-delim-errors
+                                   ; ast/convert-newlines-to-whitespace
+                                   ; ast/remove-superfluous-whitespace
 
-                                   ;                     bind/introduce-lambdas
-                                   ;                     bind/introduce-fun-calls
+                                   ; bind/introduce-lambdas
+                                   ; bind/introduce-fun-calls
                                    bind/introduce-bindings
 
                                    sugar/introduce-par-calls
@@ -97,7 +97,7 @@
                                    lambda/evaluate-fun-calls
 
                                    bind/expand-bindings
-                                   ;                     bind/remove-superfluous-whitespace
+                                   ; bind/remove-superfluous-whitespace
                                    ))
                                block?
                                rw2/lexical-scope)
@@ -107,9 +107,9 @@
                                  math-sugar/introduce-math-operators
                                  math-sugar/introduce-msub-msup
                                  math-sugar/introduce-mfrac
-                                 ;                     math-sugar/math-cast-next-token
-                                 ;                     math-sugar/flatten-math-fences
-                                 ;                     math-sugar/introduce-nbsp-entities
+                                 ; math-sugar/math-cast-next-token
+                                 ; math-sugar/flatten-math-fences
+                                 math-sugar/introduce-nbsp-entities
                                  )
                                block?
                                rw2/narrow-scope)
