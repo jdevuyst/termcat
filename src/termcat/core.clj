@@ -33,6 +33,17 @@
          (println indent (token-to-string t)))))
    tree))
 
+(defn print-tree-rule
+  ([] nil)
+  ([state input]
+   (do
+     (if (nil? (first input))
+       (->> input
+            (filter (complement nil?))
+            vec
+            print-tree))
+     nil)))
+
 (defn compile
   ([s]
    (compile s (rw2/make-cache)))
@@ -64,7 +75,7 @@
                                  ast/remove-superfluous-whitespace
                                  )
                                block?
-                               rw2/lexical-scope)]
+                               rw2/narrow-scope)]
                             $)
            (rw2/apply-rules [(rw2/make-recursive
                                (rw2/make-fixpoint
@@ -86,33 +97,45 @@
                                    lambda/evaluate-fun-calls
 
                                    bind/expand-bindings
-
                                    ;                     bind/remove-superfluous-whitespace
-
-                                   ;                     math-sugar/remove-manual-casts
-                                   ;                     math-sugar/introduce-math-operators
-                                   ; math-sugar/introduce-msub-msup
-                                   ;                     math-sugar/introduce-mfrac
-                                   ;                     math-sugar/math-cast-next-token
-                                   ;                     math-sugar/flatten-math-fences
-                                   ;                     math-sugar/introduce-nbsp-entities
                                    ))
                                block?
                                rw2/lexical-scope)
-                             ]
-                            $)
-           (print-tree $)
-           (rw2/apply-rules [(rw2/make-fixpoint
+                             (rw2/make-recursive
+                               (rw2/compose-rules
+                                 math-sugar/remove-manual-casts
+                                 ;                     math-sugar/introduce-math-operators
+                                 ; math-sugar/introduce-msub-msup
+                                 ;                     math-sugar/introduce-mfrac
+                                 ;                     math-sugar/math-cast-next-token
+                                 ;                     math-sugar/flatten-math-fences
+                                 ;                     math-sugar/introduce-nbsp-entities
+                                 )
+                               block?
+                               rw2/narrow-scope)
+                             print-tree-rule
+                             (rw2/make-recursive
                                (rw2/compose-rules
                                  html/introduce-typographic-dashes
                                  html/introduce-typographic-quotes
                                  html/introduce-typographic-full-stops
                                  html/introduce-typographic-colons
+                                 )
+                               html/text-block?
+                               rw2/narrow-scope)
+                             (rw2/make-recursive
+                               (rw2/compose-rules
                                  html/remove-error-tokens
                                  html/introduce-math-tags
-                                 ; html/introduce-mtext-tags
-                                 ; html/remove-math-tags
-                                 ))]
+                                 ; html/introduce-mtext-tags ; special scope
+                                 )
+                               block?
+                               rw2/narrow-scope)
+                             (rw2/make-recursive
+                                 html/remove-math-tags
+                                 block?
+                                 rw2/narrow-scope)
+                             ]
                             $)
            (html/add-boilerplate $)
            (rw2/apply-rules [(rw2/make-recursive

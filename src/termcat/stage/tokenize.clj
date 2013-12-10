@@ -176,7 +176,8 @@
      t3
      (if (= (tt t2) :underscore)
        (token :html "'> </span>")
-       (token :html "'></span>"))])
+       (token :html "'></span>"))]
+    [nil (token :whitespace) t2 t3])
 
   [_ :percent (:or :left-quote
                    :right-quote

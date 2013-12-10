@@ -11,7 +11,7 @@
   [state t1 t2]
   tt
   block?
-  [_ _ :whitespace] nil
+  [_ _ (:or nil :whitespace)] nil
   [_ :double-quote _] [nil (math/math-block
                              (if (block? t2)
                                (center t2)
