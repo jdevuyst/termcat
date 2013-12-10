@@ -50,104 +50,95 @@
   ([s cache]
    (rw2/with-cache
      cache
-     (as-> s $
-           (pretok/map-to-tokens $)
-           (rewrite $ tok/escape-html)
-           (.terms $)
-           (rw2/apply-rules [(rw2/make-fixpoint
-                               (rw2/compose-rules
-                                 tok/remove-escape-tokens
-                                 tok/remove-annotated-tokens
-                                 tok/merge-tokens
-                                 tok/remove-magic-tokens
-                                 ))
-                             (rw2/make-fixpoint
-                               tok/remove-percent-tokens)
-                             tok/introduce-emptyline-tokens
-                             tok/introduce-indent-tokens
-                             tok/remove-superfluous-whitespace
-                             tok/introduce-item-tokens ; fix unwind for bullet items
-                             ]
-                            $)
-           (-> $ fragmentcat (rewrite ast/abstract-blocks) .terms)
-           (rw2/apply-rules [(rw2/make-recursive
-                               (rw2/compose-rules
-                                 ast/fix-bullet-continuations
-                                 ast/remove-superfluous-whitespace
-                                 )
-                               block?
-                               rw2/narrow-scope)]
-                            $)
-           (rw2/apply-rules [(rw2/make-recursive
-                               (rw2/make-fixpoint
-                                 (rw2/compose-rules
-                                   ; ast/introduce-delim-errors
-                                   ; ast/convert-newlines-to-whitespace
-                                   ; ast/remove-superfluous-whitespace
+     (->> s
+          pretok/map-to-tokens
+          (#(-> % fragmentcat (rewrite tok/escape-html) .terms))
+          (rw2/apply-rules
+            [(rw2/make-fixpoint
+               (rw2/compose-rules
+                 tok/remove-escape-tokens
+                 tok/remove-annotated-tokens
+                 tok/merge-tokens
+                 tok/remove-magic-tokens))
+             (rw2/make-fixpoint
+               tok/remove-percent-tokens)
+             tok/introduce-emptyline-tokens
+             tok/introduce-indent-tokens
+             tok/remove-superfluous-whitespace
+             tok/introduce-item-tokens ; fix unwind for bullet items
+             ])
+          (#(-> % fragmentcat (rewrite ast/abstract-blocks) .terms))
+          (rw2/apply-rules
+            [(rw2/make-recursive
+               (rw2/compose-rules
+                 ast/fix-bullet-continuations
+                 ast/remove-superfluous-whitespace)
+               block?
+               rw2/narrow-scope)
+             (rw2/make-recursive
+               (rw2/make-fixpoint
+                 (rw2/compose-rules
+                   ; ast/introduce-delim-errors
+                   ; ast/convert-newlines-to-whitespace
+                   ; ast/remove-superfluous-whitespace
 
-                                   ; bind/introduce-lambdas
-                                   bind/introduce-fun-calls
-                                   bind/introduce-bindings
+                   ; bind/introduce-lambdas
+                   bind/introduce-fun-calls
+                   bind/introduce-bindings
 
-                                   sugar/introduce-par-calls
-                                   sugar/introduce-section-calls
-                                   sugar/introduce-blockquote-calls
-                                   sugar/introduce-bullet-list-calls
-                                   sugar/introduce-link-calls
-                                   sugar/remove-decorators
-                                   lambda/evaluate-fun-calls
+                   sugar/introduce-par-calls
+                   sugar/introduce-section-calls
+                   sugar/introduce-blockquote-calls
+                   sugar/introduce-bullet-list-calls
+                   sugar/introduce-link-calls
+                   sugar/remove-decorators
+                   lambda/evaluate-fun-calls
 
-                                   bind/expand-bindings
-                                   ; bind/remove-superfluous-whitespace
-                                   ))
-                               block?
-                               rw2/lexical-scope)
-                             (rw2/make-recursive
-                               (rw2/compose-rules
-                                 math-sugar/remove-manual-casts
-                                 math-sugar/introduce-math-operators
-                                 math-sugar/introduce-msub-msup
-                                 math-sugar/introduce-mfrac
-                                 ; math-sugar/math-cast-next-token
-                                 ; math-sugar/flatten-math-fences
-                                 )
-                               block?
-                               rw2/narrow-scope)
-                             (rw2/make-recursive
-                               (rw2/compose-rules
-                                 html/introduce-nbsp-entities
-                                 html/introduce-typographic-dashes
-                                 html/introduce-typographic-quotes
-                                 html/introduce-typographic-full-stops
-                                 html/introduce-typographic-colons
-                                 )
-                               html/text-block?
-                               rw2/narrow-scope)
-                             (rw2/make-recursive
-                               (rw2/compose-rules
-                                 html/remove-error-tokens
-                                 html/introduce-math-tags
-                                 ; html/introduce-mtext-tags ; special scope
-                                 )
-                               block?
-                               rw2/narrow-scope)
-                             print-tree-rule
-                             (rw2/make-recursive
-                                 html/remove-math-tags
-                                 block?
-                                 rw2/narrow-scope)
-                             ]
-                            $)
-           (html/add-boilerplate $)
-           (rw2/apply-rules [(rw2/make-recursive
-                               (rw2/make-fixpoint
-                                 html/to-html-tokens)
-                               block?
-                               rw2/narrow-scope)]
-                            $)
-           (fragmentcat $)
-           (html/to-string $)
-           ))))
+                   bind/expand-bindings
+                   ; bind/remove-superfluous-whitespace
+                   ))
+               block?
+               rw2/lexical-scope)
+             (rw2/make-recursive
+               (rw2/compose-rules
+                 math-sugar/remove-manual-casts
+                 math-sugar/introduce-math-operators
+                 math-sugar/introduce-msub-msup
+                 math-sugar/introduce-mfrac
+                 ; math-sugar/math-cast-next-token
+                 ; math-sugar/flatten-math-fences
+                 )
+               block?
+               rw2/narrow-scope)
+             (rw2/make-recursive
+               (rw2/compose-rules
+                 html/introduce-nbsp-entities
+                 html/introduce-typographic-dashes
+                 html/introduce-typographic-quotes
+                 html/introduce-typographic-full-stops
+                 html/introduce-typographic-colons)
+               html/text-block?
+               rw2/narrow-scope)
+             (rw2/make-recursive
+               (rw2/compose-rules
+                 html/remove-error-tokens
+                 html/introduce-math-tags
+                 ; html/introduce-mtext-tags ; special scope
+                 )
+               block?
+               rw2/narrow-scope)
+             print-tree-rule
+             (rw2/make-recursive
+               html/remove-math-tags
+               block?
+               rw2/narrow-scope)
+             (rw2/make-recursive
+               (rw2/make-fixpoint
+                 html/to-html-tokens)
+               block?
+               rw2/narrow-scope)])
+          html/add-boilerplate
+          html/to-string))))
 
 ; (defn repeat-compile [s]
 ;   (let [the-cache (rw2/make-cache)]

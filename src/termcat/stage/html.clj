@@ -267,8 +267,7 @@
                [(token :html "</body>")
                 (token :html "</html>")])))
 
-(defn to-string [frag]
-  (->> frag
-       .terms
+(defn to-string [v]
+  (->> v
        (r/map payload)
        (r/reduce str)))
