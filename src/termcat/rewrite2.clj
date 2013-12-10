@@ -1,13 +1,11 @@
 (ns termcat.rewrite2
   (:refer-clojure :exclude [memoize])
   (:require [clojure.core.reducers :as r]
-            [clojure.core.match :refer (match)]
-            [clojure.core.cache :as cache]))
+            [clojure.core.match :refer (match)]))
 
 (def ^:dynamic !*cache*)
 
-(defn make-cache []
-  (atom (cache/basic-cache-factory {})))
+(defn make-cache [] (atom {}))
 
 (defmacro with-cache [cache & body]
   `(binding [!*cache* ~cache]
@@ -15,15 +13,13 @@
 
 (defn memoize [f]
   (fn [& args]
-    (if-let [result (cache/lookup @!*cache*
-                                  [f args])]
-      (do
-        ; (reset! !*cache* (cache/hit @!*cache* :apply-rule-1))
-        result)
+    (if-let [result (get @!*cache* [f args])]
+      result
       (let [result (apply f args)]
-        (reset! !*cache* (cache/miss @!*cache*
-                                     [f args]
-                                     result))
+        (reset! !*cache* (assoc @!*cache* [f args] result))
+        (reset! !*cache* (assoc @!*cache* :funs
+                           (conj (get @!*cache* :funs)
+                                 (hash f))))
         result))))
 
 (def apply-rule-1
@@ -76,10 +72,12 @@
                     (rest new-input)
                     (conj! output (first new-input))))))))))
 
-(defn apply-rules [rules input]
-  (r/reduce #(apply-rule %2 %1)
-            input
-            rules))
+(def apply-rules
+  (identity
+    (fn [rules input]
+      (r/reduce #(apply-rule %2 %1)
+                input
+                rules))))
 
 (defn make-fixpoint [rule]
   (fn
@@ -105,35 +103,23 @@
   state)
 
 (def apply-rule-recursively
-  (identity
-    (fn [f rule pred scope state input]
-      (->> input
-           (map #(if (pred %)
-                   (apply-rule f (scope rule state %) %)
-                   %))))))
+  (fn [f rule pred scope state input]
+    (->> input
+         (map #(if (pred %)
+                 (apply-rule f (scope rule state %) %)
+                 %)))))
 
 (defn make-recursive [rule pred scope]
   (letfn [(f ([] (rule))
              ([state input]
               (->> input
                    (apply-rule-recursively f rule pred scope state)
+                   ; Alternatively:
+                   ; (if (nil? (first input))
+                   ;   (apply-rule-recursively f rule pred scope state input)
+                   ;   input)
                    (apply-rule-1 rule state))))]
     f))
-
-(defn memoize-truthy [f]
-  (fn [& args]
-    (if-let [result (cache/lookup @!*cache*
-                                  [f args])]
-      (do
-        nil
-        ; (reset! !*cache* (cache/hit @!*cache* :apply-rule-1))
-        result)
-      (let [result (apply f args)]
-        (if result
-          (reset! !*cache* (cache/miss @!*cache*
-                                       [f args]
-                                       result)))
-        result))))
 
 (defn compose-rules [& orig-rules]
   (let [init-state (->> orig-rules

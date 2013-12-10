@@ -66,7 +66,8 @@
                              tok/introduce-emptyline-tokens
                              tok/introduce-indent-tokens
                              tok/remove-superfluous-whitespace
-                             tok/introduce-item-tokens]
+                             tok/introduce-item-tokens ; fix unwind for bullet items
+                             ]
                             $)
            (-> $ fragmentcat (rewrite ast/abstract-blocks) .terms)
            (rw2/apply-rules [(rw2/make-recursive
@@ -147,7 +148,24 @@
            (fragmentcat $)
            (html/to-string $)
            ))))
-; fix unwind for bullet items
+
+; (defn repeat-compile [s]
+;   (let [the-cache (rw2/make-cache)]
+;     (println "PASS 1" (count @the-cache)
+;              (count (get @the-cache :funs)))
+;     (compile s the-cache)
+;     (println "PASS 2" (count @the-cache)
+;              (count (get @the-cache :funs)))
+;     (compile s the-cache)
+;     (println "PASS 3" (count @the-cache)
+;              (count (get @the-cache :funs)))
+;     (compile s the-cache)
+;     (println "PASS 4" (count @the-cache)
+;              (count (get @the-cache :funs)))
+;     (compile s the-cache)
+;     (println "PASS 5" (count @the-cache)
+;              (count (get @the-cache :funs)))
+;     (compile s the-cache)))
 
 (->> (slurp "doc/termcat-intro.tc")
      compile
