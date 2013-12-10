@@ -128,26 +128,26 @@
   tt
   block?
   [_
-   _
    [:block (_ :guard :math)]
-   :right-quote] [nil
-                  t1
-                  (subsup-token
-                    (split-base-sub-sup t2)
-                    [nil nil (->
-                               (token :default
-                                      (let [length (-> t3
-                                                       payload
-                                                       str
-                                                       count)]
-                                        (case length
-                                          4 \⁗
-                                          3 \‴
-                                          2 \″
-                                          1 \′
-                                          (string/join (repeat length \′)))))
-                               fragment
-                               (math/math-block :mo))])]
+   :right-quote
+   _] [nil
+       (subsup-token
+         (split-base-sub-sup t1)
+         [nil nil (->
+                    (token :default
+                           (let [length (-> t2
+                                            payload
+                                            str
+                                            count)]
+                             (case length
+                               4 \⁗
+                               3 \‴
+                               2 \″
+                               1 \′
+                               (string/join (repeat length \′)))))
+                    fragment
+                    (math/math-block :mo))])
+       t3]
   [_
    (:or :default [:block _])
    :underscore

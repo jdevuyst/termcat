@@ -105,7 +105,7 @@
                                (rw2/compose-rules
                                  math-sugar/remove-manual-casts
                                  math-sugar/introduce-math-operators
-                                 ; math-sugar/introduce-msub-msup
+                                 math-sugar/introduce-msub-msup
                                  ;                     math-sugar/introduce-mfrac
                                  ;                     math-sugar/math-cast-next-token
                                  ;                     math-sugar/flatten-math-fences
