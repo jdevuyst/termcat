@@ -157,7 +157,7 @@ to generate
 
   E = {<~ a , n , n' ~> SUBSETEQ I * N * N | Pa and n < n'}
 
-Notice that Termcat also correctly recognizes primes. It's also possible to use subscripts, superscripts, and fraction using syntax like this:
+Notice that Termcat also correctly recognizes primes. It's also possible to use subscripts, superscripts, and fractions using syntax like this:
   (a\^b\_c)\|d TO (a^b_c)|d
 
 To coerce something to be text, prefix it with a "double "upright "quotes "character \".
