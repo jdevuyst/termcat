@@ -35,7 +35,7 @@
 
 (defn compile
   ([s]
-   (compile s rw2/empty-cache))
+   (compile s (rw2/make-cache)))
   ([s cache]
    (rw2/with-cache
      cache
@@ -70,7 +70,6 @@
                                (rw2/make-fixpoint
                                  (rw2/compose-rules
                                    ;                     ast/introduce-delim-errors
-                                   ; ast/fix-bullet-continuations
                                    ;                     ast/convert-newlines-to-whitespace
                                    ;                     ast/remove-superfluous-whitespace
 
@@ -85,6 +84,8 @@
                                    sugar/introduce-link-calls
                                    sugar/remove-decorators
                                    lambda/evaluate-fun-calls
+
+                                   bind/expand-bindings
 
                                    ;                     bind/remove-superfluous-whitespace
 
@@ -127,6 +128,5 @@
 
 (->> (slurp "doc/termcat-intro.tc")
      compile
-     first
      (spit "doc/termcat-intro.html")
      time)

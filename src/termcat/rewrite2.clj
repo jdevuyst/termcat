@@ -6,12 +6,12 @@
 
 (def ^:dynamic !*cache*)
 
-(def empty-cache (cache/basic-cache-factory {}))
+(defn make-cache []
+  (atom (cache/basic-cache-factory {})))
 
 (defmacro with-cache [cache & body]
-  `(binding [!*cache* (atom ~cache)]
-     [(do ~@body)
-      @!*cache*]))
+  `(binding [!*cache* ~cache]
+     ~@body))
 
 (defn memoize [f]
   (fn [& args]

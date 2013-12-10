@@ -63,13 +63,13 @@ Users of p%1iny%1in can also use the notation \%1e, \%2e, \%3e, \%4e for %1e, %2
 
 It's possible to change the space between characters:
   l\%-2pt\%ess is m\%+0.4ex\%ore TO l%-2pt%ess is m%+0.4ex%ore
-Similarly, spaces of variable width can be created using%_1em%the%_1em%syntax%_1em%\%\_1em. Like in LaTeX, tildes can be used for non-breaking spaces: 100\~kg TO 100~kg.
+Similarly, spaces%_1ex%of%_1ex%variable%_1ex%width can be created using the syntax \%\_1ex. Like in LaTeX, tildes can be used for non-breaking spaces: 100\~kg TO 100~kg.
 
 Two subsequent percent symbols indicate the start of a comment. The comment continues until a newline character is encountered. %% This is a comment
 
 When \% is used in other contexts then it inserts a zero-width space. This space will not make it into the output HTML document. This is useful when you want to trigger syntactic sugar that only works after or before whitespace. For example, type a\%\*\*b\*\*\%c for a%**b**%c.
 
-To indicate that a symbol is not syntactic sugar, use a backslash \\ to escape it.
+Put a backslash \\ in front of a symbol to indicate that the symbol is content, not syntax.
 
 ## The Structure of a Termcat Document
 
