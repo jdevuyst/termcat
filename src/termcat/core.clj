@@ -106,7 +106,7 @@
                                  math-sugar/remove-manual-casts
                                  math-sugar/introduce-math-operators
                                  math-sugar/introduce-msub-msup
-                                 ;                     math-sugar/introduce-mfrac
+                                 math-sugar/introduce-mfrac
                                  ;                     math-sugar/math-cast-next-token
                                  ;                     math-sugar/flatten-math-fences
                                  ;                     math-sugar/introduce-nbsp-entities
