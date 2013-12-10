@@ -81,19 +81,19 @@
   [state t1 t2 t3 t4 t5 t6 t7]
   tt
   block?
-  [_ _ (:or :whitespace nil)
+  [_ (:or :whitespace nil)
    :underscore _ :underscore
-   (:or :whitespace nil) _]
-  (concat [nil t1 t2]
-          (wrap-term "u" t4)
-          [t6 t7])
+   (:or :whitespace nil) _ _]
+  (concat [nil t1]
+          (wrap-term "u" t3)
+          [t5 t6 t7])
 
-  [_ _ (:or :whitespace nil)
+  [_ (:or :whitespace nil)
    :asterisk _ :asterisk
-   (:or :whitespace nil) _]
-  (concat [nil t1 t2]
-          (wrap-term "em" t4)
-          [t6 t7])
+   (:or :whitespace nil) _ _]
+  (concat [nil t1]
+          (wrap-term "em" t3)
+          [t5 t6 t7])
 
   [_ (:or :whitespace nil)
    :asterisk :asterisk _ :asterisk :asterisk
