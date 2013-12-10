@@ -59,16 +59,16 @@
 ;                t1)]
 ;             (make-lambda t4 t5))))
 
-; (defrule introduce-fun-calls
-;   [state t1 t2 t3]
-;   tt
-;   block?
-;   [_
-;    (:or nil :whitespace :newline :emptyline)
-;    (:or :period :colon)
-;    :default]
-;   [nil t1 (fun/fun-call-head (str (payload t2)
-;                                   (payload t3)))])
+(defrule introduce-fun-calls
+  [state t1 t2 t3]
+  tt
+  block?
+  [_
+   (:or nil :whitespace :newline :emptyline)
+   (:or :period :colon)
+   :default]
+  [nil t1 (fun/fun-call-head (str (payload t2)
+                                  (payload t3)))])
 
 (defrule introduce-bindings
   (fn

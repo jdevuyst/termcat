@@ -85,7 +85,7 @@
                                    ; ast/remove-superfluous-whitespace
 
                                    ; bind/introduce-lambdas
-                                   ; bind/introduce-fun-calls
+                                   bind/introduce-fun-calls
                                    bind/introduce-bindings
 
                                    sugar/introduce-par-calls
