@@ -11,6 +11,12 @@
   (and (block? x)
        (not (:math (second (tt x))))))
 
+(defrule introduce-nbsp-entities
+  [state t1]
+  tt
+  block?
+  [_ :tilde] [nil (token :html "&nbsp;")])
+
 (defrule introduce-typographic-dashes
   [state t1]
   tt

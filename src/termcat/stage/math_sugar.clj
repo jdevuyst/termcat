@@ -213,9 +213,3 @@
 ;                                               (fragment (right t1))
 ;                                               :mo)])
 ;                                    :else nil)))
-
-(defrule introduce-nbsp-entities
-  [state t1 t2 t3]
-  tt
-  block?
-  [_ _ :tilde _] [nil t1 (token :html "&nbsp;") t3])

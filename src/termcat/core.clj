@@ -109,12 +109,12 @@
                                  math-sugar/introduce-mfrac
                                  ; math-sugar/math-cast-next-token
                                  ; math-sugar/flatten-math-fences
-                                 math-sugar/introduce-nbsp-entities
                                  )
                                block?
                                rw2/narrow-scope)
                              (rw2/make-recursive
                                (rw2/compose-rules
+                                 html/introduce-nbsp-entities
                                  html/introduce-typographic-dashes
                                  html/introduce-typographic-quotes
                                  html/introduce-typographic-full-stops
