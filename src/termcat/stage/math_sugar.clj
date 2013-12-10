@@ -68,21 +68,22 @@
                     :postfix
                     opt)]
             [t5 t6 t7]))
-  [_ _ _ _ _ :tilde :whitespace _]
-  (if-let [opt (match (payload t5)
+  [_ _ :tilde :whitespace _ _ _ _]
+  (if-let [opt (match (payload t2)
                       \~ []
                       "~~" [:normal-left]
                       "~~~" [:wide-left]
                       :else nil)]
-    (concat [nil t1 t2 t3]
+    (concat [nil]
             [(apply math/math-block
-                    (if (block? t4)
-                      (center t4)
-                      (fragment t4))
+                    (if (block? t1)
+                      (center t1)
+                      (fragment t1))
                     :mo
                     :prefix
                     opt)]
-            (math/math-cast t7))))
+            (math/math-cast t4)
+            [t5 t6 t7])))
 
 (defn split-base-sub-sup [t]
   (match (tt t)

@@ -104,7 +104,7 @@
                              (rw2/make-recursive
                                (rw2/compose-rules
                                  math-sugar/remove-manual-casts
-                                 ;                     math-sugar/introduce-math-operators
+                                 math-sugar/introduce-math-operators
                                  ; math-sugar/introduce-msub-msup
                                  ;                     math-sugar/introduce-mfrac
                                  ;                     math-sugar/math-cast-next-token
@@ -113,7 +113,6 @@
                                  )
                                block?
                                rw2/narrow-scope)
-                             print-tree-rule
                              (rw2/make-recursive
                                (rw2/compose-rules
                                  html/introduce-typographic-dashes
@@ -131,6 +130,7 @@
                                  )
                                block?
                                rw2/narrow-scope)
+                             print-tree-rule
                              (rw2/make-recursive
                                  html/remove-math-tags
                                  block?
