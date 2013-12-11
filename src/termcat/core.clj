@@ -127,15 +127,16 @@
               print-tree-rule
 
               (rw2/recursion
-                (rw2/procedure
-                  (rw2/disjunction
-                    math-sugar/remove-manual-casts
-                    math-sugar/introduce-math-operators
-                    math-sugar/introduce-msub-msup
-                    math-sugar/introduce-mfrac
-                    ; math-sugar/math-cast-next-token
-                    ; math-sugar/flatten-math-fences
-                    ))
+                (rw2/fixpoint
+                  (rw2/procedure
+                    (rw2/disjunction
+                      math-sugar/remove-manual-casts
+                      math-sugar/introduce-math-operators
+                      math-sugar/introduce-msub-msup
+                      math-sugar/introduce-mfrac
+                      ; math-sugar/math-cast-next-token
+                      ; math-sugar/flatten-math-fences
+                      )))
                 block?)
 
               (rw2/recursion
