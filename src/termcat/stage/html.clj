@@ -191,7 +191,7 @@
                      (if-not (= :whitespace (tt t2))
                        t2)])
 
-(defrule remove-math-tags
+(defrule remove-math-tokens
   [state t1 t2]
   tt
   block?

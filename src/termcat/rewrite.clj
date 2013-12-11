@@ -38,7 +38,7 @@
                        ~arg-mapf
                        [~@args]
                        ~@body)
-           rw2/abstract-state))))
+           rw2/abstraction))))
 
 (defprotocol IRewrite
   (rewrite [coll rule]))

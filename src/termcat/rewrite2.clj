@@ -1,31 +1,7 @@
 (ns termcat.rewrite2
-  (:refer-clojure :exclude [memoize])
+  (:refer-clojure :exclude [memoize sequence])
   (:require [clojure.core.reducers :as r]
             [clojure.core.match :refer (match)]))
-
-(def ^:dynamic !*cache*)
-
-(defn make-cache [] (atom {}))
-
-(defmacro with-cache [cache & body]
-  `(binding [!*cache* ~cache]
-     ~@body))
-
-(defn memoize [f]
-  (fn [& args]
-    (if-let [result (get @!*cache* [f args])]
-      result
-      (let [result (apply f args)]
-        (reset! !*cache* (assoc @!*cache* [f args] result))
-        (reset! !*cache* (assoc @!*cache* :funs
-                           (conj (get @!*cache* :funs)
-                                 (hash f))))
-        result))))
-
-(def apply-rule-1
-  (fn [rule state input]
-    (or (rule state input)
-        [state input])))
 
 (defprotocol IWrapped
   (unwrap [orig])
@@ -35,6 +11,27 @@
   clojure.lang.IPersistentVector
   (unwrap [orig] orig)
   (rewrap [orig result] result))
+
+(def ^:dynamic !*cache*)
+
+(defn make-cache [] (atom {}))
+
+(defmacro with-cache [cache & body]
+  `(binding [!*cache* ~cache]
+     ~@body))
+
+; (defn- memoize [f]
+;   (fn [& args]
+;     (if-let [result (get @!*cache* [f args])]
+;       result
+;       (let [result (apply f args)]
+;         (reset! !*cache* (assoc @!*cache* [f args] result))
+;         (reset! !*cache* (assoc @!*cache* :funs
+;                            (conj (get @!*cache* :funs)
+;                                  (hash f))))
+;         result))))
+
+(def memoize identity)
 
 (defn- pad-1 [v]
   (-> (cons nil (conj v nil))))
@@ -55,6 +52,34 @@
 
        :else
        (subvec v lidx (inc ridx))))))
+
+(def apply-rule-1
+  (fn [rule state input]
+    (or (rule state input)
+        [state input])))
+
+(defn apply-rule-x
+  ([rule input] (apply-rule-x rule (rule) input))
+  ([rule state input]
+   (->> input
+        unwrap
+        (apply-rule-1 rule (rule))
+        second
+        (rewrap input))))
+
+(defn procedure [rule]
+  (fn
+    ([] (rule))
+    ([orig-state orig-input]
+     (loop [state orig-state
+            input (pad-1 orig-input)
+            output (transient [])]
+       (if (empty? input)
+         [state (-> output persistent! trim)]
+         (let [[new-state new-input] (apply-rule-1 rule state input)]
+           (recur new-state
+                  (rest new-input)
+                  (conj! output (first new-input)))))))))
 
 (def apply-rule
   (memoize
@@ -79,7 +104,60 @@
                 input
                 rules))))
 
-(defn make-fixpoint [rule]
+(defn narrow-scope [rule state term]
+  (rule))
+
+(defn lexical-scope [rule state term]
+  state)
+
+(def apply-rule-recursion
+  (fn [f rule pred scope state input]
+    (->> input
+         (map #(if (pred %)
+                 (apply-rule-x f (scope rule state %) %)
+                 %)))))
+
+(defn recursion [rule pred scope]
+  (letfn [(f ([] (rule))
+             ([state input]
+              (->> input
+                   (apply-rule-recursion f rule pred scope state)
+                   (apply-rule-1 rule state))))]
+    f))
+
+(defn disjunction [& orig-rules]
+  (let [init-state (->> orig-rules
+                        (r/mapcat #(%))
+                        (r/reduce assoc! (transient {}))
+                        persistent!)]
+    (fn
+      ([] init-state)
+      ([orig-state orig-input]
+       (loop [next-rules orig-rules
+              [state input] [orig-state orig-input]]
+         (if (empty? next-rules)
+           [state input]
+           (let [result (apply-rule-1 (first next-rules) state input)]
+             (if-not (= (second result) input)
+               result
+               (recur (rest next-rules) result)))))))))
+
+(defn sequence [& orig-rules]
+  (let [init-state (->> orig-rules
+                        (r/mapcat #(%))
+                        (r/reduce assoc! (transient {}))
+                        persistent!)]
+    (fn
+      ([] init-state)
+      ([orig-state orig-input]
+       (loop [next-rules orig-rules
+              [state input] [orig-state orig-input]]
+         (if (empty? next-rules)
+           [state input]
+           (recur (rest next-rules)
+                  (apply-rule-1 (first next-rules) state input))))))))
+
+(defn fixpoint [rule]
   (fn
     ([] (rule))
     ([state input]
@@ -88,58 +166,13 @@
          result
          (recur new-state new-input))))))
 
-(defn abstract-state [rule]
+(defn abstraction [rule]
   (fn
     ([] {rule (rule)})
     ([state input]
      (if-let [r (rule (get state rule) input)]
        [(assoc state rule (first r))
         (second r)]))))
-
-(defn narrow-scope [rule state term]
-  (rule))
-
-(defn lexical-scope [rule state term]
-  state)
-
-(def apply-rule-recursively
-  (fn [f rule pred scope state input]
-    (->> input
-         (map #(if (pred %)
-                 (apply-rule f (scope rule state %) %)
-                 %)))))
-
-(defn make-recursive [rule pred scope]
-  (letfn [(f ([] (rule))
-             ([state input]
-              (->> input
-                   (apply-rule-recursively f rule pred scope state)
-                   ; Alternatively:
-                   ; (if (nil? (first input))
-                   ;   (apply-rule-recursively f rule pred scope state input)
-                   ;   input)
-                   (apply-rule-1 rule state))))]
-    f))
-
-(defn compose-rules [& orig-rules]
-  (let [init-state (->> orig-rules
-                        (r/mapcat #(%))
-                        (r/reduce assoc! (transient {}))
-                        persistent!)]
-    (fn
-      ([] init-state)
-      ([orig-state orig-input]
-       (loop [prev-rules nil
-              next-rules orig-rules
-              [state input] [orig-state orig-input]]
-         (if (empty? next-rules)
-           [state input]
-           (let [result (apply-rule-1 (first next-rules) state input)]
-             (if-not (= (second result) input)
-               result
-               (recur (conj prev-rules (first next-rules))
-                      (rest next-rules)
-                      result)))))))))
 
 (defmacro window [init-state proj [& arg-list] & body]
   (assert (or (nil? init-state) (map? init-state)))
