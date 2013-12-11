@@ -1,106 +1,70 @@
-(ns rewrite.core
+(ns termcat.rewrite2
+  (:refer-clojure :exclude [memoize sequence])
   (:require [clojure.core.reducers :as r]
-            [clojure.core.match :refer (match)]
-            [clojure.core.cache :as cache]))
+            [clojure.core.match :refer (match)]))
 
-; (defn trace [x]
-;   (println "Trace" x)
-;   x)
+(defprotocol IWrapped
+  (unwrap [orig])
+  (rewrap [orig result]))
 
-; (defn remove-dups [input]
-;   (if (= (first input) (second input))
-;     (rest input)))
-
-; (defn abstract-dups [input]
-;   (if (= (first input) (second input))
-;     (cons [(first input) (second input)]
-;           (drop 2 input))))
-
-
-; (time (println
-;         (apply-rules [abstract-dups
-;                       remove-dups
-;                       ] [ 1 1 2 3 4 4 5 5 5 5  6 7])))
-
-; (defn mul [input]
-;   (if (and (<= 3 (count input))
-;            (= '* (second input)))
-;     (cons (* (first input) (nth input 2))
-;           (drop 3 input))))
-
-; (defn add [input]
-;   (if (and (<= 3 (count input))
-;            (= '+ (second input)))
-;     (cons (+ (first input) (nth input 2))
-;           (drop 3 input))))
-
-; (time (println
-;         (apply-rules [(compose-rules mul
-;                                      add)
-;                       ] [ 1 '+ 2 '* 3])))
+(extend-protocol IWrapped
+  clojure.lang.IPersistentVector
+  (unwrap [orig] orig)
+  (rewrap [orig result] result))
 
 (def ^:dynamic !*cache*)
 
-(def empty-cache (cache/basic-cache-factory {}))
+(defn make-cache [] (atom {}))
 
 (defmacro with-cache [cache & body]
-  `(binding [!*cache* (atom ~cache)]
+  `(binding [!*cache* ~cache]
      ~@body))
 
+(defn- memoize [f]
+  (fn [& args]
+    (if-let [result (get @!*cache* [f args])]
+      result
+      (let [result (apply f args)]
+        (reset! !*cache* (assoc @!*cache* [f args] result))
+        (reset! !*cache* (assoc @!*cache* :funs
+                           (conj (get @!*cache* :funs)
+                                 (hash f))))
+        result))))
+
+(defn- pad-1 [v]
+  (-> (cons nil (conj v nil))))
+
+(defn- trim
+  ([v] (trim v 0 (-> v count dec)))
+  ([v lidx ridx]
+   (let [lnil? (nil? (nth v lidx))
+         rnil? (nil? (nth v ridx))]
+     (cond
+       (> lidx ridx)
+       []
+
+       (or lnil? rnil?)
+       (recur v
+              (if lnil? (inc lidx) lidx)
+              (if rnil? (dec ridx) ridx))
+
+       :else
+       (subvec v lidx (inc ridx))))))
+
 (defn apply-rule-1 [rule state input]
-  (if-let [result (cache/lookup
-                    @!*cache*
-                    [:apply-rule-1 rule state input])]
-    (do
-      ; (reset! !*cache* (cache/hit @!*cache* :apply-rule-1))
-      result)
-    (let [result (or (rule state input)
-                     [state input])]
-      (reset! !*cache* (cache/miss
-                         @!*cache*
-                         [:apply-rule-1 rule state input]
-                         result))
-      result)))
+  (or (rule state input)
+      [state input]))
 
-(defn apply-rule
-  ([rule input] (apply-rule rule (rule) input))
+(defn apply-rule-x
+  ([rule input] (apply-rule-x rule (rule) input))
   ([rule state input]
-   (loop [state state
-          input input
-          output (transient [])]
-     (if (empty? input)
-       (with-meta (persistent! output) {:state state
-                                        :cache @!*cache*})
-       (match (apply-rule-1 rule state input)
-              [new-state input] (recur new-state
-                                       (rest input)
-                                       (conj! output (first input)))
-              [new-state new-input] (recur state
-                                           new-input
-                                           output))))))
+   (let [[state2 input2] (->> input
+                              unwrap
+                              (apply-rule-1 rule state))]
+     (with-meta (rewrap input input2)
+                {:state state2}))))
 
-(defn apply-rules [rules input]
-  (r/reduce #(apply-rule %2 %1)
-            input
-            rules))
-
-(defn narrow-scope [rule state term]
-  (rule))
-
-(defn lexical-scope [rule state term]
-  state)
-
-(defn make-recursive [rule pred scope]
-  (letfn [(f ([] (rule))
-             ([state input]
-              (->> input
-                   (map #(if (pred %)
-                           (apply-rule f (scope rule state %) %)
-                           %))
-                   (rule state))))]
-    f))
-
-(defn compose-rules [& orig-rules]
+(defn disjunction [& orig-rules]
   (let [init-state (->> orig-rules
                         (r/mapcat #(%))
                         (r/reduce assoc! (transient {}))
@@ -108,19 +72,97 @@
     (fn
       ([] init-state)
       ([orig-state orig-input]
-       (loop [prev-rules nil
-              next-rules orig-rules
+       (loop [next-rules orig-rules
               [state input] [orig-state orig-input]]
          (if (empty? next-rules)
            [state input]
            (let [result (apply-rule-1 (first next-rules) state input)]
-             (if (not (some #(not= (apply-rule-1 % orig-state (second result))
-                                   result)
-                            prev-rules))
-               (recur (conj prev-rules (first next-rules))
-                      (rest next-rules)
-                      result)
-               (recur nil orig-rules [orig-state (second result)])))))))))
+             (if-not (= (second result) input)
+               result
+               (recur (rest next-rules) result)))))))))
+
+(defn sequence [& orig-rules]
+  (let [init-state (->> orig-rules
+                        (r/mapcat #(%))
+                        (r/reduce assoc! (transient {}))
+                        persistent!)]
+    (fn
+      ([] init-state)
+      ([orig-state orig-input]
+       (loop [next-rules orig-rules
+              [state input] [orig-state orig-input]]
+         (if (empty? next-rules)
+           [state input]
+           (recur (rest next-rules)
+                  (apply-rule-1 (first next-rules) state input))))))))
+
+(defn fixpoint [rule]
+  (fn
+    ([] (rule))
+    ([state input]
+     (let [[new-state new-input :as result] (apply-rule-1 rule state input)]
+       (if (= input new-input)
+         result
+         (recur new-state new-input))))))
+
+(defn recursion [rule pred]
+  (letfn [(f ([] (rule))
+             ([state input]
+              (->> input
+                   (map #(if (pred %)
+                           (apply-rule-x f %)
+                           %))
+                   (apply-rule-1 rule state))))]
+    f))
+
+(defn abstraction [rule]
+  (fn
+    ([] {rule (rule)})
+    ([state input]
+     (if-let [r (rule (get state rule) input)]
+       [(assoc state rule (first r))
+        (second r)]))))
+
+(defn procedure [rule]
+  (fn
+    ([] (rule))
+    ([orig-state orig-input]
+     (loop [state orig-state
+            input (pad-1 orig-input)
+            output (transient [])]
+       (if (empty? input)
+         [state (-> output persistent! trim)]
+         (let [[new-state new-input] (apply-rule-1 rule state input)]
+           (recur new-state
+                  (rest new-input)
+                  (conj! output (first new-input)))))))))
+
+(defn lexical-scope
+  ([prev-level-state] prev-level-state)
+  ([left-state returned-state] left-state))
+
+(defn flat-scope
+  ([prev-level-state] prev-level-state)
+  ([left-state returned-state] returned-state))
+
+(defn recursive-procedure [rule pred scope]
+  (letfn [(f ([] (rule))
+             ([orig-state orig-input]
+              (loop [state orig-state
+                     input (pad-1 orig-input)
+                     output (transient [])]
+                (if (empty? input)
+                  [state (-> output persistent! trim)]
+                  (let [el1 (first input)
+                        input (if (pred el1)
+                                (cons (apply-rule-x f (scope state) el1)
+                                      (rest input))
+                                input)
+                        [new-state new-input] (apply-rule-1 rule state input)]
+                    (recur new-state
+                           (rest new-input)
+                           (conj! output (first new-input))))))))]
+    f))
 
 (defmacro window [init-state proj [& arg-list] & body]
   (assert (or (nil? init-state) (map? init-state)))
@@ -130,50 +172,12 @@
     `(fn
        ([] ~init-state)
        ([state# input#]
-        (let [[~@arg-list] (cons state# (take ~argc input#))]
-          (match (vec (cons state# (take ~argc (map ~proj input#))))
-                 ~@body
-                 :else nil))))))
-
-(defn count-elements
-  ([] {:count 0})
-  ([state input]
-   (println :x state input)
-   (if-not (empty? input)
-     [(update-in state [:count] inc)
-      input]
-     [state input])))
-
-(defn delete-odd-numbers
-  ([] {})
-  ([state input]
-   (println :y state input)
-   [state
-    (if (and (number? (first input))
-             (odd? (first input)))
-      (rest input)
-      input)]))
-
-(defn return-count
-  ([] {})
-  ([state input]
-   (println :z state input)
-   (cond (empty? input)
-         [state input]
-         (sequential? (first input))
-         [state input]
-         :else
-         [state (cons (:count state)
-                      (rest input))])))
-
-(time
-  (println
-    (with-cache
-      empty-cache
-      (apply-rules [
-                    (-> (compose-rules count-elements
-                                       ; delete-odd-numbers
-                                       return-count)
-                        (make-recursive sequential? lexical-scope))
-                    ]
-                   [10 11 12 13 [14 15 16 17 [18 [19 [20 21 [22 [23]]]]]]]))))
+        (let [padded-input# (concat input# (repeat nil))
+              [~@arg-list] (cons state# (take ~argc padded-input#))]
+          (if-let [r# (match (vec (cons state#
+                                        (take ~argc (map ~proj padded-input#))))
+                             ~@body
+                             :else nil)]
+            [(or (first r#) state#)
+             (concat (rest r#)
+                     (drop ~argc input#))]))))))

@@ -55,21 +55,21 @@ Long dashes can be included using double (-\-/--) or triple (---) hyphens.
 
 There's special syntax for diactritics:
 - r\%\^ole TO r%^ole
-- zo\%\"even TO zo%"even
 - n\%\'ee TO n%'ee
-- tr\%\`es TO tr%`es
+- Gruy\%\`ere TO Gruy%`ere
+- zo\%\"even TO zo%"even
 
 Users of p%1iny%1in can also use the notation \%1e, \%2e, \%3e, \%4e for %1e, %2e, %3e, and %4e.
 
 It's possible to change the space between characters:
   l\%-2pt\%ess is m\%+0.4ex\%ore TO l%-2pt%ess is m%+0.4ex%ore
-Similarly, spaces of variable width can be created using%_1em%the%_1em%syntax%_1em%\%\_1em. Like in LaTeX, tildes can be used for non-breaking spaces: 100\~kg TO 100~kg.
+Similarly, spaces%_1ex%of%_1ex%variable%_1ex%width can be created using the syntax \%\_1ex. Like in LaTeX, tildes can be used for non-breaking spaces: 100\~kg TO 100~kg.
 
-A percent symbol \% followed by a space indicates a comment. A newline signals the end of the comment. % This is a comment
+Two subsequent percent symbols indicate the start of a comment. The comment continues until a newline character is encountered. %% This is a comment
 
 When \% is used in other contexts then it inserts a zero-width space. This space will not make it into the output HTML document. This is useful when you want to trigger syntactic sugar that only works after or before whitespace. For example, type a\%\*\*b\*\*\%c for a%**b**%c.
 
-To indicate that a symbol is not syntactic sugar, use a backslash \\ to escape it.
+Put a backslash \\ in front of a symbol to indicate that the symbol is content, not syntax.
 
 ## The Structure of a Termcat Document
 
@@ -79,7 +79,8 @@ For many purposes it doesn't matter how a block is delimited. For instance, a nu
   \:numbered-list%<br>%\- item 1%<br>%\- item 2
 or
   \:numbered-list(item 1)[item 2]
-and it will render as :numbered-list(item 1)[item 2]
+and it will render as
+  :numbered-list(item 1)[item 2]
 
 ## Math
 
@@ -157,7 +158,7 @@ to generate
 
   E = {<~ a , n , n' ~> SUBSETEQ I * N * N | Pa and n < n'}
 
-Notice that Termcat also correctly recognizes primes. It's also possible to use subscripts, superscripts, and fraction using syntax like this:
+Notice that Termcat also correctly recognizes primes. It's also possible to use subscripts, superscripts, and fractions using syntax like this:
   (a\^b\_c)\|d TO (a^b_c)|d
 
 To coerce something to be text, prefix it with a "double "upright "quotes "character \".

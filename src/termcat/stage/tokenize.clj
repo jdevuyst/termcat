@@ -86,7 +86,6 @@
             :else (reject)))))
 
 (defrule remove-escape-tokens
-  "[:escape \\] + [type payload] -> [:default payload]"
   [state t1 t2]
   tt
   block?
@@ -109,163 +108,21 @@
   [_ _ :tilde] [nil (token :default (payload t1)) t2])
 
 (defrule merge-tokens
-  "[type x] + [type y] -> [type xy] for some token types.
-
-  For some token types we don't want to make a distinction
-  between a single token and a sequences of tokens of that
-  token type. We merge subsequent occurences of such tokens.
-  This also allows for easier matching later on."
-[state t1 t2]
-tt
-block?
-[_ _ (:or :default
-          :whitespace
-          :tilde
-          :dash
-          :left-quote
-          :right-quote
-          :hash
-          :html)] (if (= (tt t1) (tt t2))
-                    [nil
-                     (with-meta (token (tt t1)
-                                       (str (payload t1) (payload t2)))
-                                (assoc (meta t1) :rpos (-> t2 meta :rpos)))]))
-
-(defrule introduce-emptyline-tokens
-  "Any two or more successive :newline tokens are replaced by
-  a single :emptyline token. Isolated :newline tokens are not
-  removed."
-[state t1 t2]
-tt
-block?
-[_ :emptyline :newline] [nil t2]
-[_ :newline :newline] [nil (with-meta (token :emptyline)
-                                      (meta t1))])
-
-(defrule introduce-indent-tokens
-  "Introduces [:ldelim :indent] and [:rdelim :indent] tokens.
-
-  Left delimiters are inserted after empty lines (if applicable) and
-  right delimiters are inserted before empty lines (if applicable)"
-(constant-state {:indent 0})
-[state t1 t2]
-tt
-block?
-[_ _ nil] (concat [nil t1]
-                  (for [x (range (/ (:indent state) 2))]
-                    (with-meta (rdelim :indent)
-                               (reduce #(update-in %1 [%2] inc)
-                                       (meta t1)
-                                       [:lpos :rpos]))))
-[_ (:or :newline
-        :emptyline) _] (let [indent (if (and (= (tt t2) :whitespace)
-                                             (string? (payload t2)))
-                                      (-> t2
-                                          payload
-                                          count
-                                          (/ 2)
-                                          int)
-                                      0)
-                             diff (- indent (:indent state))]
-                         (concat [{:indent indent}]
-                                 (for [x (range (- diff))]
-                                   (with-meta (rdelim :indent)
-                                              (meta t1)))
-                                 (if t1 [t1])
-                                 (for [x (range diff)]
-                                   (with-meta (ldelim :indent)
-                                              (meta t1)))
-                                 [t2])))
-
-(defrule remove-superfluous-whitespace
-  "Removes leading and trailing whitespace."
   [state t1 t2]
   tt
   block?
-  [_
-   (:or [:ldelim :indent]
-        [:rdelim :indent]
-        :newline
-        :emptyline)
-   :whitespace] [nil t1]
-  [_
-   :whitespace
-   (:or [:ldelim :indent]
-        [:rdelim :indent]
-        :newline
-        :emptyline)] [nil t2])
-
-(defn item-type [tok]
-  "Returns the item 'type' of the token, if any, or nil. The item
-  type can be bullet, section, subsection, etcetera."
-(case (payload tok)
-  \- :bullet
-  \# :h1
-  "##" :h2
-  "###" :h3
-  "####" :h4
-  "#####" :h5
-  "######" :h6
-  nil))
-
-(defrule introduce-item-tokens
-  "Adds [:ldelim :item] tokens in front of dashes at the start of a
-  line. Adds [:rdelim :item] tokens where the bullet ends.
-
-  Newline tokens before [:rdelim :item] terms are removed.
-
-  Like indentation, right delimiter for bullets are inserted in front
-  of, not after, :emptylines."
-(constant-state {:in-bullet false
-                 :item-type nil
-                 :prev-state nil})
-[state t1 t2 t3]
-tt
-block?
-[{:in-bullet true} _ nil nil] (letfn [(unwind [state2]
-                                              (when-not (nil? state2)
-                                                (cons (token [:rdelim (:item-type state2)])
-                                                      (unwind (:prev-state state2)))))]
-                                (cons nil
-                                      (unwind state)))
-[{:in-bullet true} _ (:or :emptyline
-                          [:rdelim :indent]) _] [(:prev-state state)
-                                                 t1
-                                                 (token [:rdelim (:item-type state)])
-                                                 t2
-                                                 t3]
-[{:in-bullet true} :newline (:or :dash
-                                 :hash) (:or :whitespace
-                                             :newline
-                                             :emptyline
-                                             nil)] (if (item-type t2)
-                                                     [(assoc state :item-type (item-type t2))
-                                                      t1
-                                                      (token [:rdelim (:item-type state)])
-                                                      (token [:ldelim (item-type t2)]
-                                                             (payload t2))
-                                                      t3])
-[{:in-bullet true} :newline _ _] [(:prev-state state)
-                                  t1
-                                  (token [:rdelim (:item-type state)])
-                                  t2
-                                  t3]
-[_ (:or nil
-        :newline
-        :emptyline
-        [:ldelim :indent]) _ (:or :whitespace
-                                  :newline
-                                  :emptyline
-                                  nil)] (if (item-type t2)
-                                          [{:in-bullet true
-                                            :item-type (item-type t2)
-                                            :prev-state state}
-                                           t1
-                                           (token [:ldelim (item-type t2)]
-                                                  (payload t2))
-                                           t3])
-[_ [:ldelim :indent] _ _] [{:in-bullet false :prev-state state} t1 t2 t3]
-[_ [:rdelim :indent] _ _] [(:prev-state state) t1 t2 t3])
+  [_ _ (:or :default
+            :whitespace
+            :tilde
+            :dash
+            :left-quote
+            :right-quote
+            :hash
+            :html)] (if (= (tt t1) (tt t2))
+                      [nil
+                       (with-meta (token (tt t1)
+                                         (str (payload t1) (payload t2)))
+                                  (assoc (meta t1) :rpos (-> t2 meta :rpos)))]))
 
 (defrule remove-magic-tokens
   [state t1 t2 t3]
@@ -299,69 +156,193 @@ block?
   [state t1 t2 t3]
   tt
   block?
-  [_
-   _
-   :percent
-   :percent] [nil t1 (token :whitespace)
-              (token :default) (token :whitespace)]
-  [_
-   :percent
-   :whitespace
-   (:or :newline :emptyline [:ldelim _] [:block _] nil)] [nil]
-  [_
-   :percent
-   :whitespace
-   _] [nil t1 t2]
-  [_
-   :percent
-   (:or :plus
-        :underscore
-        :dash)
-   :default] (if (css-length? (payload t3))
-               [nil
-                (token :html "<span style='")
-                (token :html (case (payload t2)
-                               \+ "margin-left: "
-                               \- "margin-left: -"
-                               \_ "display: inline-block; width: "))
-                t3
-                (if (= (tt t2) :underscore)
-                  (token :html "'> </span>")
-                  (token :html "'></span>"))])
-  [_
-   :percent
-   (:or :left-quote
-        :right-quote
-        :double-quote
-        :circumflex
-        :default)
-   _] (let [[c r t] (if (and (= (tt t2) :default)
-                             (string? (payload t2)))
-                      [(first (payload t2))
-                       (subs (payload t2) 1)
-                       t3]
-                      [(payload t2) (str (payload t3)) nil])]
-        (if-let [diacritic (case c
-                             \` (char 0x0300)
-                             \4 (char 0x0300)
-                             \' (char 0x0301)
-                             \2 (char 0x0301)
-                             \^ (char 0x0302)
-                             \1 (char 0x0304)
-                             \" (char 0x0308)
-                             \3 (char 0x030c)
-                             nil)]
-          (conj [nil (token :default (str (first r)
-                                          diacritic
-                                          (subs r 1)))]
-                t))))
+  ; [_ _ :percent :percent]
+  ; [nil t1 (token :whitespace) (token :default) (token :whitespace)]
 
-(defrule remove-remaining-percent-tokens
+  [_ :percent :percent (:or :newline :emptyline nil)]
+  [nil t3]
+
+  [_ :percent :percent _]
+  [nil t1 t2]
+
+  [_  :percent (:or :plus :underscore :dash) :default]
+  (if (css-length? (payload t3))
+    [nil
+     (token :html "<span style='")
+     (token :html (case (payload t2)
+                    \+ "margin-left: "
+                    \- "margin-left: -"
+                    \_ "display: inline-block; width: "))
+     t3
+     (if (= (tt t2) :underscore)
+       (token :html "'> </span>")
+       (token :html "'></span>"))]
+    [nil (token :whitespace) t2 t3])
+
+  [_ :percent (:or :left-quote
+                   :right-quote
+                   :double-quote
+                   :circumflex
+                   :default) _]
+  (let [[c r t] (if (and (= (tt t2) :default)
+                         (string? (payload t2)))
+                  [(first (payload t2))
+                   (subs (payload t2) 1)
+                   t3]
+                  [(payload t2) (str (payload t3)) nil])]
+    (if-let [diacritic (case c
+                         \` (char 0x0300)
+                         \4 (char 0x0300)
+                         \' (char 0x0301)
+                         \2 (char 0x0301)
+                         \^ (char 0x0302)
+                         \1 (char 0x0304)
+                         \" (char 0x0308)
+                         \3 (char 0x030c)
+                         nil)]
+      (conj [nil (token :default (str (first r)
+                                      diacritic
+                                      (subs r 1)))]
+            t)
+      [nil (token :whitespace) t2 t3]))
+
+  [_ :percent _ _]
+  [nil (token :whitespace) t2 t3])
+
+(defrule introduce-emptyline-tokens
   [state t1 t2]
   tt
   block?
-  [_ _ :percent] [nil t1 (token :whitespace)]
-  [_ :whitespace :whitespace] [nil (token :whitespace (str (payload t1)
-                                                           (payload t2)))]
-  [_ :default :default] [nil (token :default (str (payload t1)
-                                                  (payload t2)))])
+  [_ :emptyline :newline] [nil t2]
+  [_ :newline :newline] [nil (with-meta (token :emptyline)
+                                        (meta t1))])
+
+(defrule introduce-indent-tokens
+  (constant-state {:indent 0})
+  [state t1 t2]
+  tt
+  block?
+  [_ _ nil]
+  (concat [nil t1]
+          (for [x (range (/ (:indent state) 2))]
+            (with-meta (rdelim :indent)
+                       (reduce #(update-in %1 [%2] inc)
+                               (meta t1)
+                               [:lpos :rpos]))))
+
+  [_ (:or :newline
+          :emptyline) _]
+  (let [indent (if (and (= (tt t2) :whitespace)
+                        (string? (payload t2)))
+                 (-> t2
+                     payload
+                     count
+                     (/ 2)
+                     int)
+                 0)
+        diff (- indent (:indent state))]
+    (concat [{:indent indent}]
+            (for [x (range (- diff))]
+              (with-meta (rdelim :indent)
+                         (meta t1)))
+            (if t1 [t1])
+            (for [x (range diff)]
+              (with-meta (ldelim :indent)
+                         (meta t1)))
+            [t2])))
+
+(defrule remove-superfluous-whitespace
+  [state t1 t2]
+  tt
+  block?
+  [_ (:or [:ldelim :indent]
+          [:rdelim :indent]
+          :newline
+          :emptyline) :whitespace]
+  [nil t1]
+
+  [_ :whitespace (:or [:ldelim :indent]
+                      [:rdelim :indent]
+                      :newline
+                      :emptyline)]
+  [nil t2])
+
+(defn item-type [tok]
+  (case (payload tok)
+    \- :bullet
+    \# :h1
+    "##" :h2
+    "###" :h3
+    "####" :h4
+    "#####" :h5
+    "######" :h6
+    nil))
+
+(defrule introduce-item-tokens
+  (constant-state {:in-bullet false
+                   :item-type nil
+                   :prev-state nil})
+  [state t1 t2 t3]
+  tt
+  block?
+  ; [{:in-bullet true} _ nil nil]
+  ; (letfn [(unwind [state2]
+  ;                 (when-not (nil? state2)
+  ;                   (cons (token [:rdelim (:item-type state2)])
+  ;                         (unwind (:prev-state state2)))))]
+  ;   (cons nil
+  ;         (unwind state)))
+
+  [{:in-bullet true} :newline (:or :dash
+                                   :hash) (:or :whitespace
+                                               :newline
+                                               :emptyline
+                                               nil)]
+  (if (item-type t2)
+    [(assoc state :item-type (item-type t2))
+     t1
+     (token [:rdelim (:item-type state)])
+     (token [:ldelim (item-type t2)]
+            (payload t2))
+     t3])
+
+  ; [{:in-bullet true} (:or :newline
+  ;                         :emptyline
+  ;                         [:rdelim :indent]) [:rdelim _] _]
+  ; nil ; make sure the next rule terminates
+
+  [{:in-bullet true} (:or :newline
+                          :emptyline
+                          [:rdelim :indent]) _ _]
+  (if-not (= (tt t2) [:ldelim (:item-type state)]) ; handle recursion
+    [(:prev-state state)
+     (token [:rdelim (:item-type state)])
+     t1
+     t2
+     t3])
+
+  ; [_ _ [:ldelim _] _]
+  ; nil ; don't run next rule twice
+
+  [_ (:or nil
+          :newline
+          :emptyline
+          [:ldelim :indent]
+          [:rdelim _]) _ (:or :whitespace
+                              :newline
+                              :emptyline
+                              nil)]
+  (if (item-type t2)
+    [{:in-bullet true
+      :item-type (item-type t2)
+      :prev-state state}
+     t1
+     (token [:ldelim (item-type t2)]
+            (payload t2))
+     t3])
+
+  [_ [:ldelim :indent] _ _]
+  [{:in-bullet false :prev-state state} t1 t2 t3]
+
+  [_ [:rdelim :indent] _ _]
+  [(:prev-state state) t1 t2 t3])

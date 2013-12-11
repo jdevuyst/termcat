@@ -5,11 +5,18 @@
             [clojure.string :as string]
             [termcat.term :refer :all]
             [termcat.rewrite :refer :all]
+            [termcat.rewrite2 :as rw2]
             [termcat.math :as math]))
 
 (defn text-block? [x]
   (and (block? x)
        (not (:math (second (tt x))))))
+
+(defrule introduce-nbsp-entities
+  [state t1]
+  tt
+  block?
+  [_ :tilde] [nil (token :html "&nbsp;")])
 
 (defrule introduce-typographic-dashes
   [state t1]
@@ -107,100 +114,88 @@
             [(token :html (str \< \/ tag-name \>))])))
 
 (defrule introduce-math-tags
-  [state t1 t2]
+  [state t1]
   tt
   block?
-  [_ _ [:block (_ :guard :text)]] nil
-  [_ _ [:block (_ :guard :error)]] (concat [nil
-                                           t1
-                                           (token :open-math)
-                                           (token :html "<merror>")
-                                           (token :html "<mtext>")]
-                                          (.terms (center t2))
-                                          [(token :html "</mtext>")
-                                           (token :html "</merror>")
-                                           (token :close-math)])
-  [_ _ [:block (_ :guard :msup)]] (concat [nil
-                                           t1
-                                           (token :open-math)
-                                           (token :html "<msup>")
-                                           (token :already-math)]
-                                          (.terms (center t2))
-                                          [(token :still-math)
-                                           (token :html "</msup>")
-                                           (token :close-math)])
-  [_ _ [:block (_ :guard :msub)]] (concat [nil
-                                           t1
-                                           (token :open-math)
-                                           (token :html "<msub>")
-                                           (token :already-math)]
-                                          (.terms (center t2))
-                                          [(token :still-math)
-                                           (token :html "</msub>")
-                                           (token :close-math)])
-  [_ _ [:block (_ :guard :msubsup)]] (concat [nil
-                                              t1
-                                              (token :open-math)
-                                              (token :html "<msubsup>")
-                                              (token :already-math)]
-                                             (.terms (center t2))
-                                             [(token :still-math)
-                                              (token :html "</msubsup>")
-                                              (token :close-math)])
-  [_ _ [:block (_ :guard :mfrac)]] (concat [nil
-                                            t1
+  [_ [:block (_ :guard :text)]] nil
+  [_ [:block (_ :guard :error)]] (concat [nil
+                                          (token :open-math)
+                                          (token :html "<merror>")
+                                          (token :html "<mtext>")]
+                                         (.terms (center t1))
+                                         [(token :html "</mtext>")
+                                          (token :html "</merror>")
+                                          (token :close-math)])
+  [_ [:block (_ :guard :msup)]] (concat [nil
+                                         (token :open-math)
+                                         (token :html "<msup>")
+                                         (token :already-math)]
+                                        (.terms (center t1))
+                                        [(token :still-math)
+                                         (token :html "</msup>")
+                                         (token :close-math)])
+  [_ [:block (_ :guard :msub)]] (concat [nil
+                                         (token :open-math)
+                                         (token :html "<msub>")
+                                         (token :already-math)]
+                                        (.terms (center t1))
+                                        [(token :still-math)
+                                         (token :html "</msub>")
+                                         (token :close-math)])
+  [_ [:block (_ :guard :msubsup)]] (concat [nil
                                             (token :open-math)
-                                            (token :html "<mfrac>")
+                                            (token :html "<msubsup>")
                                             (token :already-math)]
-                                           (.terms (center t2))
+                                           (.terms (center t1))
                                            [(token :still-math)
-                                            (token :html "</mfrac>")
+                                            (token :html "</msubsup>")
                                             (token :close-math)])
-  [_ _ [:block (_ :guard :mrow)]] (concat [nil
-                                           t1
-                                           (token :open-math)
-                                           (token :html "<mrow>")
-                                           (token :already-math)]
-                                          (.terms (center t2))
-                                          [(token :still-math)
-                                           (token :html "</mrow>")
-                                           (token :close-math)])
-  [_ _ [:block (x :guard :math)]] (concat [nil
-                                           t1
-                                           (token :open-math)]
-                                          (wrap-math-block t2 x)
-                                          [(token :close-math)]))
+  [_ [:block (_ :guard :mfrac)]] (concat [nil
+                                          (token :open-math)
+                                          (token :html "<mfrac>")
+                                          (token :already-math)]
+                                         (.terms (center t1))
+                                         [(token :still-math)
+                                          (token :html "</mfrac>")
+                                          (token :close-math)])
+  [_ [:block (_ :guard :mrow)]] (concat [nil
+                                         (token :open-math)
+                                         (token :html "<mrow>")
+                                         (token :already-math)]
+                                        (.terms (center t1))
+                                        [(token :still-math)
+                                         (token :html "</mrow>")
+                                         (token :close-math)])
+  [_ [:block (x :guard :math)]] (concat [nil
+                                         (token :open-math)]
+                                        (wrap-math-block t1 x)
+                                        [(token :close-math)]))
 
-(defrule introduce-mtext-tags
-  (fn
-    ([] 0)
-    ([x] x)
-    ([x y] y))
-  [state t1 t2]
-  tt
-  block?
-  [_ _ :already-math] [(inc state) t1 t2]
-  [_ :close-math :still-math] [(dec state) t1 t2]
-  [_ :close-math :open-math] nil
-  [_ _ :still-math] [(dec state)
-                     (if-not (= :whitespace (tt t1))
-                       t1)
-                     (token :html "</mtext>")]
-  [0 :close-math _] nil
-  [_ :close-math _] [state
-                     (token :html "<mtext>")
-                     (if-not (= :whitespace (tt t2))
-                       t2)])
+(def introduce-mtext-tags
+  (rw2/window {:count 0} tt [state t1 t2]
+    [_ _ :already-math] [(update-in state [:count] inc) t1 t2]
+    [_ :close-math :still-math] [(update-in state [:count] dec) t1 t2]
+    [_ :close-math :open-math] nil
+    [_ _ :still-math] (concat [(update-in state [:count] dec)]
+                              (if-not (= :whitespace (tt t1))
+                                [t1])
+                              [(token :html "</mtext>")])
+    [{:count 0} :close-math _] nil
+    [_ :close-math _] (concat [state
+                               (token :html "<mtext>")]
+                              (if-not (= :whitespace (tt t2))
+                                [t2])))
+  )
 
-(defrule remove-math-tags
+(defrule remove-math-tokens
   [state t1 t2]
   tt
   block?
   [_ :close-math :open-math] [nil]
   [_ :already-math :open-math] [nil]
-  [_ :already-math _] (assert false)
+  [_ :already-math _] (assert false (tt t2))
   [_ :close-math :still-math] [nil]
-  [_ _ :still-math] (assert false)
+  [_ _ :still-math] (assert false (tt t1))
   [_ :close-math _] [nil (token :html "</math>") t2]
   [_ _ :open-math] [nil t1 (token :html "<math>")])
 
@@ -228,52 +223,47 @@
               (token :html (escape (payload t1)))
               (token :html "</span>")]
   [_ :whitespace] (if (payload t1)
-                    [nil (token :html \space)])
-  [_ :html] [nil t1]
+                    [nil (token :html \space)]
+                    [nil])
+  [_ :html] nil
+  [_ nil] nil ; make next clause terminate
   [_ _] [nil (token :html (escape (payload t1)))])
 
-(defrule introduce-boilerplate
-  [state t1 t2]
-  tt
-  (constantly false)
-  [_ nil _] [nil
-             (token :html "<!DOCTYPE html>")
-             (token :html "<html>")
-             (token :html "<head>")
-             (token :html "<meta charset='utf-8'>")
-             (token :html "<title>")
-             (token :html "A Termcat Document")
-             (token :html "</title>")
-             (token :html "<style>")
-             (token :html "html { background: gray } ")
-             (token :html "h1, h2, h3, h4, h5, h6 { ")
-             (token :html "font-family: helvetica, Arial, sans-serif; ")
-             (token :html "font-weight: lighter } ")
-             (token :html "body { ")
-             (token :html "font-family: 'STIXGeneral Regular', serif; ")
-             (token :html "background: white; ")
-             (token :html "margin: 0 auto; ")
-             (token :html "padding: 2.5em; ")
-             (token :html "max-width: 50em } ")
-             (token :html ".wide_punctuation_mark {")
-             (token :html "padding-right: .5em } ")
-             (token :html "</style>")
-             (token :html "<script type='text/x-mathjax-config'>")
-             (token :html "MathJax.Hub.Config({ ")
-             (token :html "MathML: { ")
-             (token :html "useMathMLspacing: true } });")
-             (token :html "</script>")
-             (token :html "<script async src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML'></script>")
-             (token :html "</head>")
-             (token :html "<body>")
-             t2]
-  [_ _ nil] [nil
-             t1
-             (token :html "</body>")
-             (token :html "</html>")])
+(defn add-boilerplate [l]
+  (vec (concat [(token :html"<!DOCTYPE html>")
+                (token :html"<html>")
+                (token :html"<head>")
+                (token :html"<meta charset='utf-8'>")
+                (token :html"<title>")
+                (token :html"A Termcat Document")
+                (token :html"</title>")
+                (token :html"<style>")
+                (token :html"html { background: gray } ")
+                (token :html"h1, h2, h3, h4, h5, h6 { ")
+                (token :html"font-family: helvetica, Arial, sans-serif; ")
+                (token :html"font-weight: lighter } ")
+                (token :html"body { ")
+                (token :html"font-family: 'STIXGeneral Regular', serif; ")
+                (token :html"background: white; ")
+                (token :html"margin: 0 auto; ")
+                (token :html"padding: 2.5em; ")
+                (token :html"max-width: 50em } ")
+                (token :html".wide_punctuation_mark {")
+                (token :html"padding-right: .5em } ")
+                (token :html"</style>")
+                (token :html"<script type='text/x-mathjax-config'>")
+                (token :html"MathJax.Hub.Config({ ")
+                (token :html"MathML: { ")
+                (token :html"useMathMLspacing: true } });")
+                (token :html"</script>")
+                (token :html"<script async src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML'></script>")
+                (token :html"</head>")
+                (token :html"<body>")]
+               l
+               [(token :html "</body>")
+                (token :html "</html>")])))
 
-(defn to-string [frag]
-  (->> frag
-       .terms
+(defn to-string [v]
+  (->> v
        (r/map payload)
        (r/reduce str)))

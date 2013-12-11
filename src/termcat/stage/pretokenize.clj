@@ -48,5 +48,4 @@
                                       :rpos pos}))
                     (inc pos)])
                  [[] 0])
-       first
-       fragmentcat))
+       first))
