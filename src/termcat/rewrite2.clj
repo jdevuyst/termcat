@@ -20,18 +20,16 @@
   `(binding [!*cache* ~cache]
      ~@body))
 
-; (defn- memoize [f]
-;   (fn [& args]
-;     (if-let [result (get @!*cache* [f args])]
-;       result
-;       (let [result (apply f args)]
-;         (reset! !*cache* (assoc @!*cache* [f args] result))
-;         (reset! !*cache* (assoc @!*cache* :funs
-;                            (conj (get @!*cache* :funs)
-;                                  (hash f))))
-;         result))))
-
-(def memoize identity)
+(defn- memoize [f]
+  (fn [& args]
+    (if-let [result (get @!*cache* [f args])]
+      result
+      (let [result (apply f args)]
+        (reset! !*cache* (assoc @!*cache* [f args] result))
+        (reset! !*cache* (assoc @!*cache* :funs
+                           (conj (get @!*cache* :funs)
+                                 (hash f))))
+        result))))
 
 (defn- pad-1 [v]
   (-> (cons nil (conj v nil))))
@@ -53,77 +51,18 @@
        :else
        (subvec v lidx (inc ridx))))))
 
-(def apply-rule-1
-  (fn [rule state input]
-    (or (rule state input)
-        [state input])))
+(defn apply-rule-1 [rule state input]
+  (or (rule state input)
+      [state input]))
 
 (defn apply-rule-x
   ([rule input] (apply-rule-x rule (rule) input))
   ([rule state input]
-   (->> input
-        unwrap
-        (apply-rule-1 rule (rule))
-        second
-        (rewrap input))))
-
-(defn procedure [rule]
-  (fn
-    ([] (rule))
-    ([orig-state orig-input]
-     (loop [state orig-state
-            input (pad-1 orig-input)
-            output (transient [])]
-       (if (empty? input)
-         [state (-> output persistent! trim)]
-         (let [[new-state new-input] (apply-rule-1 rule state input)]
-           (recur new-state
-                  (rest new-input)
-                  (conj! output (first new-input)))))))))
-
-(def apply-rule
-  (memoize
-    (fn
-      ([rule orig-input] (apply-rule rule (rule) orig-input))
-      ([rule state orig-input]
-       (loop [state state
-              input (-> orig-input unwrap pad-1)
-              output (transient [])]
-         (if (empty? input)
-           (rewrap orig-input
-                   (-> output persistent! trim))
-           (let [[new-state new-input] (apply-rule-1 rule state input)]
-             (recur new-state
-                    (rest new-input)
-                    (conj! output (first new-input))))))))))
-
-(def apply-rules
-  (identity
-    (fn [rules input]
-      (r/reduce #(apply-rule %2 %1)
-                input
-                rules))))
-
-(defn narrow-scope [rule state term]
-  (rule))
-
-(defn lexical-scope [rule state term]
-  state)
-
-(def apply-rule-recursion
-  (fn [f rule pred scope state input]
-    (->> input
-         (map #(if (pred %)
-                 (apply-rule-x f (scope rule state %) %)
-                 %)))))
-
-(defn recursion [rule pred scope]
-  (letfn [(f ([] (rule))
-             ([state input]
-              (->> input
-                   (apply-rule-recursion f rule pred scope state)
-                   (apply-rule-1 rule state))))]
-    f))
+   (let [[state2 input2] (->> input
+                              unwrap
+                              (apply-rule-1 rule state))]
+     (with-meta (rewrap input input2)
+                {:state state2}))))
 
 (defn disjunction [& orig-rules]
   (let [init-state (->> orig-rules
@@ -166,6 +105,16 @@
          result
          (recur new-state new-input))))))
 
+(defn recursion [rule pred]
+  (letfn [(f ([] (rule))
+             ([state input]
+              (->> input
+                   (map #(if (pred %)
+                           (apply-rule-x f %)
+                           %))
+                   (apply-rule-1 rule state))))]
+    f))
+
 (defn abstraction [rule]
   (fn
     ([] {rule (rule)})
@@ -173,6 +122,47 @@
      (if-let [r (rule (get state rule) input)]
        [(assoc state rule (first r))
         (second r)]))))
+
+(defn procedure [rule]
+  (fn
+    ([] (rule))
+    ([orig-state orig-input]
+     (loop [state orig-state
+            input (pad-1 orig-input)
+            output (transient [])]
+       (if (empty? input)
+         [state (-> output persistent! trim)]
+         (let [[new-state new-input] (apply-rule-1 rule state input)]
+           (recur new-state
+                  (rest new-input)
+                  (conj! output (first new-input)))))))))
+
+(defn lexical-scope
+  ([prev-level-state] prev-level-state)
+  ([left-state returned-state] left-state))
+
+(defn flat-scope
+  ([prev-level-state] prev-level-state)
+  ([left-state returned-state] returned-state))
+
+(defn recursive-procedure [rule pred scope]
+  (letfn [(f ([] (rule))
+             ([orig-state orig-input]
+              (loop [state orig-state
+                     input (pad-1 orig-input)
+                     output (transient [])]
+                (if (empty? input)
+                  [state (-> output persistent! trim)]
+                  (let [el1 (first input)
+                        input (if (pred el1)
+                                (cons (apply-rule-x f (scope state) el1)
+                                      (rest input))
+                                input)
+                        [new-state new-input] (apply-rule-1 rule state input)]
+                    (recur new-state
+                           (rest new-input)
+                           (conj! output (first new-input))))))))]
+    f))
 
 (defmacro window [init-state proj [& arg-list] & body]
   (assert (or (nil? init-state) (map? init-state)))

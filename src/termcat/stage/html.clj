@@ -5,6 +5,7 @@
             [clojure.string :as string]
             [termcat.term :refer :all]
             [termcat.rewrite :refer :all]
+            [termcat.rewrite2 :as rw2]
             [termcat.math :as math]))
 
 (defn text-block? [x]
@@ -170,26 +171,21 @@
                                         (wrap-math-block t1 x)
                                         [(token :close-math)]))
 
-(defrule introduce-mtext-tags
-  (fn
-    ([] 0)
-    ([x] x)
-    ([x y] y))
-  [state t1 t2]
-  tt
-  block?
-  [_ _ :already-math] [(inc state) t1 t2]
-  [_ :close-math :still-math] [(dec state) t1 t2]
-  [_ :close-math :open-math] nil
-  [_ _ :still-math] [(dec state)
-                     (if-not (= :whitespace (tt t1))
-                       t1)
-                     (token :html "</mtext>")]
-  [0 :close-math _] nil
-  [_ :close-math _] [state
-                     (token :html "<mtext>")
-                     (if-not (= :whitespace (tt t2))
-                       t2)])
+(def introduce-mtext-tags
+  (rw2/window {:count 0} tt [state t1 t2]
+    [_ _ :already-math] [(update-in state [:count] inc) t1 t2]
+    [_ :close-math :still-math] [(update-in state [:count] dec) t1 t2]
+    [_ :close-math :open-math] nil
+    [_ _ :still-math] (concat [(update-in state [:count] dec)]
+                              (if-not (= :whitespace (tt t1))
+                                [t1])
+                              [(token :html "</mtext>")])
+    [{:count 0} :close-math _] nil
+    [_ :close-math _] (concat [state
+                               (token :html "<mtext>")]
+                              (if-not (= :whitespace (tt t2))
+                                [t2])))
+  )
 
 (defrule remove-math-tokens
   [state t1 t2]
@@ -197,9 +193,9 @@
   block?
   [_ :close-math :open-math] [nil]
   [_ :already-math :open-math] [nil]
-  [_ :already-math _] (assert false)
+  [_ :already-math _] (assert false (tt t2))
   [_ :close-math :still-math] [nil]
-  [_ _ :still-math] (assert false)
+  [_ _ :still-math] (assert false (tt t1))
   [_ :close-math _] [nil (token :html "</math>") t2]
   [_ _ :open-math] [nil t1 (token :html "<math>")])
 

@@ -19,15 +19,16 @@
                              [t3]))
 
 (defrule introduce-section-calls
-  [state t1]
+  [state t1 t2]
   tt
   block?
-  [_ [:block :h1]] [nil (fun/fun-call-head ":h1") t1]
-  [_ [:block :h2]] [nil (fun/fun-call-head ":h2") t1]
-  [_ [:block :h3]] [nil (fun/fun-call-head ":h3") t1]
-  [_ [:block :h4]] [nil (fun/fun-call-head ":h4") t1]
-  [_ [:block :h5]] [nil (fun/fun-call-head ":h5") t1]
-  [_ [:block :h6]] [nil (fun/fun-call-head ":h6") t1])
+  [_ :fun _] nil
+  [_ _ [:block :h1]] [nil t1 (fun/fun-call-head ":h1") t2]
+  [_ _ [:block :h2]] [nil t1 (fun/fun-call-head ":h2") t2]
+  [_ _ [:block :h3]] [nil t1 (fun/fun-call-head ":h3") t2]
+  [_ _ [:block :h4]] [nil t1 (fun/fun-call-head ":h4") t2]
+  [_ _ [:block :h5]] [nil t1 (fun/fun-call-head ":h5") t2]
+  [_ _ [:block :h6]] [nil t1 (fun/fun-call-head ":h6") t2])
 
 (defrule introduce-blockquote-calls
   [state t1 t2]

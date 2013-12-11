@@ -37,7 +37,6 @@
   ([] nil)
   ([state input]
    (->> input
-        (filter (complement nil?))
         vec
         print-tree)
    nil))
@@ -53,22 +52,27 @@
           (#(-> % fragmentcat (rewrite tok/escape-html) .terms))
           (rw2/apply-rule-x
             (rw2/sequence
-              (rw2/fixpoint
-                (rw2/procedure
+              (rw2/procedure
+                (rw2/fixpoint
                   (rw2/disjunction
                     tok/remove-escape-tokens
                     tok/remove-annotated-tokens
                     tok/merge-tokens
                     tok/remove-magic-tokens)))
-              (rw2/fixpoint
-                (rw2/procedure
+
+              (rw2/procedure
+                (rw2/fixpoint
                   tok/remove-percent-tokens))
+
               (rw2/procedure
                 tok/introduce-emptyline-tokens)
+
               (rw2/procedure
                 tok/introduce-indent-tokens)
+
               (rw2/procedure
                 tok/remove-superfluous-whitespace)
+
               (rw2/procedure
                 tok/introduce-item-tokens) ; fix unwind for bullet items
               ))
@@ -81,36 +85,46 @@
                 (rw2/procedure
                   (rw2/disjunction
                     ast/fix-bullet-continuations
-                    ast/remove-superfluous-whitespace)
+                    ast/remove-superfluous-whitespace))
+                block?)
+
+              ; ast/introduce-delim-errors
+              ; ast/convert-newlines-to-whitespace
+              ; ast/remove-superfluous-whitespace
+
+              ; bind/introduce-lambdas
+
+              (rw2/recursive-procedure
+                (rw2/disjunction
+                  bind/introduce-fun-calls
+                  bind/introduce-bindings
+                  ; bind/remove-superfluous-whitespace
                   )
                 block?
-                rw2/narrow-scope)
+                rw2/lexical-scope)
 
               (rw2/recursion
                 (rw2/procedure
-                  (rw2/fixpoint
                     (rw2/disjunction
-                      ; ast/introduce-delim-errors
-                      ; ast/convert-newlines-to-whitespace
-                      ; ast/remove-superfluous-whitespace
-
-                      ; bind/introduce-lambdas
-                      bind/introduce-fun-calls
-                      bind/introduce-bindings
-
                       sugar/introduce-par-calls
                       sugar/introduce-section-calls
                       sugar/introduce-blockquote-calls
                       sugar/introduce-bullet-list-calls
                       sugar/introduce-link-calls
-                      sugar/remove-decorators
+                      sugar/remove-decorators))
+                block?)
+
+                (rw2/fixpoint
+                   (rw2/recursive-procedure
+                    (rw2/disjunction
                       lambda/evaluate-fun-calls
 
                       bind/expand-bindings
-                      ; bind/remove-superfluous-whitespace
-                      )))
-                block?
-                rw2/lexical-scope)
+                      )
+                  block?
+                  rw2/lexical-scope))
+
+              print-tree-rule
 
               (rw2/recursion
                 (rw2/procedure
@@ -122,8 +136,7 @@
                     ; math-sugar/math-cast-next-token
                     ; math-sugar/flatten-math-fences
                     ))
-                block?
-                rw2/narrow-scope)
+                block?)
 
               (rw2/recursion
                 (rw2/procedure
@@ -133,33 +146,31 @@
                     html/introduce-typographic-quotes
                     html/introduce-typographic-full-stops
                     html/introduce-typographic-colons))
-                html/text-block?
-                rw2/narrow-scope)
+                html/text-block?)
 
               (rw2/recursion
                 (rw2/procedure
                   (rw2/disjunction
                     html/remove-error-tokens
                     html/introduce-math-tags
-                    ; html/introduce-mtext-tags ; special scope
                     ))
+                block?)
+
+              (rw2/recursive-procedure
+                html/introduce-mtext-tags
                 block?
-                rw2/narrow-scope)
+                rw2/flat-scope)
 
-              print-tree-rule
-
-              ; (rw2/recursion
-              ;   (rw2/procedure
-              ;     html/remove-math-tokens)
-              ;   block?
-              ;   rw2/narrow-scope)
+              (rw2/recursion
+                (rw2/procedure
+                  html/remove-math-tokens)
+                block?)
 
               (rw2/recursion
                 (rw2/procedure
                   (rw2/fixpoint
                     html/to-html-tokens))
-                block?
-                rw2/narrow-scope)))
+                block?)))
 
           html/add-boilerplate
           html/to-string

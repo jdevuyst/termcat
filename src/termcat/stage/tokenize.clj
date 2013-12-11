@@ -159,8 +159,8 @@
   ; [_ _ :percent :percent]
   ; [nil t1 (token :whitespace) (token :default) (token :whitespace)]
 
-  [_ :percent :percent (:or :newline nil)]
-  [nil]
+  [_ :percent :percent (:or :newline :emptyline nil)]
+  [nil t3]
 
   [_ :percent :percent _]
   [nil t1 t2]

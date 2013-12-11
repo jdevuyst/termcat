@@ -79,7 +79,8 @@ For many purposes it doesn't matter how a block is delimited. For instance, a nu
   \:numbered-list%<br>%\- item 1%<br>%\- item 2
 or
   \:numbered-list(item 1)[item 2]
-and it will render as :numbered-list(item 1)[item 2]
+and it will render as
+  :numbered-list(item 1)[item 2]
 
 ## Math
 
