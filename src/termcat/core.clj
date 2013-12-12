@@ -113,7 +113,7 @@
         t/block?
         rw/lexical-scope))
 
-    ; print-tree-rule
+    print-tree-rule
 
     (rw/recursion
       (rw/fixpoint

@@ -29,7 +29,7 @@
         result))))
 
 (defn- pad-1 [v]
-  (-> (cons nil (conj v nil))))
+  (cons nil (conj v nil)))
 
 (defn- trim
   ([v] (trim v 0 (-> v count dec)))
@@ -169,7 +169,7 @@
   (fn
     ([] (rule))
     ([state input]
-     (r/reduce rule [state []] input))))
+     (r/reduce rule [state []] (conj input nil)))))
 
 (defmacro window [init-state proj [& arg-list] & body]
   (assert (or (nil? init-state) (map? init-state)))
