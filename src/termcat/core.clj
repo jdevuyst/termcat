@@ -1,7 +1,7 @@
 (ns termcat.core
   (:refer-clojure :exclude [compile])
-  (:require [termcat.term :refer :all]
-            [termcat.rewrite :as rw]
+  (:require [termcat.rewrite :as rw]
+            [termcat.term :as t]
             [termcat.rules.pretokenize :as pretok]
             [termcat.rules.tokenize :as tok]
             [termcat.rules.ast :as ast]
@@ -15,18 +15,18 @@
   ([tree] (print-tree tree ""))
   ([tree indent]
    (letfn [(token-to-string [t]
-                            (assert (token? t))
-                            (str [(tt t) (payload t)]
+                            (assert (t/token? t))
+                            (str [(t/tt t) (t/payload t)]
                                  (let [lpos (-> t meta :lpos)
                                        rpos (-> t meta :rpos)]
                                    (if (or lpos rpos)
                                      (str " :: " lpos "-" rpos)))))]
      (doseq [t (rw/unwrap tree)]
-       (if (block? t)
+       (if (t/block? t)
          (let [new-indent (str indent "  ")]
-           (println indent \> (token-to-string (left t)))
+           (println indent \> (token-to-string (t/left t)))
            (print-tree t new-indent)
-           (println indent \< (token-to-string (right t))))
+           (println indent \< (token-to-string (t/right t))))
          (println indent (token-to-string t)))))
    tree))
 
@@ -75,7 +75,7 @@
         (rw/disjunction
           ast/fix-bullet-continuations
           ast/remove-superfluous-whitespace))
-      block?)
+      t/block?)
 
     ; ast/introduce-delim-errors
     ; ast/convert-newlines-to-whitespace
@@ -89,7 +89,7 @@
         bind/introduce-bindings
         ; bind/remove-superfluous-whitespace
         )
-      block?
+      t/block?
       rw/lexical-scope)
 
     (rw/recursion
@@ -101,7 +101,7 @@
           markdown/introduce-bullet-list-calls
           markdown/introduce-link-calls
           markdown/remove-decorators))
-      block?)
+      t/block?)
 
     (rw/fixpoint
       (rw/recursive-procedure
@@ -110,10 +110,10 @@
 
           bind/expand-bindings
           )
-        block?
+        t/block?
         rw/lexical-scope))
 
-    print-tree-rule
+    ; print-tree-rule
 
     (rw/recursion
       (rw/fixpoint
@@ -126,7 +126,7 @@
             ; math-rules/math-cast-next-token
             ; math-rules/flatten-math-fences
             )))
-      block?)
+      t/block?)
 
     (rw/recursion
       (rw/procedure
@@ -143,23 +143,23 @@
         (rw/disjunction
           html/remove-error-tokens
           html/introduce-math-tags))
-      block?)
+      t/block?)
 
     (rw/recursive-procedure
       html/introduce-mtext-tags
-      block?
+      t/block?
       rw/flat-scope)
 
     (rw/recursion
       (rw/procedure
         html/remove-math-tokens)
-      block?)
+      t/block?)
 
     (rw/recursion
       (rw/procedure
         (rw/fixpoint
           html/to-html-tokens))
-      block?)))
+      t/block?)))
 
 (defn compile
   ([s]
@@ -175,9 +175,9 @@
 
 (let [the-cache (rw/cache)
       f #(compile % the-cache)
-      void (fn [f x] (f x) x)]
+      void (fn [f x] (f x) (str x \a))]
   (->> (slurp "doc/termcat-intro.tc")
-       ; (void f) (void f) (void f) (void f)
+       ; (#(nth (iterate (partial void f) %) 20))
        f
        (spit "doc/termcat-intro.html")
        time)

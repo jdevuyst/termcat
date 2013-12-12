@@ -79,7 +79,7 @@
 
 (defn fragmentcat
   ([terms]
-   ; (println :fragmentcat-FAIL (filter #(not (or (token? %) (block? %))) terms))
+   ; (println :fragmentcat (filter #(not (or (token? %) (block? %))) terms))
    (assert (reduce (fn [result t]
                      (and result
                           (or (token? t) (block? t))))
@@ -138,7 +138,7 @@
   (right [this] (.right this))
   rw/IWrapped
   (unwrap [orig]
-          (.terms (center orig)))
+          (.terms (.center orig)))
   (rewrap [orig result]
           (block (left orig)
                  (fragmentcat result)

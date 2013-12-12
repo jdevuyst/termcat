@@ -1,5 +1,6 @@
 (ns termcat.rules.markdown
-  (:require [termcat.term :refer :all]
+  (:require [termcat.rewrite :as rw]
+            [termcat.term :refer :all]
             [termcat.util.lambda :as lambda]))
 
 (defrule introduce-par-calls
@@ -42,8 +43,8 @@
    [:block :parenthesis]
    (:or :whitespace nil)] (concat [nil t1]
                                   (lambda/fun-call-seq ":img"
-                                                    (center t3)
-                                                    (center t4))
+                                                       (center t3)
+                                                       (center t4))
                                   [t5])
   [_
    (:or :whitespace nil)
@@ -52,15 +53,15 @@
    (:or :whitespace nil)
    _] (concat [nil t1]
               (lambda/fun-call-seq ":link"
-                                (center t2)
-                                (center t3))
+                                   (center t2)
+                                   (center t3))
               [t4 t5]))
 
 (defn wrap-term [tag-name t]
   (concat
     [(token :html (str \< tag-name \>))]
     (if (block? t)
-      (.terms (center t))
+      (rw/unwrap t)
       [t])
     [(token :html (str "</" tag-name \>))]))
 

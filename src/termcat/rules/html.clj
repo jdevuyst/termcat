@@ -1,6 +1,7 @@
 (ns termcat.rules.html
   (:require [clojure.core.reducers :as r]
             [clojure.string :as string]
+            [termcat.rewrite :as rw]
             [termcat.term :refer :all]
             [termcat.rewrite :as rw]
             [termcat.util.math :as math]))
@@ -95,7 +96,7 @@
                                  :normal-right " rspace=thickmathspace"
                                  nil)
                                \>))]
-            (.terms (center t))
+            (rw/unwrap t)
             [(token :html (str \< \/ tag-name \>))])))
 
 (defrule introduce-math-tags
@@ -105,7 +106,7 @@
                                           (token :open-math)
                                           (token :html "<merror>")
                                           (token :html "<mtext>")]
-                                         (.terms (center t1))
+                                         (rw/unwrap t1)
                                          [(token :html "</mtext>")
                                           (token :html "</merror>")
                                           (token :close-math)])
@@ -113,7 +114,7 @@
                                          (token :open-math)
                                          (token :html "<msup>")
                                          (token :already-math)]
-                                        (.terms (center t1))
+                                        (rw/unwrap t1)
                                         [(token :still-math)
                                          (token :html "</msup>")
                                          (token :close-math)])
@@ -121,7 +122,7 @@
                                          (token :open-math)
                                          (token :html "<msub>")
                                          (token :already-math)]
-                                        (.terms (center t1))
+                                        (rw/unwrap t1)
                                         [(token :still-math)
                                          (token :html "</msub>")
                                          (token :close-math)])
@@ -129,7 +130,7 @@
                                             (token :open-math)
                                             (token :html "<msubsup>")
                                             (token :already-math)]
-                                           (.terms (center t1))
+                                           (rw/unwrap t1)
                                            [(token :still-math)
                                             (token :html "</msubsup>")
                                             (token :close-math)])
@@ -137,7 +138,7 @@
                                           (token :open-math)
                                           (token :html "<mfrac>")
                                           (token :already-math)]
-                                         (.terms (center t1))
+                                         (rw/unwrap t1)
                                          [(token :still-math)
                                           (token :html "</mfrac>")
                                           (token :close-math)])
@@ -145,7 +146,7 @@
                                          (token :open-math)
                                          (token :html "<mrow>")
                                          (token :already-math)]
-                                        (.terms (center t1))
+                                        (rw/unwrap t1)
                                         [(token :still-math)
                                          (token :html "</mrow>")
                                          (token :close-math)])
@@ -195,7 +196,7 @@
   [state t1]
   [_ [:block _]] (concat [nil
                           (token :html (escape (payload (left t1))))]
-                         (.terms (center t1))
+                         (rw/unwrap t1)
                          [(token :html (escape (payload (right t1))))])
   [_ :error] [nil
               (token :html "<span class='termcat_error'>")

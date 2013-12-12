@@ -1,5 +1,6 @@
 (ns termcat.rules.ast
-  (:require [termcat.term :refer :all]))
+  (:require [termcat.rewrite :as rw]
+            [termcat.term :refer :all]))
 
 (defn- pop-n [coll n]
   (subvec coll 0 (- (count coll) n)))
@@ -40,8 +41,8 @@
   (assert (block? b1))
   (assert (block? b2))
   (block (left b1)
-         (fragmentcat (.terms (center b1))
-                      (.terms (center b2)))
+         (fragmentcat (rw/unwrap b1)
+                      (rw/unwrap b2))
          (right b1)))
 
 (defrule fix-bullet-continuations

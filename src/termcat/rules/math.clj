@@ -1,6 +1,7 @@
 (ns termcat.rules.math
   (:require [clojure.core.match :refer (match)]
             [clojure.string :as string]
+            [termcat.rewrite :as rw]
             [termcat.term :refer :all]
             [termcat.util.math :as math]))
 
@@ -17,7 +18,7 @@
                                                 :mi)]
                               (math/math-cast t2)))
   [_ :plus _] (let [ts (if (block? t2)
-                         (.terms (center t2))
+                         (rw/unwrap t2)
                          [t2])]
                 (concat [nil]
                         (mapcat #(math/math-cast % #{:script}) ts))))
@@ -80,15 +81,15 @@
 
 (defn split-base-sub-sup [t]
   (match (tt t)
-         [:block (_ :guard :msub)] [(first (.terms (center t)))
-                                    (second (.terms (center t)))
+         [:block (_ :guard :msub)] [(first (rw/unwrap t))
+                                    (second (rw/unwrap t))
                                     nil]
-         [:block (_ :guard :msup)] [(first (.terms (center t)))
+         [:block (_ :guard :msup)] [(first (rw/unwrap t))
                                     nil
-                                    (second (.terms (center t)))]
-         [:block (_ :guard :msubsup)] [(first (.terms (center t)))
-                                       (second (.terms (center t)))
-                                       (nth (.terms (center t)) 2)]
+                                    (second (rw/unwrap t))]
+         [:block (_ :guard :msubsup)] [(first (rw/unwrap t))
+                                       (second (rw/unwrap t))
+                                       (nth (rw/unwrap t) 2)]
          :else [t nil nil]))
 
 (defn subsup-token

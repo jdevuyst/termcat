@@ -1,5 +1,6 @@
 (ns termcat.rules.bind
   (:require [clojure.core.match :refer (match)]
+            [termcat.rewrite :as rw]
             [termcat.term :refer :all]
             [termcat.util.lambda :as lambda]))
 
@@ -84,7 +85,7 @@
                      (if $ (payload $)))]
       (if (and (= 1 (count ts))
                (or (char? name) (string? name)))
-        [(assoc state name (.terms (center t5)))
+        [(assoc state name (rw/unwrap t5))
          t1]
         [state t1 (token :error
                          (apply str
