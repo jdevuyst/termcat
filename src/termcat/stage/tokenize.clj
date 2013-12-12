@@ -1,7 +1,6 @@
 (ns termcat.stage.tokenize
   (:require [clojure.core.match :refer (match)]
-            [termcat.term :refer :all]
-            [termcat.rewrite :refer :all]))
+            [termcat.term :refer :all]))
 
 (def letters (->> (concat (range (int \a)
                                  (inc (int \z)))
@@ -39,61 +38,57 @@
                         (into (:acc state))
                         (conj tok))])]
      (match [(:stage state) (payload tok)]
-               [nil \\] (segue :escape)
-               [:escape _] (reject)
-               [nil \&] (segue :entity)
-               [(:or :entity
-                     :named-entity)
-                (_ :guard letter?)] (segue :named-entity)
-               [:entity \#] (segue :maybe-num-entity)
-               [:maybe-num-entity \x] (segue :maybe-hex-num-entity)
-               [(:or :maybe-num-entity :dec-num-entity)
-                (_ :guard digit?)] (segue :dec-num-entity)
-               [(:or :maybe-hex-num-entity :hex-num-entity)
-                (_ :guard hexdigit?)] (segue :hex-num-entity)
-               [(:or :named-entity
-                     :dec-num-entity
-                     :hex-num-entity) \;] (accept)
-               [nil \<] (segue :before-tag-name)
-               [:before-tag-name \/] (segue :maybe-in-tag-name)
-               [(:or :before-tag-name
-                     :maybe-in-tag-name
-                     :in-tag-name)
-                (_ :guard letter?)] (segue :in-tag-name)
-               [:in-tag-name \-] (segue :maybe-in-tag-name)
-               [(:or :in-tag-name
-                     :after-tag-name
-                     :after-val)
-                \space] (segue :after-tag-name)
-               [(:or :after-tag-name
-                     :maybe-in-attr-name
-                     :in-attr-name)
-                (_ :guard letter?)] (segue :in-attr-name)
-               [:in-attr-name \-] (segue :maybe-in-attr-name)
-               [:in-attr-name \=] (segue :before-val)
-               [(:or :before-val
-                     :maybe-in-val
-                     :in-val)
-                (_ :guard letter?)] (segue :in-val)
-               [:in-val \-] (segue :maybe-in-val)
-               [:before-val \"] (segue :in-double-quotes)
-               [:in-double-quotes \"] (segue :after-val)
-               [:in-double-quotes _] (segue :in-double-quotes)
-               [(:or :in-tag-name
-                     :in-val
-                     :after-val) \>] (accept)
-               :else (reject)))))
+            [nil \\] (segue :escape)
+            [:escape _] (reject)
+            [nil \&] (segue :entity)
+            [(:or :entity
+                  :named-entity)
+             (_ :guard letter?)] (segue :named-entity)
+            [:entity \#] (segue :maybe-num-entity)
+            [:maybe-num-entity \x] (segue :maybe-hex-num-entity)
+            [(:or :maybe-num-entity :dec-num-entity)
+             (_ :guard digit?)] (segue :dec-num-entity)
+            [(:or :maybe-hex-num-entity :hex-num-entity)
+             (_ :guard hexdigit?)] (segue :hex-num-entity)
+            [(:or :named-entity
+                  :dec-num-entity
+                  :hex-num-entity) \;] (accept)
+            [nil \<] (segue :before-tag-name)
+            [:before-tag-name \/] (segue :maybe-in-tag-name)
+            [(:or :before-tag-name
+                  :maybe-in-tag-name
+                  :in-tag-name)
+             (_ :guard letter?)] (segue :in-tag-name)
+            [:in-tag-name \-] (segue :maybe-in-tag-name)
+            [(:or :in-tag-name
+                  :after-tag-name
+                  :after-val)
+             \space] (segue :after-tag-name)
+            [(:or :after-tag-name
+                  :maybe-in-attr-name
+                  :in-attr-name)
+             (_ :guard letter?)] (segue :in-attr-name)
+            [:in-attr-name \-] (segue :maybe-in-attr-name)
+            [:in-attr-name \=] (segue :before-val)
+            [(:or :before-val
+                  :maybe-in-val
+                  :in-val)
+             (_ :guard letter?)] (segue :in-val)
+            [:in-val \-] (segue :maybe-in-val)
+            [:before-val \"] (segue :in-double-quotes)
+            [:in-double-quotes \"] (segue :after-val)
+            [:in-double-quotes _] (segue :in-double-quotes)
+            [(:or :in-tag-name
+                  :in-val
+                  :after-val) \>] (accept)
+            :else (reject)))))
 
 (defrule remove-escape-tokens
   [state t1 t2]
-  tt
-  block?
   [_ :escape _] [nil (token :default (payload t2))])
 
 (defrule remove-annotated-tokens
   [state t1 t2]
-  tt
-  block?
   [_ :tilde :tilde] nil
   [_ :tilde (:or :whitespace :newline nil)] nil
   [_ (:or :whitespace :newline nil) :tilde] nil
@@ -108,8 +103,6 @@
 
 (defrule merge-tokens
   [state t1 t2]
-  tt
-  block?
   [_ _ (:or :default
             :whitespace
             :tilde
@@ -125,8 +118,6 @@
 
 (defrule remove-magic-tokens
   [state t1 t2 t3]
-  tt
-  block?
   [_ _ (:or :whitespace
             :newline
             :emptyline
@@ -153,8 +144,6 @@
 
 (defrule remove-percent-tokens
   [state t1 t2 t3]
-  tt
-  block?
   ; [_ _ :percent :percent]
   ; [nil t1 (token :whitespace) (token :default) (token :whitespace)]
 
@@ -210,17 +199,13 @@
 
 (defrule introduce-emptyline-tokens
   [state t1 t2]
-  tt
-  block?
   [_ :emptyline :newline] [nil t2]
   [_ :newline :newline] [nil (with-meta (token :emptyline)
                                         (meta t1))])
 
 (defrule introduce-indent-tokens
-  (constant-state {:indent 0})
+  {:indent 0}
   [state t1 t2]
-  tt
-  block?
   [_ _ nil]
   (concat [nil t1]
           (for [x (range (/ (:indent state) 2))]
@@ -252,8 +237,6 @@
 
 (defrule remove-superfluous-whitespace
   [state t1 t2]
-  tt
-  block?
   [_ (:or [:ldelim :indent]
           [:rdelim :indent]
           :newline
@@ -278,12 +261,10 @@
     nil))
 
 (defrule introduce-item-tokens
-  (constant-state {:in-bullet false
-                   :item-type nil
-                   :prev-state nil})
+  {:in-bullet false
+   :item-type nil
+   :prev-state nil}
   [state t1 t2 t3]
-  tt
-  block?
   ; [{:in-bullet true} _ nil nil]
   ; (letfn [(unwind [state2]
   ;                 (when-not (nil? state2)

@@ -2,14 +2,11 @@
   (:require [clojure.core.match :refer (match)]
             [clojure.core.reducers :as r]
             [termcat.term :refer :all]
-            [termcat.rewrite :refer :all]
             [termcat.fun :as fun]
             [termcat.math :as math]))
 
 (defrule introduce-par-calls
   [state t1 t2 t3]
-  tt
-  block?
   [_ _ :emptyline _] (concat [nil t1]
                              (if-not (= (tt t1) :whitespace)
                                [(token :whitespace nil)])
@@ -20,8 +17,6 @@
 
 (defrule introduce-section-calls
   [state t1 t2]
-  tt
-  block?
   [_ :fun _] nil
   [_ _ [:block :h1]] [nil t1 (fun/fun-call-head ":h1") t2]
   [_ _ [:block :h2]] [nil t1 (fun/fun-call-head ":h2") t2]
@@ -32,23 +27,17 @@
 
 (defrule introduce-blockquote-calls
   [state t1 t2]
-  tt
-  block?
   [_ :fun _] nil ; make sure the next line terminates
   [_ _ [:block :indent]] [nil t1 (fun/fun-call-head ":quotation") t2])
 
 (defrule introduce-bullet-list-calls
   [state t1 t2]
-  tt
-  block?
   [_ [:block :bullet] _] nil
   [_ :fun _] nil ; make sure the next line terminates
   [_ _ [:block :bullet]] [nil t1 (fun/fun-call-head ":bullet-list") t2])
 
 (defrule introduce-link-calls
   [state t1 t2 t3 t4 t5]
-  tt
-  block?
   [_
    (:or :whitespace nil)
    :bang
@@ -80,8 +69,6 @@
 
 (defrule remove-decorators
   [state t1 t2 t3 t4 t5 t6 t7]
-  tt
-  block?
   [_ (:or :whitespace nil)
    :underscore _ :underscore
    (:or :whitespace nil) _ _]

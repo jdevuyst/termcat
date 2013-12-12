@@ -3,14 +3,11 @@
             [clojure.core.reducers :as r]
             [clojure.string :as string]
             [termcat.term :refer :all]
-            [termcat.rewrite :refer :all]
             [termcat.fun :as fun]
             [termcat.math :as math]))
 
 (defrule remove-manual-casts
   [state t1 t2]
-  tt
-  block?
   [_ _ (:or nil :whitespace)] nil
   [_ :double-quote _] [nil (math/math-block
                              (if (block? t2)
@@ -29,8 +26,6 @@
 
 (defrule introduce-math-operators
   [state t1 t2 t3 t4 t5 t6 t7]
-  tt
-  block?
   [_ _ :whitespace :tilde _ :tilde :whitespace _]
   (if-let [opt (concat (match (payload t3)
                               \~ []
@@ -125,8 +120,6 @@
 
 (defrule introduce-msub-msup
   [state t1 t2 t3]
-  tt
-  block?
   [_
    [:block (_ :guard :math)]
    :right-quote
@@ -169,8 +162,6 @@
 
 (defrule introduce-mfrac
   [state t1 t2 t3]
-  tt
-  block?
   [_
    (:or :default
         [:block _])

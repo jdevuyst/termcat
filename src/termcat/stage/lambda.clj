@@ -1,7 +1,6 @@
 (ns termcat.stage.lambda
   (:require [clojure.core.match :refer (match)]
-            [termcat.term :refer :all]
-            [termcat.rewrite :refer :all]))
+            [termcat.term :refer :all]))
 
 (defn apply-fun [fun-token arg-token]
   (let [f (payload fun-token)
@@ -12,8 +11,6 @@
 
 (defrule evaluate-fun-calls
   [state t1 t2]
-  tt
-  block?
   [_ :fun [:block _]] (cons nil (apply-fun t1 t2))
   [_ :fun nil] nil ; Moving the function around may add new args
   [_ :fun _] (-> (concat [nil]

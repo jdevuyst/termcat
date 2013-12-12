@@ -2,7 +2,6 @@
   (:require [clojure.core.match :refer (match)]
             [clojure.core.reducers :as r]
             [termcat.term :refer :all]
-            [termcat.rewrite :refer :all]
             [termcat.fun :as fun]))
 
 ; (defn call-lambda [lambda & arg-values]
@@ -61,8 +60,6 @@
 
 (defrule introduce-fun-calls
   [state t1 t2 t3]
-  tt
-  block?
   [_
    (:or nil :whitespace :newline :emptyline)
    (:or :period :colon)
@@ -71,13 +68,7 @@
                                   (payload t3)))])
 
 (defrule introduce-bindings
-  (fn
-    ([] nil)
-    ([x] x)
-    ([x y] x))
   [state t1 t2 t3 t4 t5]
-  tt
-  block?
   ; [_ _ _ _ _ :arg]
   ; [(dissoc state (payload t5)) t1 t2 t3 t4 t5]
 
@@ -157,8 +148,6 @@
 
 (defrule expand-bindings
   [state t1]
-  tt
-  block?
   [_ :identifier] (cons nil (payload t1)))
 
 ; (defrule remove-superfluous-whitespace

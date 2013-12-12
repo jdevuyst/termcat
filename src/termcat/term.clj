@@ -1,8 +1,7 @@
 (ns termcat.term
   (:require [clojure.core.reducers :as r]
             [clojure.edn :as edn]
-            [termcat.rewrite2 :as rw]
-            [termcat.rewrite :refer :all]))
+            [termcat.rewrite :as rw]))
 
 (defprotocol ITerm
   (tt [this]))
@@ -137,12 +136,7 @@
                   str
                   edn/read-string)
               (catch java.lang.Exception x
-                nil))))
-  IRewrite
-  (rewrite [this rule]
-           (let [result (rewrite (.terms this) rule)]
-             (with-meta (fragmentcat result)
-                        (meta result)))))
+                nil)))))
 
 (extend-type Block
   ITerm
@@ -151,13 +145,6 @@
   (left [this] (.left this))
   (center [this] (.center this))
   (right [this] (.right this))
-  IRewrite
-  (rewrite [this rule]
-           (let [result (rewrite (center this) rule)]
-             (with-meta (block (left this)
-                               result
-                               (right this))
-                        (meta result))))
   rw/IWrapped
   (unwrap [orig]
           (.terms (center orig)))
@@ -166,3 +153,20 @@
                  (fragmentcat result)
                  (right orig))))
 
+(defmacro defrule [fnname & rdecl]
+  ; Note: auto-recur-test is ignored since refactoring
+  (assert (symbol? fnname))
+  (let [[doc-str rdecl] (if (string? (first rdecl))
+                          [(first rdecl) (next rdecl)]
+                          ["" rdecl])
+        [init-state rdecl] (if (vector? (first rdecl))
+                             [nil rdecl]
+                             [(first rdecl) (next rdecl)])
+        [[& args] body] [(first rdecl) (next rdecl)]]
+    (assert (>= (count args) 2))
+    `(def ~fnname ~doc-str
+       (-> (rw/window ~init-state
+                       tt
+                       [~@args]
+                       ~@body)
+           rw/abstraction))))

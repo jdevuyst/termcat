@@ -1,6 +1,5 @@
 (ns termcat.stage.ast
   (:require [termcat.util :as u]
-            [termcat.rewrite :refer :all]
             [termcat.term :refer :all]))
 
 (defn abstract-blocks
@@ -34,8 +33,6 @@
 
 (defrule fix-bullet-continuations
   [state t1 t2]
-  tt
-  block?
   [_ [:block :bullet] [:block :indent]]
   [nil (merge-blocks t1 t2)])
 
@@ -47,8 +44,6 @@
 
 (defrule remove-superfluous-whitespace
   [state t1 t2]
-  tt
-  block?
   [_ (:or nil
           :emptyline
           [:block :indent]

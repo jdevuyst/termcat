@@ -4,8 +4,7 @@
             [clojure.set :as set]
             [clojure.string :as string]
             [termcat.term :refer :all]
-            [termcat.rewrite :refer :all]
-            [termcat.rewrite2 :as rw2]
+            [termcat.rewrite :as rw]
             [termcat.math :as math]))
 
 (defn text-block? [x]
@@ -14,14 +13,10 @@
 
 (defrule introduce-nbsp-entities
   [state t1]
-  tt
-  block?
   [_ :tilde] [nil (token :html "&nbsp;")])
 
 (defrule introduce-typographic-dashes
   [state t1]
-  tt
-  block?
   [_ :dash] (case (if (string? (payload t1))
                     (count (payload t1)))
               2 [nil (token :default \–)]
@@ -29,10 +24,8 @@
               nil))
 
 (defrule introduce-typographic-quotes
-  (constant-state {:in-math-tag false})
+  {:in-math-tag false}
   [state t1]
-  tt
-  text-block?
   [_ :left-quote] (let [length (count (str (payload t1)))
                         doublec (int (/ length 2))
                         also-single (odd? (mod length 2))]
@@ -48,8 +41,6 @@
 
 (defrule introduce-typographic-full-stops
   [state t1 t2 t3]
-  tt
-  text-block?
   [_ (:or :default
           [:block _])
    :period
@@ -66,8 +57,6 @@
 
 (defrule introduce-typographic-colons
   [state t1 t2 t3]
-  tt
-  text-block?
   [_ (:or :default
           [:block _])
    (:or :colon :bang :question-mark)
@@ -80,8 +69,6 @@
 
 (defrule remove-error-tokens
   [state t1]
-  tt
-  block?
   [_ :error] [nil (math/math-block
                     (fragment (token :default
                                      (payload t1)))
@@ -115,8 +102,6 @@
 
 (defrule introduce-math-tags
   [state t1]
-  tt
-  block?
   [_ [:block (_ :guard :text)]] nil
   [_ [:block (_ :guard :error)]] (concat [nil
                                           (token :open-math)
@@ -172,25 +157,23 @@
                                         [(token :close-math)]))
 
 (def introduce-mtext-tags
-  (rw2/window {:count 0} tt [state t1 t2]
-    [_ _ :already-math] [(update-in state [:count] inc) t1 t2]
-    [_ :close-math :still-math] [(update-in state [:count] dec) t1 t2]
-    [_ :close-math :open-math] nil
-    [_ _ :still-math] (concat [(update-in state [:count] dec)]
-                              (if-not (= :whitespace (tt t1))
-                                [t1])
-                              [(token :html "</mtext>")])
-    [{:count 0} :close-math _] nil
-    [_ :close-math _] (concat [state
-                               (token :html "<mtext>")]
-                              (if-not (= :whitespace (tt t2))
-                                [t2])))
+  (rw/window {:count 0} tt [state t1 t2]
+             [_ _ :already-math] [(update-in state [:count] inc) t1 t2]
+             [_ :close-math :still-math] [(update-in state [:count] dec) t1 t2]
+             [_ :close-math :open-math] nil
+             [_ _ :still-math] (concat [(update-in state [:count] dec)]
+                                       (if-not (= :whitespace (tt t1))
+                                         [t1])
+                                       [(token :html "</mtext>")])
+             [{:count 0} :close-math _] nil
+             [_ :close-math _] (concat [state
+                                        (token :html "<mtext>")]
+                                       (if-not (= :whitespace (tt t2))
+                                         [t2])))
   )
 
 (defrule remove-math-tokens
   [state t1 t2]
-  tt
-  block?
   [_ :close-math :open-math] [nil]
   [_ :already-math :open-math] [nil]
   [_ :already-math _] (assert false (tt t2))
@@ -212,8 +195,6 @@
 
 (defrule to-html-tokens
   [state t1]
-  tt
-  block?
   [_ [:block _]] (concat [nil
                           (token :html (escape (payload (left t1))))]
                          (.terms (center t1))

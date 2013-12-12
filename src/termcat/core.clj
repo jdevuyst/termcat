@@ -1,7 +1,6 @@
 (ns termcat.core
   (:refer-clojure :exclude [compile])
-  (:require [termcat.rewrite :refer :all]
-            [termcat.rewrite2 :as rw2]
+  (:require [termcat.rewrite :as rw]
             [termcat.term :refer :all]
             [termcat.stage.pretokenize :as pretok]
             [termcat.stage.tokenize :as tok]
@@ -24,7 +23,7 @@
                                        rpos (-> t meta :rpos)]
                                    (if (or lpos rpos)
                                      (str " :: " lpos "-" rpos)))))]
-     (doseq [t (rw2/unwrap tree)]
+     (doseq [t (rw/unwrap tree)]
        (if (block? t)
          (let [new-indent (str indent "  ")]
            (println indent \> (token-to-string (left t)))
@@ -42,42 +41,42 @@
    nil))
 
 (def main-rule
-  (rw2/sequence
-    (rw2/abstraction
-      (rw2/reduction
+  (rw/sequence
+    (rw/abstraction
+      (rw/reduction
         tok/escape-html))
 
-    (rw2/procedure
-      (rw2/fixpoint
-        (rw2/disjunction
+    (rw/procedure
+      (rw/fixpoint
+        (rw/disjunction
           tok/remove-escape-tokens
           tok/remove-annotated-tokens
           tok/merge-tokens
           tok/remove-magic-tokens)))
 
-    (rw2/procedure
-      (rw2/fixpoint
+    (rw/procedure
+      (rw/fixpoint
         tok/remove-percent-tokens))
 
-    (rw2/procedure
+    (rw/procedure
       tok/introduce-emptyline-tokens)
 
-    (rw2/procedure
+    (rw/procedure
       tok/introduce-indent-tokens)
 
-    (rw2/procedure
+    (rw/procedure
       tok/remove-superfluous-whitespace)
 
-    (rw2/procedure
+    (rw/procedure
       tok/introduce-item-tokens) ; fix unwind for bullet items
 
-    (rw2/abstraction
-      (rw2/reduction
+    (rw/abstraction
+      (rw/reduction
         ast/abstract-blocks))
 
-    (rw2/recursion
-      (rw2/procedure
-        (rw2/disjunction
+    (rw/recursion
+      (rw/procedure
+        (rw/disjunction
           ast/fix-bullet-continuations
           ast/remove-superfluous-whitespace))
       block?)
@@ -88,18 +87,18 @@
 
     ; bind/introduce-lambdas
 
-    (rw2/recursive-procedure
-      (rw2/disjunction
+    (rw/recursive-procedure
+      (rw/disjunction
         bind/introduce-fun-calls
         bind/introduce-bindings
         ; bind/remove-superfluous-whitespace
         )
       block?
-      rw2/lexical-scope)
+      rw/lexical-scope)
 
-    (rw2/recursion
-      (rw2/procedure
-        (rw2/disjunction
+    (rw/recursion
+      (rw/procedure
+        (rw/disjunction
           sugar/introduce-par-calls
           sugar/introduce-section-calls
           sugar/introduce-blockquote-calls
@@ -108,22 +107,22 @@
           sugar/remove-decorators))
       block?)
 
-    (rw2/fixpoint
-      (rw2/recursive-procedure
-        (rw2/disjunction
+    (rw/fixpoint
+      (rw/recursive-procedure
+        (rw/disjunction
           lambda/evaluate-fun-calls
 
           bind/expand-bindings
           )
         block?
-        rw2/lexical-scope))
+        rw/lexical-scope))
 
     print-tree-rule
 
-    (rw2/recursion
-      (rw2/fixpoint
-        (rw2/procedure
-          (rw2/disjunction
+    (rw/recursion
+      (rw/fixpoint
+        (rw/procedure
+          (rw/disjunction
             math-sugar/remove-manual-casts
             math-sugar/introduce-math-operators
             math-sugar/introduce-msub-msup
@@ -133,9 +132,9 @@
             )))
       block?)
 
-    (rw2/recursion
-      (rw2/procedure
-        (rw2/disjunction
+    (rw/recursion
+      (rw/procedure
+        (rw/disjunction
           html/introduce-nbsp-entities
           html/introduce-typographic-dashes
           html/introduce-typographic-quotes
@@ -143,45 +142,45 @@
           html/introduce-typographic-colons))
       html/text-block?)
 
-    (rw2/recursion
-      (rw2/procedure
-        (rw2/disjunction
+    (rw/recursion
+      (rw/procedure
+        (rw/disjunction
           html/remove-error-tokens
           html/introduce-math-tags
           ))
       block?)
 
-    (rw2/recursive-procedure
+    (rw/recursive-procedure
       html/introduce-mtext-tags
       block?
-      rw2/flat-scope)
+      rw/flat-scope)
 
-    (rw2/recursion
-      (rw2/procedure
+    (rw/recursion
+      (rw/procedure
         html/remove-math-tokens)
       block?)
 
-    (rw2/recursion
-      (rw2/procedure
-        (rw2/fixpoint
+    (rw/recursion
+      (rw/procedure
+        (rw/fixpoint
           html/to-html-tokens))
       block?)))
 
 (defn compile
   ([s]
-   (compile s (rw2/make-cache)))
+   (compile s (rw/make-cache)))
   ([s cache]
-   (rw2/with-cache
+   (rw/with-cache
      cache
      (->> s
           pretok/map-to-tokens
-          (rw2/apply-rule-x main-rule)
+          (rw/apply-rule-x main-rule)
           html/add-boilerplate
           html/to-string
           ))))
 
 ; (defn repeat-compile [s]
-;   (let [the-cache (rw2/make-cache)]
+;   (let [the-cache (rw/make-cache)]
 ;     (println "PASS 1" (count @the-cache)
 ;              (count (get @the-cache :funs)))
 ;     (compile s the-cache)

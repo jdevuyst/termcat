@@ -1,59 +1,189 @@
 (ns termcat.rewrite
-  (require [clojure.core.reducers :as r]
-           [clojure.core.match :refer (match)]
-           [termcat.util :as u]
-           [termcat.rewrite2 :as rw2]))
+  (:refer-clojure :exclude [memoize sequence])
+  (:require [clojure.core.reducers :as r]
+            [clojure.core.match :refer (match)]))
 
-(defn constant-state [m]
-  (fn
-    ([] m)
-    ([x] m)
-    ([x y] x)))
+(defprotocol IWrapped
+  (unwrap [orig])
+  (rewrap [orig result]))
 
-(defmacro defrule [fnname & rdecl]
-  ; Note: auto-recur-test is ignored since refactoring
-  (assert (symbol? fnname))
-  (let [[doc-str rdecl] (if (string? (first rdecl))
-                          [(first rdecl) (next rdecl)]
-                          ["" rdecl])
-        [init-state rdecl] (cond
-                             (vector? (first rdecl))
-                             [nil rdecl]
-                             (= (ffirst rdecl)
-                                'constant-state) ; HACK!
-                             [(first (rest (first rdecl)))
-                              (next rdecl)]
-                             :else
-                             [{:state :error} (next rdecl)])
-        [[& args] rdecl] [(first rdecl) (next rdecl)]
-        [arg-mapf rdecl] [(first rdecl) (next rdecl)]
-        [auto-recur-test rdecl] [(first rdecl) (next rdecl)]
-        auto-recur-test (if (nil? auto-recur-test)
-                          '(constantly false)
-                          auto-recur-test)
-        body rdecl]
-    (assert (>= (count args) 2))
-    `(def ~fnname ~doc-str
-       (-> (rw2/window ~init-state
-                       ~arg-mapf
-                       [~@args]
-                       ~@body)
-           rw2/abstraction))))
-
-(defprotocol IRewrite
-  (rewrite [coll rule]))
-
-(extend-protocol IRewrite
+(extend-protocol IWrapped
   clojure.lang.IPersistentVector
-  (rewrite [coll rule]
-           (assert (= (set (keys (rule))) #{:state-fn :padding-right}))
-           (let [{state-fn :state-fn
-                  padding-right :padding-right} (rule)
-                 [new-state new-acc] (->> (r/cat coll (vec (repeat padding-right nil))) ; right padding2
-                                          (r/reduce (fn [[state acc] v]
-                                                      (rule state acc v))
-                                                    [(state-fn) []]))]
-             (with-meta (->> new-acc
-                             (r/filter (complement nil?))
-                             (r/reduce conj []))
-                        {:state new-state}))))
+  (unwrap [orig] orig)
+  (rewrap [orig result] result))
+
+(def ^:dynamic !*cache*)
+
+(defn make-cache [] (atom {}))
+
+(defmacro with-cache [cache & body]
+  `(binding [!*cache* ~cache]
+     ~@body))
+
+(defn- memoize [f]
+  (fn [& args]
+    (if-let [result (get @!*cache* [f args])]
+      result
+      (let [result (apply f args)]
+        (reset! !*cache* (assoc @!*cache* [f args] result))
+        (reset! !*cache* (assoc @!*cache* :funs
+                           (conj (get @!*cache* :funs)
+                                 (hash f))))
+        result))))
+
+(defn- pad-1 [v]
+  (-> (cons nil (conj v nil))))
+
+(defn- trim
+  ([v] (trim v 0 (-> v count dec)))
+  ([v lidx ridx]
+   (let [lnil? (nil? (nth v lidx))
+         rnil? (nil? (nth v ridx))]
+     (cond
+       (> lidx ridx)
+       []
+
+       (or lnil? rnil?)
+       (recur v
+              (if lnil? (inc lidx) lidx)
+              (if rnil? (dec ridx) ridx))
+
+       :else
+       (subvec v lidx (inc ridx))))))
+
+(defn apply-rule-1 [rule state input]
+  (or (rule state input)
+      [state input]))
+
+(defn apply-rule-x
+  ([rule input] (apply-rule-x rule (rule) input))
+  ([rule state input]
+   (let [[state2 input2] (->> input
+                              unwrap
+                              (apply-rule-1 rule state))]
+     (with-meta (rewrap input input2)
+                {:state state2}))))
+
+(defn disjunction [& orig-rules]
+  (let [init-state (->> orig-rules
+                        (r/mapcat #(%))
+                        (r/reduce assoc! (transient {}))
+                        persistent!)]
+    (fn
+      ([] init-state)
+      ([orig-state orig-input]
+       (loop [next-rules orig-rules
+              [state input] [orig-state orig-input]]
+         (if (empty? next-rules)
+           [state input]
+           (let [result (apply-rule-1 (first next-rules) state input)]
+             (if-not (= (second result) input)
+               result
+               (recur (rest next-rules) result)))))))))
+
+(defn sequence [& orig-rules]
+  (let [init-state (->> orig-rules
+                        (r/mapcat #(%))
+                        (r/reduce assoc! (transient {}))
+                        persistent!)]
+    (fn
+      ([] init-state)
+      ([orig-state orig-input]
+       (loop [next-rules orig-rules
+              [state input] [orig-state orig-input]]
+         (if (empty? next-rules)
+           [state input]
+           (recur (rest next-rules)
+                  (apply-rule-1 (first next-rules) state input))))))))
+
+(defn fixpoint [rule]
+  (fn
+    ([] (rule))
+    ([state input]
+     (let [[new-state new-input :as result] (apply-rule-1 rule state input)]
+       (if (= input new-input)
+         result
+         (recur new-state new-input))))))
+
+(defn recursion [rule pred]
+  (letfn [(f ([] (rule))
+             ([state input]
+              (->> input
+                   (map #(if (pred %)
+                           (apply-rule-x f %)
+                           %))
+                   (apply-rule-1 rule state))))]
+    f))
+
+(defn abstraction [rule]
+  (fn
+    ([] {rule (rule)})
+    ([state input]
+     (if-let [r (rule (get state rule) input)]
+       [(assoc state rule (first r))
+        (second r)]))))
+
+(defn procedure [rule]
+  (fn
+    ([] (rule))
+    ([orig-state orig-input]
+     (loop [state orig-state
+            input (pad-1 orig-input)
+            output (transient [])]
+       (if (empty? input)
+         [state (-> output persistent! trim)]
+         (let [[new-state new-input] (apply-rule-1 rule state input)]
+           (recur new-state
+                  (rest new-input)
+                  (conj! output (first new-input)))))))))
+
+(defn lexical-scope
+  ([prev-level-state] prev-level-state)
+  ([left-state returned-state] left-state))
+
+(defn flat-scope
+  ([prev-level-state] prev-level-state)
+  ([left-state returned-state] returned-state))
+
+(defn recursive-procedure [rule pred scope]
+  (letfn [(f ([] (rule))
+             ([orig-state orig-input]
+              (loop [state orig-state
+                     input (pad-1 orig-input)
+                     output (transient [])]
+                (if (empty? input)
+                  [state (-> output persistent! trim)]
+                  (let [el1 (first input)
+                        input (if (pred el1)
+                                (cons (apply-rule-x f (scope state) el1)
+                                      (rest input))
+                                input)
+                        [new-state new-input] (apply-rule-1 rule state input)]
+                    (recur new-state
+                           (rest new-input)
+                           (conj! output (first new-input))))))))]
+    f))
+
+(defn reduction [rule]
+  (fn
+    ([] (rule))
+    ([state input]
+     (r/reduce rule [state []] input))))
+
+(defmacro window [init-state proj [& arg-list] & body]
+  (assert (or (nil? init-state) (map? init-state)))
+  (assert (reduce #(and %1 (symbol? %2)) true arg-list))
+  (assert (even? (count body)))
+  (let [argc (-> arg-list count dec)]
+    `(fn
+       ([] ~init-state)
+       ([state# input#]
+        (let [padded-input# (concat input# (repeat nil))
+              [~@arg-list] (cons state# (take ~argc padded-input#))]
+          (if-let [r# (match (vec (cons state#
+                                        (take ~argc (map ~proj padded-input#))))
+                             ~@body
+                             :else nil)]
+            [(or (first r#) state#)
+             (concat (rest r#)
+                     (drop ~argc input#))]))))))
