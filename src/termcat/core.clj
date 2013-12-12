@@ -175,9 +175,10 @@
 
 (let [the-cache (rw/cache)
       f #(compile % the-cache)
-      void (fn [f x] (f x) (str x \a))]
+      pre-f #(do (f %) (str % \Z))
+      repeat-pre-f #(nth (iterate pre-f %2) %1)]
   (->> (slurp "doc/termcat-intro.tc")
-       ; (#(nth (iterate (partial void f) %) 20))
+       ; (repeat-pre-f 20)
        f
        (spit "doc/termcat-intro.html")
        time)
