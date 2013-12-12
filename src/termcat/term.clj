@@ -1,6 +1,5 @@
 (ns termcat.term
-  (:require [clojure.core.reducers :as r]
-            [clojure.edn :as edn]
+  (:require [clojure.edn :as edn]
             [termcat.rewrite :as rw]))
 
 (defprotocol ITerm
@@ -98,14 +97,6 @@
   (assert (fragment? center))
   (Block. left center right))
 
-(defn merge-blocks [b1 b2]
-  (assert (block? b1))
-  (assert (block? b2))
-  (block (left b1)
-         (fragmentcat (.terms (center b1))
-                      (.terms (center b2)))
-         (right b1)))
-
 (extend-type nil
   ITerm
   (tt [this]
@@ -154,7 +145,6 @@
                  (right orig))))
 
 (defmacro defrule [fnname & rdecl]
-  ; Note: auto-recur-test is ignored since refactoring
   (assert (symbol? fnname))
   (let [[doc-str rdecl] (if (string? (first rdecl))
                           [(first rdecl) (next rdecl)]

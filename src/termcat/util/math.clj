@@ -1,10 +1,8 @@
-(ns termcat.math
+(ns termcat.util.math
   (:require [clojure.core.match :refer (match)]
             [clojure.core.reducers :as r]
             [clojure.edn :as edn]
-            [termcat.term :refer :all]
-            [termcat.util :as u]
-            [clojure.pprint]))
+            [termcat.term :refer :all]))
 
 (defn number-string? [s]
   (try

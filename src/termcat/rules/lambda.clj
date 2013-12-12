@@ -1,6 +1,5 @@
-(ns termcat.stage.lambda
-  (:require [clojure.core.match :refer (match)]
-            [termcat.term :refer :all]))
+(ns termcat.rules.lambda
+  (:require [termcat.term :refer :all]))
 
 (defn apply-fun [fun-token arg-token]
   (let [f (payload fun-token)

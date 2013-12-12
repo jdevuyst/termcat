@@ -1,8 +1,7 @@
-(ns termcat.stage.bind
+(ns termcat.rules.bind
   (:require [clojure.core.match :refer (match)]
-            [clojure.core.reducers :as r]
             [termcat.term :refer :all]
-            [termcat.fun :as fun]))
+            [termcat.util.lambda :as lambda]))
 
 ; (defn call-lambda [lambda & arg-values]
 ;   (let [arg-count (count arg-values)
@@ -27,7 +26,7 @@
 
 ; (defn make-lambda [args body]
 ;   [(token :fun
-;           (fun/curry-fun call-lambda
+;           (lambda/curry-fun call-lambda
 ;                          (->> args
 ;                               center
 ;                               .terms
@@ -64,7 +63,7 @@
    (:or nil :whitespace :newline :emptyline)
    (:or :period :colon)
    :default]
-  [nil t1 (fun/fun-call-head (str (payload t2)
+  [nil t1 (lambda/fun-call-head (str (payload t2)
                                   (payload t3)))])
 
 (defrule introduce-bindings

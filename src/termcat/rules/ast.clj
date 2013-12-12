@@ -1,6 +1,11 @@
-(ns termcat.stage.ast
-  (:require [termcat.util :as u]
-            [termcat.term :refer :all]))
+(ns termcat.rules.ast
+  (:require [termcat.term :refer :all]))
+
+(defn- pop-n [coll n]
+  (subvec coll 0 (- (count coll) n)))
+
+(defn- last-n [coll n]
+  (subvec coll (- (count coll) n)))
 
 (defn abstract-blocks
   ([] {:distance 0 :stack nil})
@@ -15,10 +20,10 @@
                      (if (delim-pair? ldelim tok)
                        [{:distance (peek (:stack state))
                          :stack (pop (:stack state))}
-                        (conj (u/pop-n result (:distance state))
+                        (conj (pop-n result (:distance state))
                               (block ldelim
-                                     (fragmentcat (u/last-n result
-                                                            (dec (:distance state))))
+                                     (fragmentcat (last-n result
+                                                          (dec (:distance state))))
                                      tok))]
                        [(update-in state [:distance] inc)
                         (conj result tok)]))
@@ -30,6 +35,14 @@
 ;   tt
 ;   block?
 ;   [_ [(:or :ldelim :rdelim) _]] [nil (token :error (payload t1))])
+
+(defn- merge-blocks [b1 b2]
+  (assert (block? b1))
+  (assert (block? b2))
+  (block (left b1)
+         (fragmentcat (.terms (center b1))
+                      (.terms (center b2)))
+         (right b1)))
 
 (defrule fix-bullet-continuations
   [state t1 t2]

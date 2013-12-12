@@ -1,11 +1,9 @@
-(ns termcat.stage.html
-  (:require [clojure.core.match :refer (match)]
-            [clojure.core.reducers :as r]
-            [clojure.set :as set]
+(ns termcat.rules.html
+  (:require [clojure.core.reducers :as r]
             [clojure.string :as string]
             [termcat.term :refer :all]
             [termcat.rewrite :as rw]
-            [termcat.math :as math]))
+            [termcat.util.math :as math]))
 
 (defn text-block? [x]
   (and (block? x)

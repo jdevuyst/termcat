@@ -1,8 +1,6 @@
-(ns termcat.fun
-  (:require [clojure.core.reducers :as r]
-            [clojure.string :as string]
-            [termcat.term :refer :all]
-            [termcat.util :as u]))
+(ns termcat.util.lambda
+  (:require [clojure.string :as string]
+            [termcat.term :refer :all]))
 
 (defn tval [t pred]
   (-> t

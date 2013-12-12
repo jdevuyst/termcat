@@ -1,16 +1,13 @@
-(ns termcat.stage.sugar
-  (:require [clojure.core.match :refer (match)]
-            [clojure.core.reducers :as r]
-            [termcat.term :refer :all]
-            [termcat.fun :as fun]
-            [termcat.math :as math]))
+(ns termcat.rules.markdown
+  (:require [termcat.term :refer :all]
+            [termcat.util.lambda :as lambda]))
 
 (defrule introduce-par-calls
   [state t1 t2 t3]
   [_ _ :emptyline _] (concat [nil t1]
                              (if-not (= (tt t1) :whitespace)
                                [(token :whitespace nil)])
-                             (fun/fun-call-seq ":par")
+                             (lambda/fun-call-seq ":par")
                              (if-not (= (tt t3) :whitespace)
                                [(token :whitespace nil)])
                              [t3]))
@@ -18,23 +15,23 @@
 (defrule introduce-section-calls
   [state t1 t2]
   [_ :fun _] nil
-  [_ _ [:block :h1]] [nil t1 (fun/fun-call-head ":h1") t2]
-  [_ _ [:block :h2]] [nil t1 (fun/fun-call-head ":h2") t2]
-  [_ _ [:block :h3]] [nil t1 (fun/fun-call-head ":h3") t2]
-  [_ _ [:block :h4]] [nil t1 (fun/fun-call-head ":h4") t2]
-  [_ _ [:block :h5]] [nil t1 (fun/fun-call-head ":h5") t2]
-  [_ _ [:block :h6]] [nil t1 (fun/fun-call-head ":h6") t2])
+  [_ _ [:block :h1]] [nil t1 (lambda/fun-call-head ":h1") t2]
+  [_ _ [:block :h2]] [nil t1 (lambda/fun-call-head ":h2") t2]
+  [_ _ [:block :h3]] [nil t1 (lambda/fun-call-head ":h3") t2]
+  [_ _ [:block :h4]] [nil t1 (lambda/fun-call-head ":h4") t2]
+  [_ _ [:block :h5]] [nil t1 (lambda/fun-call-head ":h5") t2]
+  [_ _ [:block :h6]] [nil t1 (lambda/fun-call-head ":h6") t2])
 
 (defrule introduce-blockquote-calls
   [state t1 t2]
   [_ :fun _] nil ; make sure the next line terminates
-  [_ _ [:block :indent]] [nil t1 (fun/fun-call-head ":quotation") t2])
+  [_ _ [:block :indent]] [nil t1 (lambda/fun-call-head ":quotation") t2])
 
 (defrule introduce-bullet-list-calls
   [state t1 t2]
   [_ [:block :bullet] _] nil
   [_ :fun _] nil ; make sure the next line terminates
-  [_ _ [:block :bullet]] [nil t1 (fun/fun-call-head ":bullet-list") t2])
+  [_ _ [:block :bullet]] [nil t1 (lambda/fun-call-head ":bullet-list") t2])
 
 (defrule introduce-link-calls
   [state t1 t2 t3 t4 t5]
@@ -44,7 +41,7 @@
    [:block :bracket]
    [:block :parenthesis]
    (:or :whitespace nil)] (concat [nil t1]
-                                  (fun/fun-call-seq ":img"
+                                  (lambda/fun-call-seq ":img"
                                                     (center t3)
                                                     (center t4))
                                   [t5])
@@ -54,7 +51,7 @@
    [:block :parenthesis]
    (:or :whitespace nil)
    _] (concat [nil t1]
-              (fun/fun-call-seq ":link"
+              (lambda/fun-call-seq ":link"
                                 (center t2)
                                 (center t3))
               [t4 t5]))

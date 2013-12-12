@@ -1,4 +1,4 @@
-(ns termcat.stage.tokenize
+(ns termcat.rules.tokenize
   (:require [clojure.core.match :refer (match)]
             [termcat.term :refer :all]))
 

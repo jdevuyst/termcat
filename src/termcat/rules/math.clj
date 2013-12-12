@@ -1,10 +1,8 @@
-(ns termcat.stage.math-sugar
+(ns termcat.rules.math
   (:require [clojure.core.match :refer (match)]
-            [clojure.core.reducers :as r]
             [clojure.string :as string]
             [termcat.term :refer :all]
-            [termcat.fun :as fun]
-            [termcat.math :as math]))
+            [termcat.util.math :as math]))
 
 (defrule remove-manual-casts
   [state t1 t2]

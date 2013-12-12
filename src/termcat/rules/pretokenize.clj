@@ -1,4 +1,4 @@
-(ns termcat.stage.pretokenize
+(ns termcat.rules.pretokenize
   (:require [clojure.core.reducers :as r]
             [termcat.term :refer :all]))
 

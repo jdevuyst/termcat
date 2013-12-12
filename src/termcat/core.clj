@@ -1,15 +1,15 @@
 (ns termcat.core
   (:refer-clojure :exclude [compile])
-  (:require [termcat.rewrite :as rw]
-            [termcat.term :refer :all]
-            [termcat.stage.pretokenize :as pretok]
-            [termcat.stage.tokenize :as tok]
-            [termcat.stage.ast :as ast]
-            [termcat.stage.bind :as bind]
-            [termcat.stage.sugar :as sugar]
-            [termcat.stage.math-sugar :as math-sugar]
-            [termcat.stage.lambda :as lambda]
-            [termcat.stage.html :as html]))
+  (:require [termcat.term :refer :all]
+            [termcat.rewrite :as rw]
+            [termcat.rules.pretokenize :as pretok]
+            [termcat.rules.tokenize :as tok]
+            [termcat.rules.ast :as ast]
+            [termcat.rules.bind :as bind]
+            [termcat.rules.lambda :as lambda-rules]
+            [termcat.rules.markdown :as markdown]
+            [termcat.rules.math :as math-rules]
+            [termcat.rules.html :as html]))
 
 (defn print-tree
   ([tree] (print-tree tree ""))
@@ -95,18 +95,18 @@
     (rw/recursion
       (rw/procedure
         (rw/disjunction
-          sugar/introduce-par-calls
-          sugar/introduce-section-calls
-          sugar/introduce-blockquote-calls
-          sugar/introduce-bullet-list-calls
-          sugar/introduce-link-calls
-          sugar/remove-decorators))
+          markdown/introduce-par-calls
+          markdown/introduce-section-calls
+          markdown/introduce-blockquote-calls
+          markdown/introduce-bullet-list-calls
+          markdown/introduce-link-calls
+          markdown/remove-decorators))
       block?)
 
     (rw/fixpoint
       (rw/recursive-procedure
         (rw/disjunction
-          lambda/evaluate-fun-calls
+          lambda-rules/evaluate-fun-calls
 
           bind/expand-bindings
           )
@@ -119,12 +119,12 @@
       (rw/fixpoint
         (rw/procedure
           (rw/disjunction
-            math-sugar/remove-manual-casts
-            math-sugar/introduce-math-operators
-            math-sugar/introduce-msub-msup
-            math-sugar/introduce-mfrac
-            ; math-sugar/math-cast-next-token
-            ; math-sugar/flatten-math-fences
+            math-rules/remove-manual-casts
+            math-rules/introduce-math-operators
+            math-rules/introduce-msub-msup
+            math-rules/introduce-mfrac
+            ; math-rules/math-cast-next-token
+            ; math-rules/flatten-math-fences
             )))
       block?)
 
@@ -142,8 +142,7 @@
       (rw/procedure
         (rw/disjunction
           html/remove-error-tokens
-          html/introduce-math-tags
-          ))
+          html/introduce-math-tags))
       block?)
 
     (rw/recursive-procedure
