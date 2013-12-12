@@ -20,9 +20,8 @@
   (contains? #{\0 \1 \2 \3 \4 \5 \6 \7 \8 \9 \A \B \C \D \E \a \b \c \d \e} x))
 
 (defn escape-html
-  ([] {:state-fn (constant-state {:acc []})
-       :padding-right 1})
-  ([state result tok]
+  ([] {:acc []})
+  ([[state result] tok]
    (letfn [(segue [new-stage]
                   [{:stage new-stage
                     :acc (conj (:acc state) tok)}
@@ -40,50 +39,50 @@
                         (into (:acc state))
                         (conj tok))])]
      (match [(:stage state) (payload tok)]
-            [nil \\] (segue :escape)
-            [:escape _] (reject)
-            [nil \&] (segue :entity)
-            [(:or :entity
-                  :named-entity)
-             (_ :guard letter?)] (segue :named-entity)
-            [:entity \#] (segue :maybe-num-entity)
-            [:maybe-num-entity \x] (segue :maybe-hex-num-entity)
-            [(:or :maybe-num-entity :dec-num-entity)
-             (_ :guard digit?)] (segue :dec-num-entity)
-            [(:or :maybe-hex-num-entity :hex-num-entity)
-             (_ :guard hexdigit?)] (segue :hex-num-entity)
-            [(:or :named-entity
-                  :dec-num-entity
-                  :hex-num-entity) \;] (accept)
-            [nil \<] (segue :before-tag-name)
-            [:before-tag-name \/] (segue :maybe-in-tag-name)
-            [(:or :before-tag-name
-                  :maybe-in-tag-name
-                  :in-tag-name)
-             (_ :guard letter?)] (segue :in-tag-name)
-            [:in-tag-name \-] (segue :maybe-in-tag-name)
-            [(:or :in-tag-name
-                  :after-tag-name
-                  :after-val)
-             \space] (segue :after-tag-name)
-            [(:or :after-tag-name
-                  :maybe-in-attr-name
-                  :in-attr-name)
-             (_ :guard letter?)] (segue :in-attr-name)
-            [:in-attr-name \-] (segue :maybe-in-attr-name)
-            [:in-attr-name \=] (segue :before-val)
-            [(:or :before-val
-                  :maybe-in-val
-                  :in-val)
-             (_ :guard letter?)] (segue :in-val)
-            [:in-val \-] (segue :maybe-in-val)
-            [:before-val \"] (segue :in-double-quotes)
-            [:in-double-quotes \"] (segue :after-val)
-            [:in-double-quotes _] (segue :in-double-quotes)
-            [(:or :in-tag-name
-                  :in-val
-                  :after-val) \>] (accept)
-            :else (reject)))))
+               [nil \\] (segue :escape)
+               [:escape _] (reject)
+               [nil \&] (segue :entity)
+               [(:or :entity
+                     :named-entity)
+                (_ :guard letter?)] (segue :named-entity)
+               [:entity \#] (segue :maybe-num-entity)
+               [:maybe-num-entity \x] (segue :maybe-hex-num-entity)
+               [(:or :maybe-num-entity :dec-num-entity)
+                (_ :guard digit?)] (segue :dec-num-entity)
+               [(:or :maybe-hex-num-entity :hex-num-entity)
+                (_ :guard hexdigit?)] (segue :hex-num-entity)
+               [(:or :named-entity
+                     :dec-num-entity
+                     :hex-num-entity) \;] (accept)
+               [nil \<] (segue :before-tag-name)
+               [:before-tag-name \/] (segue :maybe-in-tag-name)
+               [(:or :before-tag-name
+                     :maybe-in-tag-name
+                     :in-tag-name)
+                (_ :guard letter?)] (segue :in-tag-name)
+               [:in-tag-name \-] (segue :maybe-in-tag-name)
+               [(:or :in-tag-name
+                     :after-tag-name
+                     :after-val)
+                \space] (segue :after-tag-name)
+               [(:or :after-tag-name
+                     :maybe-in-attr-name
+                     :in-attr-name)
+                (_ :guard letter?)] (segue :in-attr-name)
+               [:in-attr-name \-] (segue :maybe-in-attr-name)
+               [:in-attr-name \=] (segue :before-val)
+               [(:or :before-val
+                     :maybe-in-val
+                     :in-val)
+                (_ :guard letter?)] (segue :in-val)
+               [:in-val \-] (segue :maybe-in-val)
+               [:before-val \"] (segue :in-double-quotes)
+               [:in-double-quotes \"] (segue :after-val)
+               [:in-double-quotes _] (segue :in-double-quotes)
+               [(:or :in-tag-name
+                     :in-val
+                     :after-val) \>] (accept)
+               :else (reject)))))
 
 (defrule remove-escape-tokens
   [state t1 t2]

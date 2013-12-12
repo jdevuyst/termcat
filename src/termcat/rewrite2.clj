@@ -164,6 +164,12 @@
                            (conj! output (first new-input))))))))]
     f))
 
+(defn reduction [rule]
+  (fn
+    ([] (rule))
+    ([state input]
+     (r/reduce rule [state []] input))))
+
 (defmacro window [init-state proj [& arg-list] & body]
   (assert (or (nil? init-state) (map? init-state)))
   (assert (reduce #(and %1 (symbol? %2)) true arg-list))

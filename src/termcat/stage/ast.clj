@@ -1,14 +1,11 @@
 (ns termcat.stage.ast
-  (:require [clojure.core.reducers :as r]
-            [clojure.core.match :refer (match)]
-            [termcat.util :as u]
+  (:require [termcat.util :as u]
             [termcat.rewrite :refer :all]
             [termcat.term :refer :all]))
 
 (defn abstract-blocks
-  ([] {:state-fn (constant-state {:distance 0 :stack nil})
-       :padding-right 1})
-  ([state result tok]
+  ([] {:distance 0 :stack nil})
+  ([[state result] tok]
    (cond
      (ldelim? tok) [{:distance 1
                      :stack (conj (:stack state)
@@ -28,7 +25,6 @@
                         (conj result tok)]))
      :else [(update-in state [:distance] inc)
             (conj result tok)])))
-
 
 ; (defrule introduce-delim-errors
 ;   [state t1]
