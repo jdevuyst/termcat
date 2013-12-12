@@ -78,7 +78,7 @@
            (let [result (apply-rule* (first next-rules) state input)]
              (if-not (= (second result) input)
                result
-               (recur (rest next-rules) result)))))))))
+               (recur (next next-rules) result)))))))))
 
 (defn sequence [& orig-rules]
   (let [init-state (->> orig-rules
@@ -92,7 +92,7 @@
               [state input] [orig-state orig-input]]
          (if (empty? next-rules)
            [state input]
-           (recur (rest next-rules)
+           (recur (next next-rules)
                   (apply-rule* (first next-rules) state input))))))))
 
 (defn fixpoint [rule]
@@ -135,7 +135,7 @@
          [state (-> output persistent! trim)]
          (let [[new-state new-input] (apply-rule* rule state input)]
            (recur new-state
-                  (rest new-input)
+                  (next new-input)
                   (conj! output (first new-input)))))))))
 
 (defn lexical-scope
@@ -157,11 +157,11 @@
                   (let [el1 (first input)
                         input (if (pred el1)
                                 (cons (apply-rule f (scope state) el1)
-                                      (rest input))
+                                      (next input))
                                 input)
                         [new-state new-input] (apply-rule* rule state input)]
                     (recur new-state
-                           (rest new-input)
+                           (next new-input)
                            (conj! output (first new-input))))))))]
     f))
 
@@ -188,5 +188,5 @@
                              ~@body
                              :else nil)]
             [(or (first r#) state#)
-             (concat (rest r#)
+             (concat (next r#)
                      (drop ~argc input#))]))))))

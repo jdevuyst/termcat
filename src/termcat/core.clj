@@ -164,7 +164,7 @@
 
 (defn compile
   ([s]
-   (compile s (rw/make-cache)))
+   (compile s (rw/cache)))
   ([s cache]
    (rw/with-cache
      cache
