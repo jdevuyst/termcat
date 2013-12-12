@@ -14,21 +14,18 @@
 
 (def ^:dynamic !*cache*)
 
-(defn make-cache [] (atom {}))
+(defn cache [] (atom {}))
 
 (defmacro with-cache [cache & body]
   `(binding [!*cache* ~cache]
      ~@body))
 
-(defn- memoize [f]
+(defn memoize [f]
   (fn [& args]
     (if-let [result (get @!*cache* [f args])]
       result
       (let [result (apply f args)]
         (reset! !*cache* (assoc @!*cache* [f args] result))
-        (reset! !*cache* (assoc @!*cache* :funs
-                           (conj (get @!*cache* :funs)
-                                 (hash f))))
         result))))
 
 (defn- pad-1 [v]
@@ -51,18 +48,20 @@
        :else
        (subvec v lidx (inc ridx))))))
 
-(defn apply-rule-1 [rule state input]
+(defn apply-rule* [rule state input]
   (or (rule state input)
       [state input]))
 
-(defn apply-rule-x
-  ([rule input] (apply-rule-x rule (rule) input))
+(defn apply-rule
+  ([rule input] (apply-rule rule (rule) input))
   ([rule state input]
    (let [[state2 input2] (->> input
                               unwrap
-                              (apply-rule-1 rule state))]
+                              (apply-rule* rule state))]
      (with-meta (rewrap input input2)
                 {:state state2}))))
+
+(def apply-rule (memoize apply-rule))
 
 (defn disjunction [& orig-rules]
   (let [init-state (->> orig-rules
@@ -76,7 +75,7 @@
               [state input] [orig-state orig-input]]
          (if (empty? next-rules)
            [state input]
-           (let [result (apply-rule-1 (first next-rules) state input)]
+           (let [result (apply-rule* (first next-rules) state input)]
              (if-not (= (second result) input)
                result
                (recur (rest next-rules) result)))))))))
@@ -94,13 +93,13 @@
          (if (empty? next-rules)
            [state input]
            (recur (rest next-rules)
-                  (apply-rule-1 (first next-rules) state input))))))))
+                  (apply-rule* (first next-rules) state input))))))))
 
 (defn fixpoint [rule]
   (fn
     ([] (rule))
     ([state input]
-     (let [[new-state new-input :as result] (apply-rule-1 rule state input)]
+     (let [[new-state new-input :as result] (apply-rule* rule state input)]
        (if (= input new-input)
          result
          (recur new-state new-input))))))
@@ -110,9 +109,9 @@
              ([state input]
               (->> input
                    (map #(if (pred %)
-                           (apply-rule-x f %)
+                           (apply-rule f %)
                            %))
-                   (apply-rule-1 rule state))))]
+                   (apply-rule* rule state))))]
     f))
 
 (defn abstraction [rule]
@@ -132,7 +131,7 @@
             output (transient [])]
        (if (empty? input)
          [state (-> output persistent! trim)]
-         (let [[new-state new-input] (apply-rule-1 rule state input)]
+         (let [[new-state new-input] (apply-rule* rule state input)]
            (recur new-state
                   (rest new-input)
                   (conj! output (first new-input)))))))))
@@ -155,10 +154,10 @@
                   [state (-> output persistent! trim)]
                   (let [el1 (first input)
                         input (if (pred el1)
-                                (cons (apply-rule-x f (scope state) el1)
+                                (cons (apply-rule f (scope state) el1)
                                       (rest input))
                                 input)
-                        [new-state new-input] (apply-rule-1 rule state input)]
+                        [new-state new-input] (apply-rule* rule state input)]
                     (recur new-state
                            (rest new-input)
                            (conj! output (first new-input))))))))]

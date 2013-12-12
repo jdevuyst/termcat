@@ -11,8 +11,6 @@
             [termcat.stage.lambda :as lambda]
             [termcat.stage.html :as html]))
 
-(def ^:dynamic *debug* true)
-
 (defn print-tree
   ([tree] (print-tree tree ""))
   ([tree indent]
@@ -35,9 +33,7 @@
 (defn print-tree-rule
   ([] nil)
   ([state input]
-   (->> input
-        vec
-        print-tree)
+   (->> input vec print-tree)
    nil))
 
 (def main-rule
@@ -174,30 +170,16 @@
      cache
      (->> s
           pretok/map-to-tokens
-          (rw/apply-rule-x main-rule)
+          (rw/apply-rule main-rule)
           html/add-boilerplate
-          html/to-string
-          ))))
+          html/to-string))))
 
-; (defn repeat-compile [s]
-;   (let [the-cache (rw/make-cache)]
-;     (println "PASS 1" (count @the-cache)
-;              (count (get @the-cache :funs)))
-;     (compile s the-cache)
-;     (println "PASS 2" (count @the-cache)
-;              (count (get @the-cache :funs)))
-;     (compile s the-cache)
-;     (println "PASS 3" (count @the-cache)
-;              (count (get @the-cache :funs)))
-;     (compile s the-cache)
-;     (println "PASS 4" (count @the-cache)
-;              (count (get @the-cache :funs)))
-;     (compile s the-cache)
-;     (println "PASS 5" (count @the-cache)
-;              (count (get @the-cache :funs)))
-;     (compile s the-cache)))
-
-(->> (slurp "doc/termcat-intro.tc")
-     compile
-     (spit "doc/termcat-intro.html")
-     time)
+(let [the-cache (rw/cache)
+      f #(compile % the-cache)
+      void (fn [f x] (f x) x)]
+  (->> (slurp "doc/termcat-intro.tc")
+       ; (void f) (void f) (void f) (void f)
+       f
+       (spit "doc/termcat-intro.html")
+       time)
+  (println "\"Cache size:" (count @the-cache) "items\""))
