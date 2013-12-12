@@ -108,9 +108,11 @@
   (letfn [(f ([] (rule))
              ([state input]
               (->> input
-                   (map #(if (pred %)
-                           (apply-rule f %)
-                           %))
+                   (r/map #(if (pred %)
+                             (apply-rule f %)
+                             %))
+                   (r/reduce conj! (transient []))
+                   persistent!
                    (apply-rule* rule state))))]
     f))
 
@@ -179,8 +181,10 @@
        ([state# input#]
         (let [padded-input# (concat input# (repeat nil))
               [~@arg-list] (cons state# (take ~argc padded-input#))]
-          (if-let [r# (match (vec (cons state#
-                                        (take ~argc (map ~proj padded-input#))))
+          (if-let [r# (match (->> padded-input#
+                                  (r/map ~proj)
+                                  (r/take ~argc)
+                                  (r/reduce conj [state#]))
                              ~@body
                              :else nil)]
             [(or (first r#) state#)
