@@ -50,11 +50,9 @@
   [_ [:block :bullet] (:or :emptyline :newline) [:block :indent]]
   [nil (merge-blocks t1 t3)])
 
-; (defrule convert-newlines-to-whitespace
-;   [state t1]
-;   tt
-;   block?
-;   [_ :newline] [nil (token :whitespace \newline)])
+(defrule convert-newlines-to-whitespace
+  [state t1]
+  [_ :newline] [nil (token :whitespace \newline)])
 
 (defrule remove-superfluous-whitespace
   [state t1 t2]

@@ -3,16 +3,6 @@
             [termcat.term :refer :all]
             [termcat.util.lambda :as lambda]))
 
-(defrule introduce-par-calls
-  [state t1 t2 t3]
-  [_ _ :emptyline _] (concat [nil t1]
-                             (if-not (= (tt t1) :whitespace)
-                               [(token :whitespace nil)])
-                             (lambda/fun-call-seq ":par")
-                             (if-not (= (tt t3) :whitespace)
-                               [(token :whitespace nil)])
-                             [t3]))
-
 (defrule introduce-section-calls
   [state t1 t2]
   [_ :fun _] nil
@@ -37,20 +27,20 @@
 (defrule introduce-link-calls
   [state t1 t2 t3 t4 t5]
   [_
-   (:or :whitespace nil)
+   (:or :whitespace :emptyline nil)
    :bang
    [:block :bracket]
    [:block :parenthesis]
-   (:or :whitespace nil)] (concat [nil t1]
+   (:or :whitespace :emptyline nil)] (concat [nil t1]
                                   (lambda/fun-call-seq ":img"
                                                        (center t3)
                                                        (center t4))
                                   [t5])
   [_
-   (:or :whitespace nil)
+   (:or :whitespace :emptyline nil)
    [:block :bracket]
    [:block :parenthesis]
-   (:or :whitespace nil)
+   (:or :whitespace :emptyline nil)
    _] (concat [nil t1]
               (lambda/fun-call-seq ":link"
                                    (center t2)
@@ -67,23 +57,23 @@
 
 (defrule remove-decorators
   [state t1 t2 t3 t4 t5 t6 t7]
-  [_ (:or :whitespace nil)
+  [_ (:or :whitespace :emptyline nil)
    :underscore _ :underscore
    (:or :whitespace nil) _ _]
   (concat [nil t1]
           (wrap-term "u" t3)
           [t5 t6 t7])
 
-  [_ (:or :whitespace nil)
+  [_ (:or :whitespace :emptyline nil)
    :asterisk _ :asterisk
    (:or :whitespace nil) _ _]
   (concat [nil t1]
           (wrap-term "em" t3)
           [t5 t6 t7])
 
-  [_ (:or :whitespace nil)
+  [_ (:or :whitespace :emptyline nil)
    :asterisk :asterisk _ :asterisk :asterisk
-   (:or :whitespace nil)]
+   (:or :whitespace :emptyline nil)]
   (concat [nil t1]
           (wrap-term "strong" t4)
           [t7]))

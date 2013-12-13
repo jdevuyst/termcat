@@ -181,6 +181,47 @@
   [_ :close-math _] [nil (token :html "</math>") t2]
   [_ _ :open-math] [nil t1 (token :html "<math>")])
 
+(def separate-head-body
+  (rw/window {:context :begin
+              :body []
+              :head []}
+             tt
+             [state t1]
+             [_ nil] nil
+             [_ [:block _]] [state]
+             [_ _] (match (-> t1 payload str string/lower-case)
+                          "<head>" [(assoc state :context :head)]
+                          "</head>" [(assoc state :context :body)]
+                          :else [(update-in state [(:context state)] conj t1)])))
+
+(defn add-boilerplate
+  ([] nil)
+  ([state input]
+   [nil
+    (concat [(token :html "<!DOCTYPE html>")
+            (token :html "<html>")
+            (token :html "<head>")
+            (token :html "<meta charset='utf-8'>")]
+           (:head state)
+           [(token :html "<script type='text/x-mathjax-config'>")
+            (token :html "MathJax.Hub.Config({ ")
+            (token :html "MathML: { useMathMLspacing: true } });")
+            (token :html "</script>")
+            (token :html "<script async src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML'></script>")
+            (token :html "</head>")
+            (token :html "<body>")
+            (token :start-body)]
+           (:body state)
+           [(token :end-body)
+            (token :html "</body>")
+            (token :html "</html>")])]))
+
+(defrule remove-superfluous-whitespace [state t1 t2]
+  [_ :whitespace (:or :whitespace :emptyline)] [nil t2]
+  [_ (:or :whitespace :emptyline) :whitespace] [nil t1]
+  [_ (:or :start-body nil) (:or :whitespace :emptyline)] [nil]
+  [_ (:or :whitespace :emptyline) (:or :end-body nil)] [nil])
+
 (defn escape [s]
   (cond (string? s) (string/join (for [c s]
                                    (case c
@@ -205,40 +246,10 @@
   [_ :whitespace] (if (payload t1)
                     [nil (token :html \space)]
                     [nil])
+  [_ :emptyline] [nil (token :html "<p>")]
   [_ :html] nil
   [_ nil] nil ; make next clause terminate
   [_ _] [nil (token :html (escape (payload t1)))])
-
-(defrule add-boilerplate
-  {:context :begin
-   :body []
-   :head []}
-  [state t1]
-  [{:context :end} _] nil
-
-  [{:context :begin} nil] [(assoc state :context :body)]
-
-  [_ nil] (concat [{:context :end}
-                   (token :html"<!DOCTYPE html>")
-                   (token :html"<html>")
-                   (token :html"<head>")
-                   (token :html"<meta charset='utf-8'>")]
-                  (:head state)
-                  [(token :html"<script type='text/x-mathjax-config'>")
-                   (token :html"MathJax.Hub.Config({ ")
-                   (token :html"MathML: { useMathMLspacing: true } });")
-                   (token :html"</script>")
-                   (token :html"<script async src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML'></script>")
-                   (token :html"</head>")
-                   (token :html"<body>")]
-                  (:body state)
-                  [(token :html "</body>")
-                   (token :html "</html>")])
-
-  [_ _] (match (-> t1 payload string/lower-case)
-               "<head>" [(assoc state :context :head)]
-               "</head>" [(assoc state :context :body)]
-               :else [(update-in state [(:context state)] conj t1)]))
 
 (defn to-string [v]
   (->> v

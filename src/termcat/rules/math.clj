@@ -7,7 +7,7 @@
 
 (defrule remove-manual-casts
   [state t1 t2]
-  [_ _ (:or nil :whitespace)] nil
+  [_ _ (:or nil :whitespace :emptyline)] nil
   [_ :double-quote _] [nil (math/math-block
                              (if (block? t2)
                                (center t2)

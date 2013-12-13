@@ -36,7 +36,7 @@
    (->> input vec print-tree)
    nil))
 
-(def main-rule
+(def compile-rule
   (rw/sequence
     (rw/abstraction
       (rw/reduction
@@ -66,26 +66,21 @@
     (rw/procedure
       tok/introduce-item-tokens) ; fix unwind for bullet items
 
-    ;
-    ; separate head and body
-    ; delete whitespace between head and body
-    ;
-
     (rw/abstraction
       (rw/reduction
         ast/abstract-blocks))
-    print-tree-rule
+
+    ; print-tree-rule
 
     (rw/recursion
       (rw/procedure
-        (rw/disjunction
+        (rw/sequence
           ast/fix-bullet-continuations
+          ast/convert-newlines-to-whitespace
           ast/remove-superfluous-whitespace))
       t/block?)
 
     ; ast/introduce-delim-errors
-    ; ast/convert-newlines-to-whitespace
-    ; ast/remove-superfluous-whitespace
 
     ; bind/introduce-lambdas
 
@@ -101,7 +96,6 @@
     (rw/recursion
       (rw/procedure
         (rw/disjunction
-          markdown/introduce-par-calls
           markdown/introduce-section-calls
           markdown/introduce-blockquote-calls
           markdown/introduce-bullet-list-calls
@@ -159,15 +153,26 @@
         html/remove-math-tokens)
       t/block?)
 
+    (rw/recursive-procedure
+      (rw/fixpoint
+        html/separate-head-body
+        )
+      t/block?
+      rw/flat-scope)
+
+    html/add-boilerplate
+
+    (rw/recursion
+      (rw/procedure
+        (rw/fixpoint
+          html/remove-superfluous-whitespace))
+      t/block?)
+
     (rw/recursion
       (rw/procedure
         (rw/fixpoint
           html/to-html-tokens))
-      t/block?)
-
-    (rw/procedure
-      (rw/fixpoint
-        html/add-boilerplate))))
+      t/block?)))
 
 (defn compile
   ([s]
@@ -177,7 +182,7 @@
      cache
      (->> s
           pretok/map-to-tokens
-          (rw/apply-rule main-rule)
+          (rw/apply-rule compile-rule)
           html/to-string))))
 
 (let [the-cache (rw/cache)

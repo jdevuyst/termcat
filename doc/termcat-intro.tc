@@ -76,6 +76,10 @@ When \% is used in other contexts then it inserts a zero-width space. This space
 
 Put a backslash \\ in front of a symbol to indicate that the symbol is content, not syntax.
 
+## HTML
+
+(More on this in a future update.)
+
 ## The Structure of a Termcat Document
 
 Termcat documents are trees. The nodes of these trees---`blocks' in Termcat parlance---are delimited by parentheses (), brackets [], braces {}, indentation, or bullet marks. One important consequence of this is that parentheses, brackets, and braces must at all times be balanced (unless they're escaped by backslashes).
