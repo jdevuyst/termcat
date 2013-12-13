@@ -153,12 +153,15 @@
         html/remove-math-tokens)
       t/block?)
 
-    (rw/recursive-procedure
+    (rw/recursion
+      (rw/procedure
+        (rw/fixpoint
+          html/flatten))
+      t/block?)
+
+    (rw/procedure
       (rw/fixpoint
-        html/separate-head-body
-        )
-      t/block?
-      rw/flat-scope)
+        html/separate-head-body))
 
     html/add-boilerplate
 
@@ -172,7 +175,8 @@
       (rw/procedure
         (rw/fixpoint
           html/to-html-tokens))
-      t/block?)))
+      t/block?)
+    ))
 
 (defn compile
   ([s]

@@ -34,8 +34,8 @@
 (defn- trim
   ([v] (trim v 0 (-> v count dec)))
   ([v lidx ridx]
-   (let [lnil? (nil? (nth v lidx))
-         rnil? (nil? (nth v ridx))]
+   (let [lnil? (nil? (get v lidx))
+         rnil? (nil? (get v ridx))]
      (cond
        (> lidx ridx)
        []
@@ -99,9 +99,9 @@
   (fn
     ([] (rule))
     ([state input]
-     (let [[new-state new-input :as result] (apply-rule* rule state input)]
-       (if (= input new-input)
-         result
+     (let [[new-state new-input] (apply-rule* rule state input)]
+       (if (or (empty? new-input) (= input new-input))
+         [new-state new-input]
          (recur new-state new-input))))))
 
 (defn recursion [rule pred]

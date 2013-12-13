@@ -10,21 +10,17 @@
   (and (block? x)
        (not (:math (second (tt x))))))
 
-(defrule introduce-nbsp-entities
-  [state t1]
+(defrule introduce-nbsp-entities [state t1]
   [_ :tilde] [nil (token :html "&nbsp;")])
 
-(defrule introduce-typographic-dashes
-  [state t1]
+(defrule introduce-typographic-dashes [state t1]
   [_ :dash] (case (if (string? (payload t1))
                     (count (payload t1)))
               2 [nil (token :default \–)]
               3 [nil (token :default \—)]
               nil))
 
-(defrule introduce-typographic-quotes
-  {:in-math-tag false}
-  [state t1]
+(defrule introduce-typographic-quotes {:in-math-tag false} [state t1]
   [_ :left-quote] (let [length (count (str (payload t1)))
                         doublec (int (/ length 2))
                         also-single (odd? (mod length 2))]
@@ -38,8 +34,7 @@
                              (if also-single [(token :default \’)])
                              (repeat doublec (token :default \”)))))
 
-(defrule introduce-typographic-full-stops
-  [state t1 t2 t3]
+(defrule introduce-typographic-full-stops [state t1 t2 t3]
   [_ (:or :default
           [:block _])
    :period
@@ -54,8 +49,7 @@
                    (token :html "</span>")
                    t3]))
 
-(defrule introduce-typographic-colons
-  [state t1 t2 t3]
+(defrule introduce-typographic-colons [state t1 t2 t3]
   [_ (:or :default
           [:block _])
    (:or :colon :bang :question-mark)
@@ -66,8 +60,7 @@
                  (token :html "</span>")
                  t3])
 
-(defrule remove-error-tokens
-  [state t1]
+(defrule remove-error-tokens [state t1]
   [_ :error] [nil (math/math-block
                     (fragment (token :default
                                      (payload t1)))
@@ -99,8 +92,7 @@
             (rw/unwrap t)
             [(token :html (str \< \/ tag-name \>))])))
 
-(defrule introduce-math-tags
-  [state t1]
+(defrule introduce-math-tags [state t1]
   [_ [:block (_ :guard :text)]] nil
   [_ [:block (_ :guard :error)]] (concat [nil
                                           (token :open-math)
@@ -171,8 +163,7 @@
                                          [t2])))
   )
 
-(defrule remove-math-tokens
-  [state t1 t2]
+(defrule remove-math-tokens [state t1 t2]
   [_ :close-math :open-math] [nil]
   [_ :already-math :open-math] [nil]
   [_ :already-math _] (assert false (tt t2))
@@ -181,14 +172,20 @@
   [_ :close-math _] [nil (token :html "</math>") t2]
   [_ _ :open-math] [nil t1 (token :html "<math>")])
 
+(defrule flatten [state t1]
+  [_ [:block _]]
+  (concat [nil
+           (token :html (-> t1 left payload escape))]
+          (rw/unwrap t1)
+          [(token :html (-> t1 right payload escape))])
+  )
+
 (def separate-head-body
   (rw/window {:context :begin
               :body []
               :head []}
              tt
              [state t1]
-             [_ nil] nil
-             [_ [:block _]] [state]
              [_ _] (match (-> t1 payload str string/lower-case)
                           "<head>" [(assoc state :context :head)]
                           "</head>" [(assoc state :context :body)]
@@ -199,22 +196,22 @@
   ([state input]
    [nil
     (concat [(token :html "<!DOCTYPE html>")
-            (token :html "<html>")
-            (token :html "<head>")
-            (token :html "<meta charset='utf-8'>")]
-           (:head state)
-           [(token :html "<script type='text/x-mathjax-config'>")
-            (token :html "MathJax.Hub.Config({ ")
-            (token :html "MathML: { useMathMLspacing: true } });")
-            (token :html "</script>")
-            (token :html "<script async src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML'></script>")
-            (token :html "</head>")
-            (token :html "<body>")
-            (token :start-body)]
-           (:body state)
-           [(token :end-body)
-            (token :html "</body>")
-            (token :html "</html>")])]))
+             (token :html "<html>")
+             (token :html "<head>")
+             (token :html "<meta charset='utf-8'>")]
+            (:head state)
+            [(token :html "<script type='text/x-mathjax-config'>")
+             (token :html "MathJax.Hub.Config({ ")
+             (token :html "MathML: { useMathMLspacing: true } });")
+             (token :html "</script>")
+             (token :html "<script async src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML'></script>")
+             (token :html "</head>")
+             (token :html "<body>")
+             (token :start-body)]
+            (:body state)
+            [(token :end-body)
+             (token :html "</body>")
+             (token :html "</html>")])]))
 
 (defrule remove-superfluous-whitespace [state t1 t2]
   [_ :whitespace (:or :whitespace :emptyline)] [nil t2]
@@ -233,12 +230,7 @@
         (char? s) (escape (str s))
         :else ""))
 
-(defrule to-html-tokens
-  [state t1]
-  [_ [:block _]] (concat [nil
-                          (token :html (escape (payload (left t1))))]
-                         (rw/unwrap t1)
-                         [(token :html (escape (payload (right t1))))])
+(defrule to-html-tokens [state t1]
   [_ :error] [nil
               (token :html "<span class='termcat_error'>")
               (token :html (escape (payload t1)))
