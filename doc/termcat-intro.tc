@@ -1,3 +1,8 @@
+<head>
+<title>The Termcat Markup Language</title>
+<link rel="stylesheet" href="termcat.css">
+</head>
+
 # The Termcat Markup Language
 
 !bind(TO)(→)

@@ -1,0 +1,20 @@
+html {
+  background: gray;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: helvetica, Arial, sans-serif;
+  font-weight: lighter;
+}
+
+body {
+  font-family: 'STIXGeneral Regular', serif;
+  background: white;
+  margin: 0 auto;
+  padding: 2.5em;
+  max-width: 50em;
+}
+
+.wide_punctuation_mark {
+  padding-right: .5em;
+}

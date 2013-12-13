@@ -1,9 +1,9 @@
 (ns termcat.rules.html
-  (:require [clojure.core.reducers :as r]
+  (:require [clojure.core.match :refer (match)]
+            [clojure.core.reducers :as r]
             [clojure.string :as string]
             [termcat.rewrite :as rw]
             [termcat.term :refer :all]
-            [termcat.rewrite :as rw]
             [termcat.util.math :as math]))
 
 (defn text-block? [x]
@@ -209,39 +209,36 @@
   [_ nil] nil ; make next clause terminate
   [_ _] [nil (token :html (escape (payload t1)))])
 
-(defn add-boilerplate [l]
-  (vec (concat [(token :html"<!DOCTYPE html>")
-                (token :html"<html>")
-                (token :html"<head>")
-                (token :html"<meta charset='utf-8'>")
-                (token :html"<title>")
-                (token :html"A Termcat Document")
-                (token :html"</title>")
-                (token :html"<style>")
-                (token :html"html { background: gray } ")
-                (token :html"h1, h2, h3, h4, h5, h6 { ")
-                (token :html"font-family: helvetica, Arial, sans-serif; ")
-                (token :html"font-weight: lighter } ")
-                (token :html"body { ")
-                (token :html"font-family: 'STIXGeneral Regular', serif; ")
-                (token :html"background: white; ")
-                (token :html"margin: 0 auto; ")
-                (token :html"padding: 2.5em; ")
-                (token :html"max-width: 50em } ")
-                (token :html".wide_punctuation_mark {")
-                (token :html"padding-right: .5em } ")
-                (token :html"</style>")
-                (token :html"<script type='text/x-mathjax-config'>")
-                (token :html"MathJax.Hub.Config({ ")
-                (token :html"MathML: { ")
-                (token :html"useMathMLspacing: true } });")
-                (token :html"</script>")
-                (token :html"<script async src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML'></script>")
-                (token :html"</head>")
-                (token :html"<body>")]
-               l
-               [(token :html "</body>")
-                (token :html "</html>")])))
+(defrule add-boilerplate
+  {:context :begin
+   :body []
+   :head []}
+  [state t1]
+  [{:context :end} _] nil
+
+  [{:context :begin} nil] [(assoc state :context :body)]
+
+  [_ nil] (concat [{:context :end}
+                   (token :html"<!DOCTYPE html>")
+                   (token :html"<html>")
+                   (token :html"<head>")
+                   (token :html"<meta charset='utf-8'>")]
+                  (:head state)
+                  [(token :html"<script type='text/x-mathjax-config'>")
+                   (token :html"MathJax.Hub.Config({ ")
+                   (token :html"MathML: { useMathMLspacing: true } });")
+                   (token :html"</script>")
+                   (token :html"<script async src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML'></script>")
+                   (token :html"</head>")
+                   (token :html"<body>")]
+                  (:body state)
+                  [(token :html "</body>")
+                   (token :html "</html>")])
+
+  [_ _] (match (-> t1 payload string/lower-case)
+               "<head>" [(assoc state :context :head)]
+               "</head>" [(assoc state :context :body)]
+               :else [(update-in state [(:context state)] conj t1)]))
 
 (defn to-string [v]
   (->> v

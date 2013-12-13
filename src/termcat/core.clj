@@ -27,7 +27,7 @@
            (println indent \> (token-to-string (t/left t)))
            (print-tree t new-indent)
            (println indent \< (token-to-string (t/right t))))
-         (println indent (token-to-string t)))))
+         (println indent (if (nil? t) "nil" (token-to-string t))))))
    tree))
 
 (defn print-tree-rule
@@ -66,9 +66,15 @@
     (rw/procedure
       tok/introduce-item-tokens) ; fix unwind for bullet items
 
+    ;
+    ; separate head and body
+    ; delete whitespace between head and body
+    ;
+
     (rw/abstraction
       (rw/reduction
         ast/abstract-blocks))
+    print-tree-rule
 
     (rw/recursion
       (rw/procedure
@@ -112,8 +118,6 @@
           )
         t/block?
         rw/lexical-scope))
-
-    print-tree-rule
 
     (rw/recursion
       (rw/fixpoint
@@ -159,7 +163,11 @@
       (rw/procedure
         (rw/fixpoint
           html/to-html-tokens))
-      t/block?)))
+      t/block?)
+
+    (rw/procedure
+      (rw/fixpoint
+        html/add-boilerplate))))
 
 (defn compile
   ([s]
@@ -170,7 +178,6 @@
      (->> s
           pretok/map-to-tokens
           (rw/apply-rule main-rule)
-          html/add-boilerplate
           html/to-string))))
 
 (let [the-cache (rw/cache)
