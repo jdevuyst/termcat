@@ -37,18 +37,19 @@
 ;   block?
 ;   [_ [(:or :ldelim :rdelim) _]] [nil (token :error (payload t1))])
 
-(defn- merge-blocks [b1 b2]
+(defn- merge-blocks [b1 t b2]
   (assert (block? b1))
   (assert (block? b2))
   (block (left b1)
          (fragmentcat (rw/unwrap b1)
+                      [t]
                       (rw/unwrap b2))
          (right b1)))
 
 (defrule fix-bullet-continuations
   [state t1 t2 t3]
   [_ [:block :bullet] (:or :emptyline :newline) [:block :indent]]
-  [nil (merge-blocks t1 t3)])
+  [nil (merge-blocks t1 t2 t3)])
 
 (defrule convert-newlines-to-whitespace
   [state t1]

@@ -70,7 +70,7 @@
       (rw/reduction
         ast/abstract-blocks))
 
-    ; print-tree-rule
+    print-tree-rule
 
     (rw/recursion
       (rw/procedure

@@ -1,4 +1,5 @@
 (ns termcat.rules.html
+  (:refer-clojure :exclude (flatten))
   (:require [clojure.core.match :refer (match)]
             [clojure.core.reducers :as r]
             [clojure.string :as string]
@@ -172,6 +173,17 @@
   [_ :close-math _] [nil (token :html "</math>") t2]
   [_ _ :open-math] [nil t1 (token :html "<math>")])
 
+(defn escape [s]
+  (cond (string? s) (string/join (for [c s]
+                                   (case c
+                                     \< "&lt;"
+                                     \> "&gt;"
+                                     \& "&amp;"
+                                     \' "&apos;"
+                                     \" "&quot;" c)))
+        (char? s) (escape (str s))
+        :else ""))
+
 (defrule flatten [state t1]
   [_ [:block _]]
   (concat [nil
@@ -218,17 +230,6 @@
   [_ (:or :whitespace :emptyline) :whitespace] [nil t1]
   [_ (:or :start-body nil) (:or :whitespace :emptyline)] [nil]
   [_ (:or :whitespace :emptyline) (:or :end-body nil)] [nil])
-
-(defn escape [s]
-  (cond (string? s) (string/join (for [c s]
-                                   (case c
-                                     \< "&lt;"
-                                     \> "&gt;"
-                                     \& "&amp;"
-                                     \' "&apos;"
-                                     \" "&quot;" c)))
-        (char? s) (escape (str s))
-        :else ""))
 
 (defrule to-html-tokens [state t1]
   [_ :error] [nil

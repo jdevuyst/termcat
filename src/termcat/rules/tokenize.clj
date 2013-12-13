@@ -312,7 +312,8 @@
                               :newline
                               :emptyline
                               nil)]
-  (if (item-type t2)
+  (if (and (item-type t2)
+           (not= (tt t1) [:rdelim (item-type t2)]))
     [{:in-bullet true
       :item-type (item-type t2)
       :prev-state state}
