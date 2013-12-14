@@ -1,3 +1,5 @@
+/* http://www.colourlovers.com/palette/3167706/Summertime_Sadness_2 */
+
 html {
   background: gray;
 }
@@ -15,24 +17,26 @@ body {
   max-width: 50em;
 }
 
-body > pre, code, q {
-  font: inherit;
-  font-variant: inherit;
-  font-style: inherit;
-  font-weight: inherit;
+a {
+  color: gray;
 }
 
-q::before,
-q::after {
-  content: "";
+a:hover, a:focus {
+  color: white;
+  background: gray;
+  text-decoration: none;
 }
 
 body > pre, code {
-  background: #EA9B70;
+  background: #FEEC9A;
 }
 
 body > blockquote, q {
   background: #C1DCAF;
+}
+
+code, q {
+  padding: .1em;
 }
 
 body > blockquote,
@@ -52,7 +56,18 @@ body > blockquote > :last-child {
 
 body > pre {
   white-space: pre-wrap;
+}
+
+body > pre, code, q {
   font: inherit;
+  font-variant: inherit;
+  font-style: inherit;
+  font-weight: inherit;
+}
+
+q::before,
+q::after {
+  content: "";
 }
 
 .wide_punctuation_mark {
