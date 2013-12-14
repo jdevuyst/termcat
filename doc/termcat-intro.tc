@@ -83,9 +83,9 @@ Put a backslash <code>\\</code> in front of a symbol to indicate that the symbol
 Termcat documents are trees. The nodes of these trees---`blocks' in Termcat parlance---are delimited by parentheses <code>()</code>, brackets <code>[]</code>, braces <code>{}</code>, indentation, or bullet marks. One important consequence of this is that parentheses, brackets, and braces must at all times be balanced (unless they're escaped by backslashes).
 
 For many purposes it doesn't matter how a block is delimited. For instance, a numbered list can be created using the notation:
-  \:numbered-list%<br>%\- item 1%<br>%\- item 2
+<pre>\:numbered-list%<br>%\- item 1%<br>%\- item 2</pre>
 or
-  \:numbered-list(item 1)[item 2]
+<pre>\:numbered-list(item 1)[item 2]</pre>
 and it will render as
   :numbered-list(item 1)[item 2]
 
