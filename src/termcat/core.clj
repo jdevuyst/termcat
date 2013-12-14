@@ -70,8 +70,6 @@
       (rw/reduction
         ast/abstract-blocks))
 
-    print-tree-rule
-
     (rw/recursion
       (rw/procedure
         (rw/sequence
@@ -85,11 +83,11 @@
     ; bind/introduce-lambdas
 
     (rw/recursive-procedure
-      (rw/disjunction
-        bind/introduce-fun-calls
-        bind/introduce-bindings
-        ; bind/remove-superfluous-whitespace
-        )
+      (rw/fixpoint (rw/disjunction
+                     bind/introduce-fun-calls
+                     bind/introduce-bindings
+                     ; bind/remove-superfluous-whitespace
+                     ))
       t/block?
       rw/lexical-scope)
 
@@ -102,6 +100,8 @@
           markdown/introduce-link-calls
           markdown/remove-decorators))
       t/block?)
+
+    print-tree-rule
 
     (rw/fixpoint
       (rw/recursive-procedure
