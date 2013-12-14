@@ -195,7 +195,6 @@
       pre-f #(do (f %) (str % \Z))
       repeat-pre-f #(nth (iterate pre-f %2) %1)]
   (->> (slurp "doc/termcat-intro.tc")
-       ; "- a\n- b\n  c"
        ; (repeat-pre-f 20)
        f
        (spit "doc/termcat-intro.html")

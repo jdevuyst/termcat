@@ -1,7 +1,8 @@
 (ns termcat.util.lambda
   (:require [clojure.string :as string]
             [termcat.rewrite :as rw]
-            [termcat.term :as t]))
+            [termcat.term :as t]
+            [termcat.util.math :as math]))
 
 (defn tval [t pred]
   (-> t
@@ -63,26 +64,18 @@
                      [(t/token :html (str \< \/ tag \>))])))
 
 (defn html-link [text url]
-  (concat [(t/token :html "<a href='")
-           (t/token :whitespace)]
-          (rw/unwrap url)
-          [(t/token :whitespace)
-           (t/token :html "'>")
-           (t/token :whitespace)]
-          (rw/unwrap text)
-          [(t/token :whitespace)
-           (t/token :html "</a>")]))
+  [(t/token :html "<a href='")
+   (math/math-block (t/center url) :text)
+   (t/token :html "'>")
+   (math/math-block (t/center text) :text)
+   (t/token :html "</a>")])
 
 (defn html-image [alt-text url]
-  (concat [(t/token :html "<img src='")
-           (t/token :whitespace)]
-          (rw/unwrap url)
-          [(t/token :whitespace)
-           (t/token :html "' alt='")
-           (t/token :whitespace)]
-          (rw/unwrap alt-text)
-          [(t/token :whitespace)
-           (t/token :html "'>")]))
+  [(t/token :html "<img src='")
+   (math/math-block (t/center url) :text)
+   (t/token :html "' alt='")
+   (math/math-block (t/center alt-text) :text)
+   (t/token :html "'>")])
 
 (defn bullet-list [& rows]
   (concat [(t/token :html "<ul>")]

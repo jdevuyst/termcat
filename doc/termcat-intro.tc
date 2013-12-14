@@ -51,7 +51,7 @@ By default, blocks of text that are indented with two spaces are considered bloc
 
 The syntax <code>!\[alt text\](filename.png)</code> includes an image in the document.
 
-  ![Termcat](hello.png)
+  ![One symbol of anarcho-syndicalism is a black cat, drawn by Ralph Chaplin.](norbert.png)
 
 Upright single quotes <code>\'</code> render as right quotes <q>'</q> (or apostrophes) and backticks <code>\`</code> render as left quotes <q>`</q>. Termcat automatically inserts extra horizontal whitespace after periods, question marks, exclamation marks, and colons, but o.c. not after acronyms.
 Long dashes can be included using double (<code>-\-</code>/<q>--</q>) or triple (<q>---</q>) hyphens.
