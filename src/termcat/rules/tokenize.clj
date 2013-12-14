@@ -246,10 +246,10 @@
           :newline
           :emptyline
           [:ldelim :indent]
-          [:rdelim _]) _ (:or :whitespace
-                              :newline
-                              :emptyline
-                              nil)]
+          [:rdelim _]) (:or :hash :dash) (:or :whitespace
+                                              :newline
+                                              :emptyline
+                                              nil)]
   (if (and (item-type t2)
            (not= (tt t1) [:rdelim (item-type t2)]))
     [{:in-bullet true

@@ -70,6 +70,8 @@
       (rw/reduction
         ast/abstract-blocks))
 
+    print-tree-rule
+
     (rw/recursion
       (rw/procedure
         (rw/sequence
@@ -100,8 +102,6 @@
           markdown/introduce-link-calls
           markdown/remove-decorators))
       t/block?)
-
-    print-tree-rule
 
     (rw/fixpoint
       (rw/recursive-procedure

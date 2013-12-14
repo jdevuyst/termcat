@@ -15,14 +15,30 @@ body {
   max-width: 50em;
 }
 
-.wide_punctuation_mark {
-  padding-right: .33em;
+body > pre, code, q {
+  font: inherit;
+  font-variant: inherit;
+  font-style: inherit;
+  font-weight: inherit;
 }
 
-blockquote {
+q::before,
+q::after {
+  content: "";
+}
+
+body > pre, code {
+  background: #fe6503;
+}
+
+body > blockquote, q {
+  background: #1C9BEA;
+}
+
+body > blockquote,
+body > pre {
   margin-left: 0;
   margin-right: 0;
-  background: #BDB398;
   padding: .5em;
 }
 
@@ -32,4 +48,13 @@ body > blockquote > :first-child {
 
 body > blockquote > :last-child {
   margin-bottom: 0;
+}
+
+body > pre {
+  white-space: pre-wrap;
+  font: inherit;
+}
+
+.wide_punctuation_mark {
+  padding-right: .33em;
 }

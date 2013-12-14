@@ -15,28 +15,26 @@ Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the u
 
 The syntax for titles is the same as in Markdown.
 
-  %\# This is a document title
+<pre>\# This is a document title
+&#10;&#10;## This is a section title
+&#10;&#10;### This is a subsection title</pre>
 
-  \## This is a section title
-
-  \### This is a subsection title
-
-So are the syntax for *emphasis* (\*emphasis\*), _underline_ (\_underline_), and [links](http://example.com) (\[links\](http://example.com)). Caveat: To emphasize or underline more than one word, it's necessary to enclose the text fragment in a block. Parentheses can be used for this purpose: \*\*(This is strong text)\*\* renders as **(This is strong text)**%.
+So are the syntax for <q>%*emphasis*%</q> (<code>\*emphasis\*</code>), <q>%_underline_%</q> (<code>\_underline_</code>), and <q>%[links](http://example.com)%</q> (<code>\[links\](http://example.com)</code>). Caveat: To emphasize or underline more than one word, it's necessary to enclose the text fragment in a block. Parentheses can be used for this purpose: <code>\*\*(This is strong text)\*\*</code> renders as <q>%**(This is strong text)**%</q>.
 
 Bullet lists can be created by starting a line with a hyphen followed by a space.
 
 Consider the following code:
 
-  <div style="white-space: pre-wrap">%.lit(
-  - Item 1
-  - Item 2
-  - Bullet items can consist of multiple paragraphs.
+<pre>%.lit(
+- Item 1
+- Item 2
+- Bullet items can consist of multiple paragraphs.
 
-    Simply indent subsequent lines with two extra spaces.
+  Simply indent subsequent lines with two extra spaces.
 
-    - Bullet lists can also be nested
-      - Once more the trick is to indent the nested lists with two extra spaces.
-  )</div>
+  - Bullet lists can also be nested
+    - Once more the trick is to indent the nested lists with two extra spaces.
+)</pre>
 
 This renders as follows:
 
@@ -51,30 +49,30 @@ This renders as follows:
 
 By default, blocks of text that are indented with two spaces are considered blockquotes.
 
-The syntax !\[alt text\](filename.png) includes an image in the document.
+The syntax <code>!\[alt text\](filename.png)</code> includes an image in the document.
 
   ![Termcat](hello.png)
 
-Upright single quotes \' render as right quotes ' (or apostrophes) and backticks \` render as left quotes `. Termcat automatically inserts extra horizontal whitespace after periods, question marks, exclamation marks, and colons, but o.c. not after acronyms.
-Long dashes can be included using double (-\-/--) or triple (---) hyphens.
+Upright single quotes <code>\'</code> render as right quotes <q>'</q> (or apostrophes) and backticks <code>\`</code> render as left quotes <q>`</q>. Termcat automatically inserts extra horizontal whitespace after periods, question marks, exclamation marks, and colons, but o.c. not after acronyms.
+Long dashes can be included using double (<code>-\-</code>/<q>--</q>) or triple (<q>---</q>) hyphens.
 
 There's special syntax for diactritics:
-- r\%\^ole TO r%^ole
-- n\%\'ee TO n%'ee
-- Gruy\%\`ere TO Gruy%`ere
-- zo\%\"even TO zo%"even
+- <code>r\%\^ole</code> TO <q>r%^ole</q>
+- <code>n\%\'ee</code> TO <q>n%'ee</q>
+- <code>Gruy\%\`ere</code> TO <q>Gruy%`ere</q>
+- <code>zo\%\"even</code> TO <q>zo%"even</q>
 
-Users of p%1iny%1in can also use the notation \%1e, \%2e, \%3e, \%4e for %1e, %2e, %3e, and %4e.
+Users of p%1iny%1in can also use the notation <code>\%1e</code>, <code>\%2e</code>, <code>\%3e</code>, <code>\%4e</code> for <q>%1e</q>, <q>%2e</q>, <q>%3e</q>, and <q>%4e</q>.
 
 It's possible to change the space between characters:
   l\%-2pt\%ess is m\%+0.4ex\%ore TO l%-2pt%ess is m%+0.4ex%ore
-Similarly, spaces%_1ex%of%_1ex%variable%_1ex%width can be created using the syntax \%\_1ex. Like in LaTeX, tildes can be used for non-breaking spaces: 100\~kg TO 100~kg.
+Similarly, spaces<q>%_1em%</q>of<q>%_1em%</q>variable<q>%_1em%</q>width can be created using the syntax <code>\%\_1em</code>. Like in LaTeX, tildes can be used for non-breaking spaces: <code>100\~kg</code> TO <q>100~kg</q>.
 
-Two subsequent percent symbols indicate the start of a comment. The comment continues until a newline character is encountered. %% This is a comment
+Two subsequent percent symbols <code>\%\%</code> indicate the start of a comment. The comment continues until a newline character is encountered. %% This is a comment
 
-When \% is used in other contexts then it inserts a zero-width space. This space will not make it into the output HTML document. This is useful when you want to trigger syntactic sugar that only works after or before whitespace. For example, type a\%\*\*b\*\*\%c for a%**b**%c.
+When <code>\%</code> is used in other contexts then it inserts a zero-width space. This space will not make it into the output HTML document. This is useful when you want to trigger syntactic sugar that only works after or before whitespace. For example, type <code>%.lit(a%**b**%c)</code> for <q>a%**b**%c</q>.
 
-Put a backslash \\ in front of a symbol to indicate that the symbol is content, not syntax.
+Put a backslash <code>\\</code> in front of a symbol to indicate that the symbol is content, not syntax: <code>%.lit(\%)</code> TO <q>\%</q>.
 
 ## HTML
 
@@ -82,7 +80,7 @@ Put a backslash \\ in front of a symbol to indicate that the symbol is content, 
 
 ## The Structure of a Termcat Document
 
-Termcat documents are trees. The nodes of these trees---`blocks' in Termcat parlance---are delimited by parentheses (), brackets [], braces {}, indentation, or bullet marks. One important consequence of this is that parentheses, brackets, and braces must at all times be balanced (unless they're escaped by backslashes).
+Termcat documents are trees. The nodes of these trees---`blocks' in Termcat parlance---are delimited by parentheses <code>()</code>, brackets <code>[]</code>, braces <code>{}</code>, indentation, or bullet marks. One important consequence of this is that parentheses, brackets, and braces must at all times be balanced (unless they're escaped by backslashes).
 
 For many purposes it doesn't matter how a block is delimited. For instance, a numbered list can be created using the notation:
   \:numbered-list%<br>%\- item 1%<br>%\- item 2
@@ -97,50 +95,48 @@ Termcat has a novel syntax for mathematics. Rather than having delimiters that i
 
 At least it expects to be told these things for *some* of the expressions that you type. Termcat can be programmed to recognize common operators and identifiers, and it can also draw inferences.
 
-To mark something as a mathematical identifier, prefix it with an asterisk \*: \*a TO *a%. This marks one character. However, when Termcat encounters the expression \*abc then it will infer that *b and *c are also identifiers. The result is *abc%. To turn a word into an identifier, type \*(myvar). This renders as *(myvar)%---as in LaTeX, multi-character indentifiers are not italicized. Mathematical identifiers can also be typeset in a caligraphic font by using \+ instead of \*. Thus, \+M becomes +M.
+To mark something as a mathematical identifier, prefix it with an asterisk <code>\*</code>: <code>\*a</code> TO <q>*a%</q>. This marks one character. However, when Termcat encounters the expression <code>\*abc</code> then it will infer that b and c are also identifiers. The result is <q>*abc%</q>. To turn a word into an identifier, type <code>\*(myvar)</code>. This renders as <q>%*(myvar)%</q>---as in LaTeX, multi-character indentifiers are not italicized. Mathematical identifiers can also be typeset in a caligraphic font by using <code>\+</code> instead of <code>\*</code>. Thus, <code>\+M</code> becomes <q>%+M</q>.
 
 !bind
 - -
 - ~-~
 
-To use the binary minus operator, type x \~\-\~ y. This yields x - y.
+To use the binary minus operator, type <code>x \~\-\~ y</code>. This yields <q>x - y</q>.
 
 Sounds like a chore? No problem. Simply include the following code at the top of your document:
   \!bind%<br>"- "-<br>"- \~-\~
 and Termcat will interpret every minus sign surrounded by whitespace on both sides as a binary infix operator.
 
-Predictably, for prefix operators you can type sin\~ x or x \~!. This renders as sin~ x or x ~!.
+Predictably, for prefix operators you can type <code>sin\~ x</code> or <code>x \~!</code>. This renders as <q>sin~ x</q> or <q>x ~!</q>.
 
-When one tilde is used on either side of an operator, Termcat will use the default MathML spacing for that operator. Use two tildes to use a `thick math space' spacing and three tildes to use a `very very thick math space'.
+When one tilde is used on either side of an operator, Termcat will use the default MathML spacing for that operator. Use two tildes to insert a `thick math space' and three tildes to use a `very very thick math space'.
 
-It may sometimes be necessary to type (\~ and \~) to indicate that parentheses (or brackets or braces) should be interpreted as mathematical `fences'. Type \<\~ and \~\> to insert chevrons.
+It may sometimes be necessary to type <code>(\~</code> and <code>\~)</code> to indicate that parentheses (or brackets or braces) should be interpreted as mathematical `fences'. Type <code>\<\~</code> and <code>\~\></code> to insert chevrons.
 
 Using some of the above knowledge we can use the following code
-  <div style="white-space: pre-wrap">%.lit(
-  !bind
-  - =
-  - ~=~
-  !bind
-  - ,
-  - ~,~
-  !bind
-  - SUBSETEQ
-  - ~⊆~
-  !bind
-  - +
-  - ~+~
-  !bind
-  - *
-  - ~×~
-  !bind
-  - |
-  - ~~|~~
-  !bind
-  - <
-  - ~<~
+<pre>%.lit(!bind
+- =
+- ~=~
+!bind
+- ,
+- ~,~
+!bind
+- SUBSETEQ
+- ~⊆~
+!bind
+- +
+- ~+~
+!bind
+- *
+- ~×~
+!bind
+- |
+- ~~|~~
+!bind
+- <
+- ~<~
 
-  E = {<~ a , n , n' ~> SUBSETEQ I * N * N | Pa and n < n'}
-  )</div>
+E = {<~ a , n , n' ~> SUBSETEQ I * N * N | Pa and n < n'})</pre>
 
 to generate
   !bind
@@ -170,7 +166,7 @@ to generate
 Notice that Termcat also correctly recognizes primes. It's also possible to use subscripts, superscripts, and fractions using syntax like this:
   (a\^b\_c)\|d TO (a^b_c)|d
 
-To coerce something to be text, prefix it with a "double "upright "quotes "character \".
+To coerce something to be text, prefix it with a double upright quotes "character <code>\"</code>.
 
 ## Programming
 
