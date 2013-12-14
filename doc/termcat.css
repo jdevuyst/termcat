@@ -25,3 +25,11 @@ blockquote {
   background: #BDB398;
   padding: .5em;
 }
+
+body > blockquote > :first-child {
+  margin-top: 0;
+}
+
+body > blockquote > :last-child {
+  margin-bottom: 0;
+}
