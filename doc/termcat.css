@@ -28,11 +28,11 @@ q::after {
 }
 
 body > pre, code {
-  background: #fe6503;
+  background: #EA9B70;
 }
 
 body > blockquote, q {
-  background: #1C9BEA;
+  background: #C1DCAF;
 }
 
 body > blockquote,

@@ -11,6 +11,8 @@
             [termcat.rules.math :as math-rules]
             [termcat.rules.html :as html]))
 
+(def ^:dynamic *debug* false)
+
 (defn print-tree
   ([tree] (print-tree tree ""))
   ([tree indent]
@@ -30,10 +32,11 @@
          (println indent (if (nil? t) "nil" (token-to-string t))))))
    tree))
 
-(defn print-tree-rule
+(defn debug-rule
   ([] nil)
   ([state input]
-   (->> input vec print-tree)
+   (if *debug*
+     (->> input vec print-tree))
    nil))
 
 (def compile-rule
@@ -60,7 +63,7 @@
       tok/remove-superfluous-whitespace)
 
     (rw/procedure
-      tok/introduce-item-tokens) ; fix unwind for bullet items
+      tok/introduce-item-tokens)
 
     (rw/procedure
       (rw/fixpoint
@@ -70,7 +73,7 @@
       (rw/reduction
         ast/abstract-blocks))
 
-    print-tree-rule
+    debug-rule
 
     (rw/recursion
       (rw/procedure
@@ -190,13 +193,14 @@
           html/to-string
           ))))
 
-(let [the-cache (rw/cache)
-      f #(compile % the-cache)
-      pre-f #(do (f %) (str % \Z))
-      repeat-pre-f #(nth (iterate pre-f %2) %1)]
-  (->> (slurp "doc/termcat-intro.tc")
-       ; (repeat-pre-f 20)
-       f
-       (spit "doc/termcat-intro.html")
-       time)
-  (println "\"Cache size:" (count @the-cache) "items\""))
+(binding [*debug* true]
+  (let [the-cache (rw/cache)
+        f #(compile % the-cache)
+        pre-f #(do (f %) (str % \Z))
+        repeat-pre-f #(nth (iterate pre-f %2) %1)]
+    (->> (slurp "doc/termcat-intro.tc")
+         ; (repeat-pre-f 20)
+         f
+         (spit "doc/termcat-intro.html")
+         time)
+    (println "\"Cache size:" (count @the-cache) "items\"")))
