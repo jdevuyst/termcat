@@ -142,73 +142,18 @@
        (re-matches #"[0-9]*\.?[0-9]+(?:px|em|ex|pt)"
                    s)))
 
-(defrule remove-percent-tokens
-  [state t1 t2 t3]
-  ; [_ _ :percent :percent]
-  ; [nil t1 (token :whitespace) (token :default) (token :whitespace)]
-
-  [_ :percent :percent (:or :newline :emptyline nil)]
-  [nil t3]
-
-  [_ :percent :percent _]
-  [nil t1 t2]
-
-  [_  :percent (:or :plus :underscore :dash) :default]
-  (if (css-length? (payload t3))
-    [nil
-     (token :html "<span style='")
-     (token :html (case (payload t2)
-                    \+ "margin-left: "
-                    \- "margin-left: -"
-                    \_ "display: inline-block; width: "))
-     t3
-     (if (= (tt t2) :underscore)
-       (token :html "'> </span>")
-       (token :html "'></span>"))]
-    [nil (token :whitespace) t2 t3])
-
-  [_ :percent (:or :left-quote
-                   :right-quote
-                   :double-quote
-                   :circumflex
-                   :default) _]
-  (let [[c r t] (if (and (= (tt t2) :default)
-                         (string? (payload t2)))
-                  [(first (payload t2))
-                   (subs (payload t2) 1)
-                   t3]
-                  [(payload t2) (str (payload t3)) nil])]
-    (if-let [diacritic (case c
-                         \` (char 0x0300)
-                         \4 (char 0x0300)
-                         \' (char 0x0301)
-                         \2 (char 0x0301)
-                         \^ (char 0x0302)
-                         \1 (char 0x0304)
-                         \" (char 0x0308)
-                         \3 (char 0x030c)
-                         nil)]
-      (conj [nil (token :default (str (first r)
-                                      diacritic
-                                      (subs r 1)))]
-            t)
-      [nil (token :whitespace) t2 t3]))
-
-  [_ :percent _ _]
-  [nil (token :whitespace) t2 t3])
-
 (defrule introduce-emptyline-tokens
   [state t1 t2]
   [_ :emptyline :newline] [nil t2]
   [_ :newline :newline] [nil (with-meta (token :emptyline)
                                         (meta t1))])
 
-(defrule introduce-indent-tokens
-  {:indent 0}
-  [state t1 t2]
+(defrule introduce-indent-tokens {:indent 0} [state t1 t2]
+  [{:fin true} _ _] nil
+
   [_ _ nil]
-  (concat [nil t1]
-          (for [x (range (/ (:indent state) 2))]
+  (concat [{:fin true} t1]
+          (for [x (range (:indent state))]
             (with-meta (rdelim :indent)
                        (reduce #(update-in %1 [%2] inc)
                                (meta t1)
@@ -260,18 +205,19 @@
     "######" :h6
     nil))
 
-(defrule introduce-item-tokens
-  {:in-bullet false
-   :item-type nil
-   :prev-state nil}
-  [state t1 t2 t3]
-  ; [{:in-bullet true} _ nil nil]
-  ; (letfn [(unwind [state2]
-  ;                 (when-not (nil? state2)
-  ;                   (cons (token [:rdelim (:item-type state2)])
-  ;                         (unwind (:prev-state state2)))))]
-  ;   (cons nil
-  ;         (unwind state)))
+(defrule introduce-item-tokens {:in-bullet false
+                                :item-type nil
+                                :prev-state nil} [state t1 t2 t3]
+  [{:fin true} _ _] nil
+
+  [{:in-bullet true} _ nil nil]
+  (letfn [(unwind [state2]
+                  (when (:in-bullet state2)
+                    (cons (token [:rdelim (:item-type state2)])
+                          (unwind (:prev-state state2)))))]
+    (concat [{:fin true} t1]
+            (unwind state)))
+
 
   [{:in-bullet true} :newline (:or :dash
                                    :hash) (:or :whitespace
@@ -286,11 +232,6 @@
             (payload t2))
      t3])
 
-  ; [{:in-bullet true} (:or :newline
-  ;                         :emptyline
-  ;                         [:rdelim :indent]) [:rdelim _] _]
-  ; nil ; make sure the next rule terminates
-
   [{:in-bullet true} (:or :newline
                           :emptyline
                           [:rdelim :indent]) _ _]
@@ -300,9 +241,6 @@
      t1
      t2
      t3])
-
-  ; [_ _ [:ldelim _] _]
-  ; nil ; don't run next rule twice
 
   [_ (:or nil
           :newline
@@ -327,3 +265,55 @@
 
   [_ [:rdelim :indent] _ _]
   [(:prev-state state) t1 t2 t3])
+
+
+(defrule remove-percent-tokens [state t1 t2 t3]
+  [_ :percent :percent (:or :newline :emptyline nil)]
+  [nil t3]
+
+  [_ :percent :percent _]
+  [nil t1 t2]
+
+  [_  :percent (:or :plus :underscore :dash) :default]
+  (if (css-length? (payload t3))
+    [nil
+     (token :html "<span style='")
+     (token :html (case (payload t2)
+                    \+ "margin-left: "
+                    \- "margin-left: -"
+                    \_ "display: inline-block; width: "))
+     t3
+     (if (= (tt t2) :underscore)
+       (token :html "'> </span>")
+       (token :html "'></span>"))]
+    [nil (token :whitespace) t2 t3])
+
+  [_ :percent (:or :left-quote
+                   :right-quote
+                   :double-quote
+                   :circumflex
+                   :default) _]
+  (let [[c r t] (if (and (= (tt t2) :default)
+                         (string? (payload t2)))
+                  [(first (payload t2))
+                   (subs (payload t2) 1)
+                   t3]
+                  [(payload t2) (str (payload t3)) nil])]
+    (if-let [diacritic (case c
+                         \` (char 0x0300)
+                         \4 (char 0x0300)
+                         \' (char 0x0301)
+                         \2 (char 0x0301)
+                         \^ (char 0x0302)
+                         \1 (char 0x0304)
+                         \" (char 0x0308)
+                         \3 (char 0x030c)
+                         nil)]
+      (conj [nil (token :default (str (first r)
+                                      diacritic
+                                      (subs r 1)))]
+            t)
+      [nil (token :whitespace) t2 t3]))
+
+  [_ :percent _ _]
+  [nil (token :whitespace) t2 t3])

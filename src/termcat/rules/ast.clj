@@ -12,6 +12,7 @@
   ([] {:distance 0 :stack nil})
   ([[state result] tok]
    (cond
+     (nil? tok) [state result]
      (ldelim? tok) [{:distance 1
                      :stack (conj (:stack state)
                                   (inc (:distance state)))}

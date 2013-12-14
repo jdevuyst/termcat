@@ -51,10 +51,6 @@
           tok/remove-magic-tokens)))
 
     (rw/procedure
-      (rw/fixpoint
-        tok/remove-percent-tokens))
-
-    (rw/procedure
       tok/introduce-emptyline-tokens)
 
     (rw/procedure
@@ -65,6 +61,10 @@
 
     (rw/procedure
       tok/introduce-item-tokens) ; fix unwind for bullet items
+
+    (rw/procedure
+      (rw/fixpoint
+        tok/remove-percent-tokens))
 
     (rw/abstraction
       (rw/reduction
@@ -187,13 +187,15 @@
      (->> s
           pretok/map-to-tokens
           (rw/apply-rule compile-rule)
-          html/to-string))))
+          html/to-string
+          ))))
 
 (let [the-cache (rw/cache)
       f #(compile % the-cache)
       pre-f #(do (f %) (str % \Z))
       repeat-pre-f #(nth (iterate pre-f %2) %1)]
   (->> (slurp "doc/termcat-intro.tc")
+       ; "- a\n- b\n  c"
        ; (repeat-pre-f 20)
        f
        (spit "doc/termcat-intro.html")

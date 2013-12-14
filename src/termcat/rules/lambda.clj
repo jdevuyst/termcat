@@ -8,10 +8,9 @@
       [(token :error (str retval " – " (:fun-name (meta f))))]
       retval)))
 
-(defrule evaluate-fun-calls
-  [state t1 t2]
+(defrule evaluate-fun-calls [state t1 t2]
   [_ :fun [:block _]] (cons nil (apply-fun t1 t2))
-  [_ :fun nil] nil ; Moving the function around may add new args
+  [_ :fun :hash] nil ; For passing functions around
   [_ :fun _] (-> (concat [nil]
                          (apply-fun t1 nil)
                          [t2])))

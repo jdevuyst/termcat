@@ -3,7 +3,7 @@ html {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: helvetica, Arial, sans-serif;
+  font-family: helvetica, arial, sans-serif;
   font-weight: lighter;
 }
 
@@ -16,11 +16,12 @@ body {
 }
 
 .wide_punctuation_mark {
-  padding-right: .5em;
+  padding-right: .33em;
 }
 
 blockquote {
   margin-left: 0;
   margin-right: 0;
-  background: #f1f1f1;
+  background: #BDB398;
+  padding: .5em;
 }
