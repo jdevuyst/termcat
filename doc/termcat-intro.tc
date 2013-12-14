@@ -64,8 +64,8 @@ There's special syntax for diactritics:
 
 Users of p%1iny%1in can also use the notation <code>\%1e</code>, <code>\%2e</code>, <code>\%3e</code>, <code>\%4e</code> for <q>%1e</q>, <q>%2e</q>, <q>%3e</q>, and <q>%4e</q>.
 
-It's possible to change the space between characters:
-  l\%-2pt\%ess is m\%+0.4ex\%ore TO l%-2pt%ess is m%+0.4ex%ore
+It's possible to change the space between characters: <code>l\%-2pt\%ess is m\%+0.4ex\%ore</code> TO <q>l%-2pt%ess is m%+0.4ex%ore</q>.
+
 Similarly, spaces<q>%_1em%</q>of<q>%_1em%</q>variable<q>%_1em%</q>width can be created using the syntax <code>\%\_1em</code>. Like in LaTeX, tildes can be used for non-breaking spaces: <code>100\~kg</code> TO <q>100~kg</q>.
 
 Two subsequent percent symbols <code>\%\%</code> indicate the start of a comment. The comment continues until a newline character is encountered. %% This is a comment
@@ -163,8 +163,7 @@ to generate
 
   E = {<~ a , n , n' ~> SUBSETEQ I * N * N | Pa and n < n'}
 
-Notice that Termcat also correctly recognizes primes. It's also possible to use subscripts, superscripts, and fractions using syntax like this:
-  (a\^b\_c)\|d TO (a^b_c)|d
+Notice that Termcat also correctly recognizes primes. It's also possible to use subscripts, superscripts, and fractions using syntax like this: <code>(a\^b\_c)\|d</code> TO <q>(a^b_c)|d</q>.
 
 To coerce something to be text, prefix it with a double upright quotes "character <code>\"</code>.
 
