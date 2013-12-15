@@ -73,8 +73,6 @@
       (rw/reduction
         ast/abstract-blocks))
 
-    debug-rule
-
     (rw/recursion
       (rw/procedure
         (rw/sequence
@@ -166,6 +164,8 @@
       (rw/fixpoint
         html/separate-head-body))
 
+    debug-rule
+
     html/add-boilerplate
 
     (rw/recursion
@@ -190,17 +190,4 @@
      (->> s
           pretok/map-to-tokens
           (rw/apply-rule compile-rule)
-          html/to-string
-          ))))
-
-(binding [*debug* true]
-  (let [the-cache (rw/cache)
-        f #(compile % the-cache)
-        pre-f #(do (f %) (str % \Z))
-        repeat-pre-f #(nth (iterate pre-f %2) %1)]
-    (->> (slurp "doc/termcat-intro.tc")
-         ; (repeat-pre-f 20)
-         f
-         (spit "doc/termcat-intro.html")
-         time)
-    (println "\"Cache size:" (count @the-cache) "items\"")))
+          html/to-string))))

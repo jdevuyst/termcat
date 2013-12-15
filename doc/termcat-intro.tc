@@ -11,7 +11,16 @@
 
 Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the user-friendly syntax for titles, lists, links, emphasis, and so on. Termcat aims to be more powerful, however. Like LaTeX, Termcat is fully programmable and it also comes with special syntax for typographic features that are difficult to unlock using plain Markdown or HTML.
 
-## The Basics
+**Contents**
+
+- [The Basics](#basics)
+- [HTML](#html)
+- [The Structure of a Termcat Document](#struct)
+- [Math](#math)
+- [Programming](#prog)
+- [Status](#status)
+
+## <a name="basics"></a>The Basics
 
 The syntax for titles is the same as in Markdown.
 
@@ -74,11 +83,11 @@ When <code>\%</code> is used in other contexts then it inserts a zero-width spac
 
 Put a backslash <code>\\</code> in front of a symbol to indicate that the symbol is content, not syntax: <code>%.lit(\%)</code> TO <q>\%</q>.
 
-## HTML
+## <a name="html"></a>HTML
 
 (More on this in a future update.)
 
-## The Structure of a Termcat Document
+## <a name="struct"></a>The Structure of a Termcat Document
 
 Termcat documents are trees. The nodes of these trees---`blocks' in Termcat parlance---are delimited by parentheses <code>()</code>, brackets <code>[]</code>, braces <code>{}</code>, indentation, or bullet marks. One important consequence of this is that parentheses, brackets, and braces must at all times be balanced (unless they're escaped by backslashes).
 
@@ -89,13 +98,13 @@ or
 and it will render as
   :numbered-list(item 1)[item 2]
 
-## Math
+## <a name="math"></a>Math
 
 Termcat has a novel syntax for mathematics. Rather than having delimiters that indicate the start and end of a mathematical expression, Termcat expects to be told what (i) the identifiers, and what (ii) the operators, functions, and predicates are in an expression.
 
 At least it expects to be told these things for *some* of the expressions that you type. Termcat can be programmed to recognize common operators and identifiers, and it can also draw inferences.
 
-To mark something as a mathematical identifier, prefix it with an asterisk <code>\*</code>: <code>\*a</code> TO <q>*a%</q>. This marks one character. However, when Termcat encounters the expression <code>\*abc</code> then it will infer that b and c are also identifiers. The result is <q>*abc%</q>. To turn a word into an identifier, type <code>\*(myvar)</code>. This renders as <q>%*(myvar)%</q>---as in LaTeX, multi-character indentifiers are not italicized. Mathematical identifiers can also be typeset in a caligraphic font by using <code>\+</code> instead of <code>\*</code>. Thus, <code>\+M</code> becomes <q>%+M</q>.
+To mark something as a mathematical identifier, prefix it with an asterisk <code>\*</code>: <code>\*a</code> TO <q>*a%</q>. This marks one character. However, when Termcat encounters the expression <code>\*abc</code> then it will infer that `b' and `c' are also identifiers. The result is <q>*abc%</q>. To turn a word into an identifier, type <code>\*(myvar)</code>. This renders as <q>%*(myvar)%</q>---as in LaTeX, multi-character indentifiers are not italicized. Mathematical identifiers can also be typeset in a caligraphic font by using <code>\+</code> instead of <code>\*</code>. Thus, <code>\+M</code> becomes <q>%+M</q>.
 
 !bind
 - -
@@ -167,11 +176,11 @@ Notice that Termcat also correctly recognizes primes. It's also possible to use 
 
 To coerce something to be text, prefix it with a double upright quotes "character <code>\"</code>.
 
-## Programming
+## <a name="prog"></a>Programming
 
 (More on this in a future update.)
 
-## Status
+## <a name="status"></a>Status
 
 This document was compiled using Termcat ([source](https://github.com/jdevuyst/termcat/blob/master/doc/termcat-intro.tc)). That said, Termcat is still very much a work in progress and is not ready for general use yet.
 

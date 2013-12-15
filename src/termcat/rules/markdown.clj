@@ -59,14 +59,14 @@
   [state t1 t2 t3 t4 t5 t6 t7]
   [_ (:or :whitespace :emptyline nil)
    :underscore _ :underscore
-   (:or :whitespace nil) _ _]
+   (:or :whitespace :emptyline nil) _ _]
   (concat [nil t1]
           (wrap-term "u" t3)
           [t5 t6 t7])
 
   [_ (:or :whitespace :emptyline nil)
    :asterisk _ :asterisk
-   (:or :whitespace nil) _ _]
+   (:or :whitespace :emptyline nil) _ _]
   (concat [nil t1]
           (wrap-term "em" t3)
           [t5 t6 t7])

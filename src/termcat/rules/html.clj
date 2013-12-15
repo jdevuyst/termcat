@@ -193,7 +193,7 @@
   )
 
 (def separate-head-body
-  (rw/window {:context :begin
+  (rw/window {:context :body
               :body []
               :head []}
              tt

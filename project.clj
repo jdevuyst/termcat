@@ -3,5 +3,7 @@
   :url "https://github.com/jdevuyst/termcat"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :main termcat.cli-app
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/core.match "0.2.0"]])
+                 [org.clojure/core.match "0.2.0"]
+                 [org.clojure/tools.cli "0.3.0-beta1"]])

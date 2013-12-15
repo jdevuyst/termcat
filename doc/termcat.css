@@ -11,20 +11,17 @@ h1, h2, h3, h4, h5, h6 {
 
 body {
   font-family: 'STIXGeneral Regular', serif;
+  font-size: 13pt;
+  line-height: 150%;
   background: white;
   margin: 0 auto;
   padding: 2.5em;
-  max-width: 50em;
+  max-width: 40em;
 }
 
 a {
-  color: gray;
-}
-
-a:hover, a:focus {
-  color: white;
-  background: gray;
-  text-decoration: none;
+  color: #FD3C03;
+  text-decoration: underline;
 }
 
 body > pre, code {
@@ -36,7 +33,7 @@ body > blockquote, q {
 }
 
 code, q {
-  padding: .1em;
+  padding: .15em;
 }
 
 body > blockquote,
