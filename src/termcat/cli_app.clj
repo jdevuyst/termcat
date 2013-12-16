@@ -4,24 +4,24 @@
             [clojure.string :as string]
             [clojure.tools.cli :as cli]
             [clojure.java.io :as io]
-            [clojure.java.browse]
+            [clojure.java.browse :as browse]
             [termcat.core :as c]
             [termcat.rewrite :as rw])
-  (:import [java.nio.file FileSystems StandardWatchEventKinds]))
+  (:import [java.lang System Runtime]
+           [java.nio.file FileSystems StandardWatchEventKinds]))
 
 (defn file-exists? [filename]
   (-> filename io/file .exists))
 
 (defn browse [file-path focus?]
-  (case (.. java.lang.System (getProperty "os.name"))
-    "Mac OS X" (.. java.lang.Runtime
+  (case (.. System (getProperty "os.name"))
+    "Mac OS X" (.. Runtime
                    getRuntime
                    (exec (-> ["open"]
                              (cond-> (not focus?) (conj "-g"))
                              (conj (str file-path))
                              into-array)))
-    :else (clojure.java.browse/browse-url
-            (.. file-path toUri toString))))
+    :else (browse/browse-url (.. file-path toUri toString))))
 
   (def cur-path (.toPath (io/file ".")))
 
@@ -59,7 +59,7 @@
                      "Open HTML output in browser"]
                     ["-w"
                      "--watch"
-                     "Watch file for changes and recompile when changed"
+                     "Watch document for changes and recompile when changed"
                      :flag true]
                     ["-v"
                      "--verbose"

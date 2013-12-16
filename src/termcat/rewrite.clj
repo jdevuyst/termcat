@@ -1,7 +1,8 @@
 (ns termcat.rewrite
   (:refer-clojure :exclude [memoize sequence])
   (:require [clojure.core.reducers :as r]
-            [clojure.core.match :refer (match)]))
+            [clojure.core.match :refer (match)]
+            [clojure.core.cache :as cache]))
 
 (defprotocol IWrapped
   (unwrap [orig])
@@ -14,7 +15,13 @@
 
 (def ^:dynamic !*cache*)
 
-(defn cache [] (atom {}))
+(defn cache [] (atom (cache/soft-cache-factory {})))
+
+(defn- cache-update! [f & args]
+  (reset! !*cache* (apply f @!*cache* args)))
+
+(defn- cache-get [k]
+  (cache/lookup @!*cache* k))
 
 (defmacro with-cache [cache & body]
   `(binding [!*cache* ~cache]
@@ -22,10 +29,12 @@
 
 (defn memoize [f]
   (fn [& args]
-    (if-let [result (get @!*cache* [f args])]
-      result
+    (if-let [result (cache-get [f args])]
+      (do
+        (cache-update! cache/hit [f args])
+        result)
       (let [result (apply f args)]
-        (reset! !*cache* (assoc @!*cache* [f args] result))
+        (cache-update! cache/miss [f args] result)
         result))))
 
 (defn- pad-1 [v]
