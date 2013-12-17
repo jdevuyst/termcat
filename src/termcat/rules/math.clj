@@ -14,24 +14,27 @@
   nil
 
   [_ (:or nil :whitespace) :double-quote _ _]
-  [nil (math/math-block
-         (if (block? t3)
-           (center t3)
-           (fragment t3))
-         :text)]
+  [nil t1 (math/math-block
+            (if (block? t3)
+              (center t3)
+              (fragment t3))
+            :text) t4]
 
   [_ (:or nil :whitespace) :asterisk _ _]
-  (cons nil (if (block? t3)
-              [(math/math-block (center t3)
-                                :mi)]
-              (math/math-cast t3)))
+  (concat [nil t1]
+          (if (block? t3)
+            [(math/math-block (center t3)
+                              :mi)]
+            (math/math-cast t3))
+          [t4])
 
   [_ (:or nil :whitespace) :plus _ _]
   (let [ts (if (block? t3)
              (rw/unwrap t3)
              [t3])]
-    (concat [nil]
-            (mapcat #(math/math-cast % #{:script}) ts))))
+    (concat [nil t1]
+            (mapcat #(math/math-cast % #{:script}) ts)
+            [t4])))
 
 (defrule introduce-math-operators
   [state t1 t2 t3 t4 t5 t6 t7]
