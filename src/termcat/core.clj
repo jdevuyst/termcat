@@ -116,7 +116,7 @@
             bind/expand-bindings)))
       t/block?)
 
-    (debug-rule :eval)
+    (debug-rule :macro)
 
     (rw/recursion
       (rw/fixpoint

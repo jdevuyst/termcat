@@ -3,7 +3,7 @@
             [termcat.core :as c]
             [termcat.rewrite :as rw]))
 
-(binding [c/*debug* :md]
+(binding [c/*debug* :macro]
   (let [the-cache (rw/cache)
         f #(c/compile % the-cache)
         pre-f #(do (f %) (str % \Z))

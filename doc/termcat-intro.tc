@@ -7,9 +7,11 @@
 
 !bind(TO)(→)
 
-[Termcat](https://github.com/jdevuyst/termcat) is a markup language optimized for scientific and technical writing. It compiles to HTML and MathML. To generate PDFs, [Prince](http://www.princexml.com) can be used.
+[Termcat](https://github.com/jdevuyst/termcat) is a markup language optimized for scientific and technical writing. It compiles to HTML and MathML (Using [MathJax](http://mathjax.com)). To generate PDFs, [Prince](http://www.princexml.com) can be used.
 
 Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the user-friendly syntax for titles, lists, links, emphasis, and so on. Termcat aims to be more powerful, however. Like LaTeX, Termcat is fully programmable and it also comes with special syntax for typographic features that are difficult to unlock using plain Markdown or HTML.
+
+This document was compiled using Termcat. You can find the source code [here](https://github.com/jdevuyst/termcat/blob/master/doc/termcat-intro.tc).
 
 **Contents**
 
@@ -60,7 +62,7 @@ By default, blocks of text that are indented with two spaces are considered bloc
 
 The syntax <code>!\[alt text\](filename.png)</code> includes an image in the document.
 
-  ![One symbol of anarcho-syndicalism is a black cat, drawn by Ralph Chaplin.](norbert.png)
+  ![One symbol of anarcho-syndicalism is a black cat, drawn by Ralph Chaplin. It was also the logo of my go-to Bagel place when I lived in Brooklyn.](norbert.png)
 
 Upright single quotes <code>\'</code> render as right quotes <q>'</q> (or apostrophes) and backticks <code>\`</code> render as left quotes <q>`</q>. Termcat automatically inserts extra horizontal whitespace after periods, question marks, exclamation marks, and colons, but o.c. not after acronyms.
 Long dashes can be included using double (<code>-\-</code> TO <q>--</q>) or triple (<q>---</q>) hyphens.
@@ -85,7 +87,9 @@ Put a backslash <code>\\</code> in front of a symbol to indicate that the symbol
 
 ## <a name="html"></a>HTML
 
-(More on this in a future update.)
+When HTML tags are encountered in Termcat documents, they `fall through' to the HTML output. Hence <code>\<b>this\</b></code> renders as <q><b>this</b></q>.
+
+When a <code>\<head></code> block is encountered, the code within that block is moved to the head of the output HTML document. This way the title of the document, stylesheets, and so on can be changed.
 
 ## <a name="struct"></a>The Structure of a Termcat Document
 
@@ -174,12 +178,13 @@ To coerce something to be text, prefix it with a double upright quotes "characte
 
 ## <a name="prog"></a>Programming
 
-(More on this in a future update.)
+It is possible to call functions using the syntax \.some-function(arg 1)(arg 2)(arg 3). The arguments are blocks and can be delimited by parentheses, brackets, braces, indentation, or bullet list marks as usual. The numbered list in the section [The Structure of a Termcat Document](#struct) is an example of a function call.
+
+It's currently not possible to create user-defined functions. Support for this is underway.
 
 ## <a name="status"></a>Status
 
-This document was compiled using Termcat ([source](https://github.com/jdevuyst/termcat/blob/master/doc/termcat-intro.tc)). That said, Termcat is still very much a work in progress and is not ready for general use yet.
-
-The goal is to have a beta version ready by Christmas 2013.
+Termcat is maturing fast and I plan to do a public release sometime soon.
+In the meantime, you can already download Termcat [here](https://github.com/jdevuyst/termcat).
 
 .if(.eq(foo)(foo))()(ERROR 1) .if(.eq(foo)(bar))(ERROR 2)()

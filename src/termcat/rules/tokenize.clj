@@ -114,7 +114,10 @@
             :html)] (if (= (tt t1) (tt t2))
                       [nil
                        (with-meta (token (tt t1)
-                                         (str (payload t1) (payload t2)))
+                                         (cond (not (payload t1)) (payload t2)
+                                               (not (payload t2)) (payload t1)
+                                               :else (str (payload t1)
+                                                          (payload t2))))
                                   (assoc (meta t1) :rpos (-> t2 meta :rpos)))]))
 
 (defrule remove-magic-tokens
