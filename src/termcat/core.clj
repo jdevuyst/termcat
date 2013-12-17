@@ -45,8 +45,6 @@
       (rw/reduction
         tok/escape-html))
 
-    debug-rule
-
     (rw/procedure
       (rw/fixpoint
         (rw/disjunction
@@ -120,6 +118,8 @@
           )
         t/block?
         rw/lexical-scope))
+
+    debug-rule
 
     (rw/recursion
       (rw/fixpoint
