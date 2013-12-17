@@ -79,9 +79,9 @@ Similarly, spaces<q>_1em</q>of<q>_1em</q>variable<q>_1em</q>width can be created
 
 Two subsequent percent symbols <code>\%\%</code> indicate the start of a comment. The comment continues until a newline character is encountered. %% This is a comment
 
-When <code>\%</code> is used in other contexts then it inserts a zero-width space. This space will not make it into the output HTML document. This is useful when you want to trigger syntactic sugar that only works after or before whitespace. For example, type <code>%.lit(a%**b**%c)</code> for <q>a%**b**%c</q>.
+When <code>\%</code> is used in other contexts then it inserts a zero-width space. This space will not make it into the output HTML document. This is useful when you want to trigger syntactic sugar that only works after or before whitespace. For example, type <code>.lit(a%**b**%c)</code> for <q>a%**b**%c</q>.
 
-Put a backslash <code>\\</code> in front of a symbol to indicate that the symbol is content, not syntax: <code>%.lit(\%)</code> TO <q>\</q>.
+Put a backslash <code>\\</code> in front of a symbol to indicate that the symbol is content, not syntax: <code>.lit(\%)</code> TO <q>\</q>.
 
 ## <a name="html"></a>HTML
 
@@ -92,7 +92,7 @@ Put a backslash <code>\\</code> in front of a symbol to indicate that the symbol
 Termcat documents are trees. The nodes of these trees---`blocks' in Termcat parlance---are delimited by parentheses <code>()</code>, brackets <code>[]</code>, braces <code>{}</code>, indentation, or bullet marks. One important consequence of this is that parentheses, brackets, and braces must at all times be balanced (unless they're escaped by backslashes).
 
 For many purposes it doesn't matter how a block is delimited. For instance, a numbered list can be created using the notation:
-<pre>\:numbered-list%<br>%\- item 1%<br>%\- item 2</pre>
+<pre>\:numbered-list<br>\- item 1<br>\- item 2</pre>
 or
 <pre>\:numbered-list(item 1)[item 2]</pre>
 and it will render as
@@ -113,7 +113,7 @@ To mark something as a mathematical identifier, prefix it with an asterisk <code
 To use the binary minus operator, type <code>x \~\-\~ y</code>. This yields <q>x - y</q>.
 
 Sounds like a chore? No problem. Simply include the following code at the top of your document:
-  \!bind%<br>"- "-<br>"- \~-\~
+  \!bind<br>"- "-<br>"- \~-\~
 and Termcat will interpret every minus sign surrounded by whitespace on both sides as a binary infix operator.
 
 Predictably, for prefix operators you can type <code>sin\~ x</code> or <code>x \~!</code>. This renders as <q>sin~ x</q> or <q>x ~!</q>.
@@ -123,7 +123,7 @@ When one tilde is used on either side of an operator, Termcat will use the defau
 It may sometimes be necessary to type <code>(\~</code> and <code>\~)</code> to indicate that parentheses (or brackets or braces) should be interpreted as mathematical `fences'. Type <code>\<\~</code> and <code>\~\></code> to insert chevrons.
 
 Using some of the above knowledge we can use the following code
-<pre>%.lit(!bind
+<pre>.lit(!bind
 - =
 - ~=~
 !bind
@@ -185,5 +185,3 @@ To coerce something to be text, prefix it with a double upright quotes "characte
 This document was compiled using Termcat ([source](https://github.com/jdevuyst/termcat/blob/master/doc/termcat-intro.tc)). That said, Termcat is still very much a work in progress and is not ready for general use yet.
 
 The goal is to have a beta version ready by Christmas 2013.
-
-*a**

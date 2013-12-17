@@ -41,6 +41,9 @@
   [_ [:block _] _ _ _]
   nil
 
+  [_ :bang _ _ _]
+  nil
+
   [_ _ _ _ [:block _]]
   nil
 
