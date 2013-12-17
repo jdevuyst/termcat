@@ -1,6 +1,6 @@
 <head>
 <title>The Termcat Markup Language</title>
-<link rel="stylesheet" href="termcat.css">
+<link rel="stylesheet" href="termcat-intro.css">
 </head>
 
 # The Termcat Markup Language
@@ -182,4 +182,4 @@ This document was compiled using Termcat ([source](https://github.com/jdevuyst/t
 
 The goal is to have a beta version ready by Christmas 2013.
 
-.fn(x)
+.if(.eq(foo)(foo))()(ERROR 1) .if(.eq(foo)(bar))(ERROR 2)()

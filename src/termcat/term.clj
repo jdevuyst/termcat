@@ -118,7 +118,8 @@
   (tt [this] :fragment)
   IFragment
   (ednval [this]
-          (if (= 1 (count (.terms this)))
+          (if (and (= 1 (count (.terms this)))
+                   (-> this .terms first token?))
             (try
               (-> this
                   .terms

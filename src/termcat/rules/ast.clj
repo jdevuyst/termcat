@@ -43,11 +43,9 @@
      :else [(update-in state [:distance] inc)
             (conj result tok)])))
 
-; (defrule introduce-delim-errors
-;   [state t1]
-;   tt
-;   block?
-;   [_ [(:or :ldelim :rdelim) _]] [nil (token :error (payload t1))])
+(defrule introduce-delim-errors
+  [state t1]
+  [_ [(:or :ldelim :rdelim) _]] [nil (token :error (payload t1))])
 
 (defn- merge-blocks [b1 t b2]
   (assert (block? b1))

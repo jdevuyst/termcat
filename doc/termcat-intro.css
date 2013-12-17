@@ -24,6 +24,10 @@ a {
   text-decoration: underline;
 }
 
+a:hover, a:focus {
+  text-shadow: 0 0 1em #EA9B70;
+}
+
 body > pre, code {
   background: #FEEC9A;
 }

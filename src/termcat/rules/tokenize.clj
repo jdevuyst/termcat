@@ -150,15 +150,12 @@
                                         (meta t1))])
 
 (defrule introduce-indent-tokens {:indent 0} [state t1 t2]
-  [{:fin true} _ _] nil
+  ; [{:fin true} _ _] nil
 
-  [_ _ nil]
-  (concat [{:fin true} t1]
-          (for [x (range (:indent state))]
-            (with-meta (rdelim :indent)
-                       (reduce #(update-in %1 [%2] inc)
-                               (meta t1)
-                               [:lpos :rpos]))))
+  ; [_ _ nil]
+  ; (concat [{:fin true} t1]
+  ;         (for [x (range (:indent state))]
+  ;           (rdelim :indent)))
 
   [_ (:or nil
           :newline
@@ -210,16 +207,15 @@
 (defrule introduce-item-tokens {:in-bullet false
                                 :item-type nil
                                 :prev-state nil} [state t1 t2 t3]
-  [{:fin true} _ _] nil
+  ; [{:fin true} _ _] nil
 
-  [{:in-bullet true} _ nil nil]
-  (letfn [(unwind [state2]
-                  (when (:in-bullet state2)
-                    (cons (token [:rdelim (:item-type state2)])
-                          (unwind (:prev-state state2)))))]
-    (concat [{:fin true} t1]
-            (unwind state)))
-
+  ; [{:in-bullet true} _ nil nil]
+  ; (letfn [(unwind [state2]
+  ;                 (when (:in-bullet state2)
+  ;                   (cons (token [:rdelim (:item-type state2)])
+  ;                         (unwind (:prev-state state2)))))]
+  ;   (concat [{:fin true} t1]
+  ;           (unwind state)))
 
   [{:in-bullet true} :newline (:or :dash
                                    :hash) (:or :whitespace
@@ -252,7 +248,10 @@
                                               :newline
                                               :emptyline
                                               nil)]
-  (if (and (item-type t2)
+  (do
+    (if (and (or ((complement rdelim?) t1)
+                 (item-type t1))
+           (item-type t2)
            (not= (tt t1) [:rdelim (item-type t2)]))
     [{:in-bullet true
       :item-type (item-type t2)
@@ -260,7 +259,7 @@
      t1
      (token [:ldelim (item-type t2)]
             (payload t2))
-     t3])
+     t3]))
 
   [_ [:ldelim :indent] _ _]
   [{:in-bullet false :prev-state state} t1 t2 t3]

@@ -11,7 +11,7 @@
             [termcat.rules.math :as math-rules]
             [termcat.rules.html :as html]))
 
-(def ^:dynamic *debug* false)
+(def ^:dynamic *debug* nil)
 
 (defn print-tree
   ([tree] (print-tree tree ""))
@@ -32,12 +32,13 @@
          (println indent (if (nil? t) "nil" (token-to-string t))))))
    tree))
 
-(defn debug-rule
-  ([] nil)
-  ([state input]
-   (if *debug*
-     (->> input vec print-tree))
-   nil))
+(defn debug-rule [id]
+  (fn
+    ([] nil)
+    ([state input]
+     (if (= id *debug*)
+       (->> input vec print-tree))
+     nil)))
 
 (def compile-rule
   (rw/sequence
@@ -59,10 +60,6 @@
     (rw/procedure
       tok/introduce-indent-tokens)
 
-    ; (rw/fixpoint
-    ;   (rw/procedure
-    ;     tok/fix-indent-tokens))
-
     (rw/procedure
       tok/remove-superfluous-whitespace)
 
@@ -73,6 +70,8 @@
       (rw/fixpoint
         tok/remove-percent-tokens))
 
+    (debug-rule :tok)
+
     (rw/abstraction
       (rw/reduction
         ast/abstract-blocks))
@@ -80,17 +79,17 @@
     (rw/recursion
       (rw/procedure
         (rw/sequence
+          ast/introduce-delim-errors
           ast/fix-bullet-continuations
           ast/convert-newlines-to-whitespace
           ast/remove-superfluous-whitespace))
       t/block?)
 
-    ; ast/introduce-delim-errors
-
-    ; bind/introduce-lambdas
+    (debug-rule :ast)
 
     (rw/recursive-procedure
       (rw/fixpoint (rw/disjunction
+                     bind/introduce-lambdas
                      bind/introduce-fun-calls
                      bind/introduce-bindings
                      ; bind/remove-superfluous-whitespace
@@ -109,17 +108,15 @@
           markdown/remove-decorators))
       t/block?)
 
-    (rw/fixpoint
-      (rw/recursive-procedure
-        (rw/disjunction
-          lambda-rules/evaluate-fun-calls
+    (rw/recursion
+      (rw/procedure
+        (rw/fixpoint
+          (rw/disjunction
+            lambda-rules/evaluate-fun-calls
+            bind/expand-bindings)))
+      t/block?)
 
-          bind/expand-bindings
-          )
-        t/block?
-        rw/lexical-scope))
-
-    debug-rule
+    (debug-rule :eval)
 
     (rw/recursion
       (rw/fixpoint
@@ -134,6 +131,8 @@
             )))
       t/block?)
 
+    (debug-rule :math)
+
     (rw/recursion
       (rw/procedure
         (rw/disjunction
@@ -146,9 +145,12 @@
 
     (rw/recursion
       (rw/procedure
-        (rw/disjunction
-          html/remove-error-tokens
-          html/introduce-math-tags))
+        html/remove-error-tokens)
+      t/block?)
+
+    (rw/recursion
+      (rw/procedure
+        html/introduce-math-tags)
       t/block?)
 
     (rw/recursive-procedure
@@ -160,6 +162,8 @@
       (rw/procedure
         html/remove-math-tokens)
       t/block?)
+
+    (debug-rule :final)
 
     (rw/recursion
       (rw/procedure

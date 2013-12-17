@@ -226,16 +226,13 @@
              (token :html "</html>")])]))
 
 (defrule remove-superfluous-whitespace [state t1 t2]
+  [_ :emptyline :emptyline] [nil t1]
   [_ :whitespace (:or :whitespace :emptyline)] [nil t2]
   [_ (:or :whitespace :emptyline) :whitespace] [nil t1]
   [_ (:or :start-body nil) (:or :whitespace :emptyline)] [nil]
   [_ (:or :whitespace :emptyline) (:or :end-body nil)] [nil])
 
 (defrule to-html-tokens [state t1]
-  [_ :error] [nil
-              (token :html "<span class='termcat_error'>")
-              (token :html (escape (payload t1)))
-              (token :html "</span>")]
   [_ :whitespace] (if (payload t1)
                     [nil (token :html \space)]
                     [nil])

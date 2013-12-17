@@ -10,18 +10,8 @@
       t/ednval
       (as-> $ (if (pred $)
                 $
-                (do
-                  (println "Wrong type.")
-                  (println "\tSource:"
-                           (->> t
-                                rw/unwrap
-                                (map t/payload)
-                                (map str)
-                                string/join))
-                  (println "\tEDN value:" $)
-                  (println "\tPredicate:" pred)
-                  (throw (java.lang.Exception.
-                           "Wrong type")))))))
+                (throw (java.lang.Exception.
+                         "Wrong type"))))))
 
 (defmacro protect [& expr]
   `(try ~@expr
@@ -169,9 +159,12 @@
                         t2
                         t3))))
 
+(defn yc [fun]
+  (conj (rw/unwrap fun)
+        fun))
+
 (def fun-map {".identity" (unary-fun [x] (rw/unwrap x))
-              ".rand" (constant-fun (t/token :default (str (rand))))
-              ":par" (html-constant "<p>")
+              ; ".rand" (constant-fun (t/token :default (str (rand))))
               ":h1" (html-wrapper "h1")
               ":h2" (html-wrapper "h2")
               ":h3" (html-wrapper "h3")
@@ -192,9 +185,9 @@
               ".litfork" (curry-fun litfork 1)
               ".nth" (curry-fun nth-fn 1)
               ".apply" (curry-fun apply-fn 2)
-              ".eq?" (curry-fun (comp vector #(t/token :default %) str =) 2)
+              ".eq" (curry-fun (comp vector #(t/token :default %) str =) 2)
               ".add" (curry-fun plus 2)
-              ".gt?" (curry-fun greater-than 2)
+              ".gt" (curry-fun greater-than 2)
               ".range" (curry-fun range-fn 2)
               ".if" (curry-fun if-fn 3)
               ; ":math" math-cast
