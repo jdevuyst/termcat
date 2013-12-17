@@ -19,16 +19,27 @@
                     (conj result tok)]
      (rdelim? tok) (let [ldelim (get result (- (count result)
                                                (:distance state)))]
-                     (if (delim-pair? ldelim tok)
-                       [{:distance (peek (:stack state))
-                         :stack (pop (:stack state))}
-                        (conj (pop-n result (:distance state))
-                              (block ldelim
-                                     (fragmentcat (last-n result
-                                                          (dec (:distance state))))
-                                     tok))]
-                       [(update-in state [:distance] inc)
-                        (conj result tok)]))
+                     (cond (delim-pair? ldelim tok)
+                           [{:distance (peek (:stack state))
+                             :stack (pop (:stack state))}
+                            (conj (pop-n result (:distance state))
+                                  (block ldelim
+                                         (fragmentcat (last-n result
+                                                              (dec (:distance state))))
+                                         tok))]
+
+                           (contains? #{[:rdelim :indent]
+                                        [:rdelim :bullet]} (tt tok))
+                           (recur [{:distance (+ (:distance state)
+                                                 -1
+                                                 (peek (:stack state)))
+                                    :stack (pop (:stack state))}
+                                   result]
+                                  tok)
+
+                           :else
+                           [(update-in state [:distance] inc)
+                            (conj result tok)]))
      :else [(update-in state [:distance] inc)
             (conj result tok)])))
 

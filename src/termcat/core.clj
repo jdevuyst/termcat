@@ -59,6 +59,10 @@
     (rw/procedure
       tok/introduce-indent-tokens)
 
+    ; (rw/fixpoint
+    ;   (rw/procedure
+    ;     tok/fix-indent-tokens))
+
     (rw/procedure
       tok/remove-superfluous-whitespace)
 
@@ -68,6 +72,8 @@
     (rw/procedure
       (rw/fixpoint
         tok/remove-percent-tokens))
+
+    ; debug-rule
 
     (rw/abstraction
       (rw/reduction
@@ -163,8 +169,6 @@
     (rw/procedure
       (rw/fixpoint
         html/separate-head-body))
-
-    debug-rule
 
     html/add-boilerplate
 

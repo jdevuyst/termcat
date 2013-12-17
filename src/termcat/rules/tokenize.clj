@@ -159,7 +159,8 @@
                                (meta t1)
                                [:lpos :rpos]))))
 
-  [_ (:or :newline
+  [_ (:or nil
+          :newline
           :emptyline) _]
   (let [indent (if (and (= (tt t2) :whitespace)
                         (string? (payload t2)))
