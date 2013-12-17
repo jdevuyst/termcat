@@ -24,28 +24,32 @@
   [_ :fun _] nil ; make sure the next line terminates
   [_ _ [:block :bullet]] [nil t1 (lambda/fun-call-head ":bullet-list") t2])
 
+(defrule introduce-img-calls
+  [state t1 t2 t3 t4]
+  [_ _ _ _ [:block _]]
+  nil
+
+  [_ :bang [:block :bracket] [:block :parenthesis] _]
+  (concat [nil]
+          (lambda/fun-call-seq ":img"
+                               (center t2)
+                               (center t3))
+          [t4]))
+
 (defrule introduce-link-calls
-  [state t1 t2 t3 t4 t5]
-  [_
-   (:or :whitespace :emptyline nil)
-   :bang
-   [:block :bracket]
-   [:block :parenthesis]
-   (:or :whitespace :emptyline nil)] (concat [nil t1]
-                                  (lambda/fun-call-seq ":img"
-                                                       (center t3)
-                                                       (center t4))
-                                  [t5])
-  [_
-   (:or :whitespace :emptyline nil)
-   [:block :bracket]
-   [:block :parenthesis]
-   (:or :whitespace :emptyline nil)
-   _] (concat [nil t1]
-              (lambda/fun-call-seq ":link"
-                                   (center t2)
-                                   (center t3))
-              [t4 t5]))
+  [state t1 t2 t3 t4]
+  [_ [:block _] _ _ _]
+  nil
+
+  [_ _ _ _ [:block _]]
+  nil
+
+  [_ _ [:block :bracket] [:block :parenthesis] _]
+  (concat [nil t1]
+          (lambda/fun-call-seq ":link"
+                               (center t2)
+                               (center t3))
+          [t4]))
 
 (defn wrap-term [tag-name t]
   (concat
@@ -56,24 +60,21 @@
     [(token :html (str "</" tag-name \>))]))
 
 (defrule remove-decorators
-  [state t1 t2 t3 t4 t5 t6 t7]
-  [_ (:or :whitespace :emptyline nil)
-   :underscore _ :underscore
-   (:or :whitespace :emptyline nil) _ _]
-  (concat [nil t1]
-          (wrap-term "u" t3)
-          [t5 t6 t7])
+  [state t1 t2 t3 t4 t5 t6 t7 t8 t9]
+  [_ x1 x2 :underscore _ :underscore y1 y2 _ _]
+  (if-not (contains? (hash-set x1 x2 y1 y2) :underscore)
+    (concat [nil t1 t2]
+            (wrap-term "u" t4)
+            [t6 t7 t8 t9]))
 
-  [_ (:or :whitespace :emptyline nil)
-   :asterisk _ :asterisk
-   (:or :whitespace :emptyline nil) _ _]
-  (concat [nil t1]
-          (wrap-term "em" t3)
-          [t5 t6 t7])
+  [_ x1 x2 :asterisk _ :asterisk y1 y2 _ _]
+  (if-not (contains? (hash-set x1 x2 y1 y2) :asterisk)
+    (concat [nil t1 t2]
+            (wrap-term "em" t4)
+            [t6 t7 t8 t9]))
 
-  [_ (:or :whitespace :emptyline nil)
-   :asterisk :asterisk _ :asterisk :asterisk
-   (:or :whitespace :emptyline nil)]
-  (concat [nil t1]
-          (wrap-term "strong" t4)
-          [t7]))
+  [_ x1 x2 :asterisk :asterisk _ :asterisk :asterisk y1 y2]
+  (if-not (contains? (hash-set x1 x2 y1 y2) :asterisk)
+    (concat [nil t1 t2]
+            (wrap-term "strong" t5)
+            [t8 t9])))

@@ -6,22 +6,32 @@
             [termcat.util.math :as math]))
 
 (defrule remove-manual-casts
-  [state t1 t2]
-  [_ _ (:or nil :whitespace :emptyline)] nil
-  [_ :double-quote _] [nil (math/math-block
-                             (if (block? t2)
-                               (center t2)
-                               (fragment t2))
-                             :text)]
-  [_ :asterisk _] (cons nil (if (block? t2)
-                              [(math/math-block (center t2)
-                                                :mi)]
-                              (math/math-cast t2)))
-  [_ :plus _] (let [ts (if (block? t2)
-                         (rw/unwrap t2)
-                         [t2])]
-                (concat [nil]
-                        (mapcat #(math/math-cast % #{:script}) ts))))
+  [state t1 t2 t3 t4]
+  [_ _ _ (:or nil :whitespace :emptyline) _]
+  nil
+
+  [_ _ _ _ (:or :double-quote :asterisk :plus)]
+  nil
+
+  [_ (:or nil :whitespace) :double-quote _ _]
+  [nil (math/math-block
+         (if (block? t3)
+           (center t3)
+           (fragment t3))
+         :text)]
+
+  [_ (:or nil :whitespace) :asterisk _ _]
+  (cons nil (if (block? t3)
+              [(math/math-block (center t3)
+                                :mi)]
+              (math/math-cast t3)))
+
+  [_ (:or nil :whitespace) :plus _ _]
+  (let [ts (if (block? t3)
+             (rw/unwrap t3)
+             [t3])]
+    (concat [nil]
+            (mapcat #(math/math-cast % #{:script}) ts))))
 
 (defrule introduce-math-operators
   [state t1 t2 t3 t4 t5 t6 t7]

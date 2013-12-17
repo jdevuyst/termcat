@@ -45,6 +45,8 @@
       (rw/reduction
         tok/escape-html))
 
+    debug-rule
+
     (rw/procedure
       (rw/fixpoint
         (rw/disjunction
@@ -72,8 +74,6 @@
     (rw/procedure
       (rw/fixpoint
         tok/remove-percent-tokens))
-
-    ; debug-rule
 
     (rw/abstraction
       (rw/reduction
@@ -107,6 +107,7 @@
           markdown/introduce-blockquote-calls
           markdown/introduce-bullet-list-calls
           markdown/introduce-link-calls
+          markdown/introduce-img-calls
           markdown/remove-decorators))
       t/block?)
 

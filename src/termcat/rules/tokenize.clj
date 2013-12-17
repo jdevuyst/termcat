@@ -27,11 +27,12 @@
                    result])
            (accept []
                    [{:acc []}
-                    (->> (conj (:acc state) tok)
-                         (map payload)
-                         (reduce str)
-                         (map (partial token :html))
-                         (into result))])
+                    (conj (->> (conj (:acc state) tok)
+                               (map payload)
+                               (reduce str)
+                               (map (partial token :html))
+                               (into (conj result (token :whitespace))))
+                          (token :whitespace))])
            (reject []
                    [{:acc []}
                     (-> result
