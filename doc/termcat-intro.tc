@@ -223,7 +223,7 @@ It reduces to <q>.identity
 
 Termcat is a console app and is invoked as follows.
 
-<pre>.lit(Usage: java -jar termcat.jar [options] <document[\.tc]>
+<pre>.lit(Usage: java -jar termcat.jar [options] <document[.tc]>
 
 The HTML output is stored in document.html.
 

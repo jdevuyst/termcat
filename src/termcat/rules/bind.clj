@@ -188,18 +188,18 @@
                                 (payload t3)))
      t4 t5 t6]))
 
-(defrule remove-superfluous-whitespace [state t1 t2]
-  [_ (:or nil
-          :whitespace
-          :newline
-          :emptyline) (:or nil
-                           :whitespace
-                           :newline
-                           :emptyline)]
-  (if-let [strongest-type (condp #(contains? %2 %1) (hash-set (tt t1) (tt t2))
-                            nil nil ; skip
-                            :emptyline :emptyline
-                            :newline :newline
-                            :whitespace :whitespace)]
-    [nil (token strongest-type
-                (str (payload t1) (payload t2)))]))
+; (defrule remove-superfluous-whitespace [state t1 t2]
+;   [_ (:or nil
+;           :whitespace
+;           :newline
+;           :emptyline) (:or nil
+;                            :whitespace
+;                            :newline
+;                            :emptyline)]
+;   (if-let [strongest-type (condp #(contains? %2 %1) (hash-set (tt t1) (tt t2))
+;                             nil nil ; skip
+;                             :emptyline :emptyline
+;                             :newline :newline
+;                             :whitespace :whitespace)]
+;     [nil (token strongest-type
+;                 (str (payload t1) (payload t2)))]))
