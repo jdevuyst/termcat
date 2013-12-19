@@ -272,7 +272,11 @@
 
 
 (defrule remove-percent-tokens [state t1 t2 t3]
-  [_ :percent :percent (:or :newline :emptyline nil)]
+  [_ :percent :percent (:or :newline
+                            :emptyline
+                            [:ldelim :indent]
+                            [:rdelim :indent]
+                            nil)]
   [nil t3]
 
   [_ :percent :percent _]

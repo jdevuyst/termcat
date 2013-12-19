@@ -4,72 +4,6 @@
             [termcat.term :refer :all]
             [termcat.util.lambda :as lambda]))
 
-(defn call-lambda [lambda & arg-values]
-  (let [arg-count (count arg-values)
-        arg-names (->> lambda
-                       center
-                       .terms
-                       (take arg-count))]
-    (concat
-      (mapcat (fn [n v]
-                [(token :bang)
-                 (token :default "bind")
-                 (block (ldelim :call-lambda)
-                        (fragment n)
-                        (rdelim :call-lambda))
-                 v])
-              arg-names
-              arg-values)
-      (->> lambda
-           center
-           .terms
-           (drop arg-count)))))
-
-(defn make-lambda [args body]
-  [(token :fun
-          (lambda/curry-fun call-lambda
-                            (->> args
-                                 center
-                                 .terms
-                                 (filter #(not= (tt %) :whitespace))
-                                 count
-                                 inc)))
-   (block (ldelim :lambda)
-          (fragmentcat (->> args
-                            center
-                            .terms
-                            (filter #(not= (tt %) :whitespace))
-                            (map (fn [x] (token :arg (payload x)))))
-                       (->> body
-                            center
-                            .terms))
-          (rdelim :lambda))])
-
-(defrule introduce-lambdas
-  [state t1 t2 t3 t4 t5]
-  [_ (:or nil :whitespace :emptyline :newline)
-   :period :default [:block _] [:block _]]
-  (if (contains? #{"fn" "recfn"} (payload t3))
-    (concat [nil
-             (if (or (= (tt t1) :emptyline)
-                     (payload t1))
-               t1)]
-            (if (= "fn" (payload t3))
-              (make-lambda t4 t5)
-              [(token :fun (lambda/curry-fun lambda/yc 1))
-               (block (ldelim :yc-arg-block)
-                      (fragmentcat (make-lambda t4 t5))
-                      (rdelim :yc-arg-block))]))))
-
-(defrule introduce-fun-calls
-  [state t1 t2 t3]
-  [_
-   (:or nil :whitespace :newline :emptyline :arg)
-   (:or :period :colon)
-   :default]
-  [nil t1 (lambda/fun-call-head (str (payload t2)
-                                     (payload t3)))])
-
 (defrule introduce-bindings
   [state t1 t2 t3 t4 t5]
   [_ (:or nil
@@ -96,6 +30,9 @@
                                        (-> ts count dec)
                                        " more tokens)"))))])))
 
+  [_ _ :arg _ _ _]
+  [(dissoc state (payload t2)) t1 t2 t3 t4 t5]
+
   [_ (:or nil
           :whitespace
           :newline
@@ -104,14 +41,92 @@
                              :whitespace
                              :newline
                              :emptyline
-                             [:block _]) _ _]
+                             [:block _]
+                             :hash) _ _]
   (if-let [ts (and (token? t2)
                    (get state (payload t2)))]
-    [state t1 (token :identifier ts) t3 t4 t5]))
+    [state
+     t1
+     (block (ldelim :identifier)
+            (fragmentcat ts)
+            (rdelim :identifier))
+     t3
+     t4
+     t5]))
 
 (defrule expand-bindings
   [state t1]
-  [_ :identifier] (cons nil (payload t1)))
+  [_ [:block :identifier]] (cons nil (rw/unwrap t1)))
+
+(defn non-lambda-block? [x]
+  (and (block? x) (not= (tt x) [:block :lambda])))
+
+; (defn call-lambda [lambda & arg-values]
+;   (let [arg-count (count arg-values)
+;         arg-names (->> lambda
+;                        center
+;                        .terms
+;                        (take arg-count))]
+;     (rw/apply-rule
+;       (rw/sequence
+;         (rw/recursive-procedure
+;           (rw/fixpoint
+;             (rw/disjunction
+;               introduce-bindings))
+;           block?
+;           rw/lexical-scope)
+;         (rw/recursion
+;           (rw/procedure
+;             (rw/fixpoint
+;               (rw/sequence
+;                 expand-bindings
+;                 lambda-rules/evaluate-fun-calls)))
+;           non-lambda-block?))
+;       (vec (concat
+;              (mapcat (fn [n v]
+;                        [(token :bang)
+;                         (token :default "bind")
+;                         (block (ldelim :call-lambda)
+;                                (fragment n)
+;                                (rdelim :call-lambda))
+;                         v])
+;                      arg-names
+;                      arg-values)
+;              (->> lambda
+;                   center
+;                   .terms
+;                   (drop arg-count)))))))
+
+(defn make-lambda [args body]
+  [(block (ldelim :lambda)
+          (fragmentcat (->> args
+                            center
+                            .terms
+                            (filter #(not= (tt %) :whitespace))
+                            (map (fn [x] (token :arg (payload x)))))
+                       (->> body
+                            center
+                            .terms))
+          (rdelim :lambda))])
+
+(defrule introduce-lambdas
+  [state t1 t2 t3 t4 t5]
+  [_ (:or nil :whitespace :emptyline :newline)
+   :period :default [:block _] [:block _]]
+  (if (contains? #{"fn" "recfn"} (payload t3))
+    (concat [nil (if (or (= (tt t1) :emptyline)
+                         (payload t1))
+                   t1)]
+            (make-lambda t4 t5))))
+
+(defrule introduce-fun-calls
+  [state t1 t2 t3]
+  [_
+   (:or nil :whitespace :newline :emptyline :arg)
+   (:or :period :colon)
+   :default]
+  [nil t1 (lambda/fun-call-head (str (payload t2)
+                                     (payload t3)))])
 
 ; (defrule remove-superfluous-whitespace
 ;   [state t1 t2]

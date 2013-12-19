@@ -20,6 +20,7 @@ This document was compiled using Termcat. You can find the source code [here](ht
 - [The Structure of a Termcat Document](#struct)
 - [Math](#math)
 - [Programming](#prog)
+- [Usage](#usage)
 - [Status](#status)
 
 ## <a name="basics"></a>The Basics
@@ -108,13 +109,13 @@ Termcat has a novel syntax for mathematics. Rather than having delimiters that i
 
 At least it expects to be told these things for *some* of the expressions that you type. Termcat can be programmed to recognize common operators and identifiers, and it can also draw inferences.
 
-To mark something as a mathematical identifier, prefix it with an asterisk <code>\*</code>: <code>\*a</code> TO <q>*a</q>. This marks one character. However, when Termcat encounters the expression <code>\*abc</code> then it will infer that `b' and `c' are also identifiers. The result is <q>*abc</q>. To turn a word into an identifier, type <code>\*(myvar)</code>. This renders as <q>*(myvar)</q>---as in LaTeX, multi-character indentifiers are not italicized. Mathematical identifiers can also be typeset in a caligraphic font by using <code>\+</code> instead of <code>\*</code>. Thus, <code>\+M</code> becomes <q>+M</q>.
+To mark a character as a mathematical identifier, prefix it with an asterisk <code>\*</code>: <code>\*a</code> TO <q>*a</q>. Similarly, when Termcat encounters the expression <code>\*abc</code> then it will infer that `b' and `c' are also identifiers. The result is <q>*abc</q>. To turn a word into a single identifier, type <code>\*(op)</code>. This renders as <q>*(op)</q>---as in LaTeX, multi-character indentifiers are not italicized. Mathematical identifiers can also be typeset in a caligraphic font by using <code>\+</code> instead of <code>\*</code>. Thus, <code>\+M</code> becomes <q>+M</q>.
 
 To use the binary minus operator, type <code>x \~\-\~ y</code>. This yields <q>x ~-~ y</q>.
 
-Sounds like a chore? No problem. Simply include the following code at the top of your document:
+Does typing <code>\~-\~</code> over and over again sound like a chore? No problem. Simply include the following code at the top of your document:
   \!bind<br>\- -<br>"- \~-\~
-and Termcat will interpret every minus sign surrounded by whitespace on both sides as a binary infix operator.
+From that point onwards, Termcat will interpret every minus sign surrounded by whitespace on both sides as a binary infix operator.
 
 Predictably, for prefix operators you can type <code>sin\~ x</code> or <code>x \~!</code>. This renders as <q>sin~ x</q> or <q>x ~!</q>.
 
@@ -178,13 +179,27 @@ To coerce something to be text, prefix it with a double upright quotes "characte
 
 ## <a name="prog"></a>Programming
 
-It is possible to call functions using the syntax \.some-function(arg 1)(arg 2)(arg 3). The arguments are blocks and can be delimited by parentheses, brackets, braces, indentation, or bullet list marks as usual. The numbered list in the section [The Structure of a Termcat Document](#struct) is an example of a function call.
+Functions are invoked using the syntax <code>function-name(arg 1)(arg 2)(arg 3)</code>. The arguments are blocks and can be delimited by parentheses, brackets, braces, indentation, or bullet list marks as usual. The numbered list in the section [The Structure of a Termcat Document](#struct) is an example of a function call.
 
-It's currently not possible to create user-defined functions. Support for this is underway.
+It's currently not possible to create user-defined functions. Support for this is being developed, however.
+
+## <a name="usage"></a>Usage
+
+Termcat is a console app and is invoked as follows.
+
+<pre>.lit(Usage: java -jar termcat.jar [options] <document[.tc]>
+
+The HTML output is stored in document.html.
+
+  -b, --browse   Open HTML output in browser
+  -w, --watch    Watch document for changes and recompile when changed
+  -v, --verbose  Use verbose output
+)</pre>
+
+Combine the switches <code>-b</code> and <code>-w</code> for a live preview of your Termcat document: Any change you make in the source document will be automatically reflected in your browser.
 
 ## <a name="status"></a>Status
 
-Termcat is maturing fast and I plan to do a public release sometime soon.
-In the meantime, you can already download Termcat [here](https://github.com/jdevuyst/termcat).
+Termcat is written in Clojure and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Bug reports and pull requests are welcome!
 
-.if(.eq(foo)(foo))()(ERROR 1) .if(.eq(foo)(bar))(ERROR 2)()
+I consider the current version of Termcat an `advanced prototype'. I find it quite usable as-is but nothing is set in stone and a lot of features are still missing.

@@ -77,20 +77,31 @@
         ast/abstract-blocks))
 
     (rw/recursion
+      (rw/sequence
+        (rw/procedure
+          (rw/disjunction
+            ast/introduce-delim-errors
+            ast/fix-bullet-continuations)))
+      t/block?)
+
+    (rw/recursion
       (rw/procedure
         (rw/sequence
-          ast/introduce-delim-errors
-          ast/fix-bullet-continuations
-          ast/convert-newlines-to-whitespace
-          ast/remove-superfluous-whitespace))
+          ast/remove-superfluous-whitespace
+          ast/convert-newlines-to-whitespace))
       t/block?)
 
     (debug-rule :ast)
 
+    (rw/recursion
+      (rw/procedure
+        (rw/disjunction
+          bind/introduce-lambdas
+          bind/introduce-fun-calls))
+      t/block?)
+
     (rw/recursive-procedure
       (rw/fixpoint (rw/disjunction
-                     bind/introduce-lambdas
-                     bind/introduce-fun-calls
                      bind/introduce-bindings
                      ; bind/remove-superfluous-whitespace
                      ))
@@ -112,9 +123,9 @@
       (rw/procedure
         (rw/fixpoint
           (rw/disjunction
-            lambda-rules/evaluate-fun-calls
-            bind/expand-bindings)))
-      t/block?)
+            bind/expand-bindings
+            lambda-rules/evaluate-fun-calls)))
+      bind/non-lambda-block?)
 
     (debug-rule :macro)
 

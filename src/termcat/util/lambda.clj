@@ -29,7 +29,7 @@
   `(fn [self# ~x]
      (if ~x
        (do ~@body)
-       [(t/token :error "Missing function argument(s)")])))
+       [(t/token :error "Missing (system) function argument(s)")])))
 
 (defn curry-fun
   ([f]
@@ -158,10 +158,6 @@
                                         (= % false)))
                         t2
                         t3))))
-
-(defn yc [fun]
-  (conj (rw/unwrap fun)
-        fun))
 
 (def fun-map {".identity" (unary-fun [x] (rw/unwrap x))
               ; ".rand" (constant-fun (t/token :default (str (rand))))

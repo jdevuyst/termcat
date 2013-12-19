@@ -5,7 +5,7 @@
 
 (defrule introduce-section-calls
   [state t1 t2]
-  [_ :fun _] nil
+  [_ (:or :fun [:block :lambda] [:block :lambda]) _] nil
   [_ _ [:block :h1]] [nil t1 (lambda/fun-call-head ":h1") t2]
   [_ _ [:block :h2]] [nil t1 (lambda/fun-call-head ":h2") t2]
   [_ _ [:block :h3]] [nil t1 (lambda/fun-call-head ":h3") t2]
@@ -15,13 +15,13 @@
 
 (defrule introduce-blockquote-calls
   [state t1 t2]
-  [_ :fun _] nil ; make sure the next line terminates
+  [_ (:or :fun [:block :lambda]) _] nil
   [_ _ [:block :indent]] [nil t1 (lambda/fun-call-head ":quotation") t2])
 
 (defrule introduce-bullet-list-calls
   [state t1 t2]
   [_ [:block :bullet] _] nil
-  [_ :fun _] nil ; make sure the next line terminates
+  [_ (:or :fun [:block :lambda]) _] nil
   [_ _ [:block :bullet]] [nil t1 (lambda/fun-call-head ":bullet-list") t2])
 
 (defrule introduce-img-calls

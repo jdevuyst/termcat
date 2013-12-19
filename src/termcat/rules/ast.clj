@@ -56,11 +56,6 @@
                       (rw/unwrap b2))
          (right b1)))
 
-(defrule fix-bullet-continuations
-  [state t1 t2 t3]
-  [_ [:block :bullet] (:or :emptyline :newline) [:block :indent]]
-  [nil (merge-blocks t1 t2 t3)])
-
 (defrule convert-newlines-to-whitespace
   [state t1]
   [_ :newline] [nil (token :whitespace \newline)])
@@ -80,3 +75,8 @@
                          [:block :indent]
                          [:block :bullet])]
   [nil t2])
+
+(defrule fix-bullet-continuations
+  [state t1 t2 t3]
+  [_ [:block :bullet] (:or :emptyline :newline) [:block :indent]]
+  [nil (merge-blocks t1 t2 t3)])
