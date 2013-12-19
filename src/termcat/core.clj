@@ -6,10 +6,11 @@
             [termcat.rules.tokenize :as tok]
             [termcat.rules.ast :as ast]
             [termcat.rules.bind :as bind]
-            [termcat.rules.lambda :as lambda-rules]
             [termcat.rules.markdown :as markdown]
             [termcat.rules.math :as math-rules]
             [termcat.rules.html :as html]))
+
+(var-set (var *assert*) false)
 
 (def ^:dynamic *debug* nil)
 
@@ -86,9 +87,10 @@
 
     (rw/recursion
       (rw/procedure
-        (rw/sequence
-          ast/remove-superfluous-whitespace
-          ast/convert-newlines-to-whitespace))
+        (rw/fixpoint
+          (rw/sequence
+            ast/remove-superfluous-whitespace
+            ast/convert-newlines-to-whitespace)))
       t/block?)
 
     (debug-rule :ast)
@@ -101,10 +103,7 @@
       t/block?)
 
     (rw/recursive-procedure
-      (rw/fixpoint (rw/disjunction
-                     bind/introduce-bindings
-                     ; bind/remove-superfluous-whitespace
-                     ))
+      (rw/fixpoint bind/introduce-bindings)
       t/block?
       rw/lexical-scope)
 
@@ -124,8 +123,8 @@
         (rw/fixpoint
           (rw/disjunction
             bind/expand-bindings
-            lambda-rules/evaluate-fun-calls)))
-      bind/non-lambda-block?)
+            bind/evaluate-fun-calls)))
+      bind/non-dormant-block?)
 
     (debug-rule :macro)
 

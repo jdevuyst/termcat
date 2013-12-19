@@ -1,5 +1,6 @@
 (ns termcat.term
-  (:require [clojure.edn :as edn]
+  (:require [clojure.core.reducers :as r]
+            [clojure.edn :as edn]
             [termcat.rewrite :as rw]))
 
 (defprotocol ITerm
@@ -118,15 +119,17 @@
   (tt [this] :fragment)
   IFragment
   (ednval [this]
-          (if (and (= 1 (count (.terms this)))
-                   (-> this .terms first token?))
+          (if (->> this
+                   .terms
+                   (r/filter (complement token?))
+                   (r/reduce (constantly (reduced false))
+                             true))
             (try
-              (-> this
-                  .terms
-                  first
-                  payload
-                  str
-                  edn/read-string)
+              (->> this
+                   .terms
+                   (r/map payload)
+                   (r/fold str)
+                   edn/read-string)
               (catch java.lang.Exception x
                 nil)))))
 
@@ -157,7 +160,7 @@
     (assert (>= (count args) 2))
     `(def ~fnname ~doc-str
        (-> (rw/window ~init-state
-                       tt
-                       [~@args]
-                       ~@body)
+                      tt
+                      [~@args]
+                      ~@body)
            rw/abstraction))))

@@ -7,7 +7,7 @@
 
 !bind(TO)(→)
 
-[Termcat](https://github.com/jdevuyst/termcat) is a markup language optimized for scientific and technical writing. It compiles to HTML and MathML (Using [MathJax](http://mathjax.com)). To generate PDFs, [Prince](http://www.princexml.com) can be used.
+[Termcat](https://github.com/jdevuyst/termcat) is a markup language optimized for scientific and technical writing. It compiles to HTML and MathML (using [MathJax](http://mathjax.com)). To generate PDFs, [Prince](http://www.princexml.com) can be used.
 
 Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the user-friendly syntax for titles, lists, links, emphasis, and so on. Termcat aims to be more powerful, however. Like LaTeX, Termcat is fully programmable and it also comes with special syntax for typographic features that are difficult to unlock using plain Markdown or HTML.
 
@@ -72,7 +72,7 @@ There's special syntax for diactritics:
 - <code>r\%\^ole</code> TO <q>r%^ole</q>
 - <code>n\%\'ee</code> TO <q>n%'ee</q>
 - <code>Gruy\%\`ere</code> TO <q>Gruy%`ere</q>
-- <code>zo\%\"even</code> TO <q>zo%"even</q>
+- <code>co\%\"option</code> TO <q>co%"option</q>
 
 Users of p%1iny%1in can also use the notation <code>\%1e</code>, <code>\%2e</code>, <code>\%3e</code>, <code>\%4e</code> for <q>%1e</q>, <q>%2e</q>, <q>%3e</q>, and <q>%4e</q>.
 
@@ -146,7 +146,7 @@ Using some of the above knowledge we can use the following code
 - <
 - ~<~
 
-E = {<~ a , n , n' ~> SUBSETEQ I * N * N | Pa and n < n'})</pre>
+E = {<~ a , n , n' ~> SUBSETEQ A * N * N | Pa and n < n'})</pre>
 
 to generate
   !bind
@@ -171,7 +171,7 @@ to generate
   - <
   - ~<~
 
-  E = {<~ a , n , n' ~> SUBSETEQ I * N * N | Pa and n < n'}
+  E = {<~ a , n , n' ~> SUBSETEQ A * N * N | Pa and n < n'}
 
 Notice that Termcat also correctly recognizes primes. It's also possible to use subscripts, superscripts, and fractions using syntax like this: <code>(a\^b\_c)\|d</code> TO <q>(a^b_c)|d</q>.
 
@@ -181,13 +181,49 @@ To coerce something to be text, prefix it with a double upright quotes "characte
 
 Functions are invoked using the syntax <code>function-name(arg 1)(arg 2)(arg 3)</code>. The arguments are blocks and can be delimited by parentheses, brackets, braces, indentation, or bullet list marks as usual. The numbered list in the section [The Structure of a Termcat Document](#struct) is an example of a function call.
 
-It's currently not possible to create user-defined functions. Support for this is being developed, however.
+There's also experimental support for user-defined functions. The following Termcat code computes the fifth Fibonacci number:
+
+<pre>.lit(
+!bind
+- fib
+- .fn
+  - self n
+  - .if
+    - .eq(n)(0)
+    - 1
+    - .if
+      - .eq(n)(1)
+      - 1
+      - .add
+        - self(self#)(.add(n)(-2))
+        - self(self#)(.add(n)(-1))
+  #
+
+fib(fib#)(5))</pre>
+
+It reduces to <q>.identity
+  !bind
+  - fib
+  - .fn
+    - self n
+    - .if
+      - .eq(n)(0)
+      - 1
+      - .if
+        - .eq(n)(1)
+        - 1
+        - .add
+          - self(self#)(.add(n)(-2))
+          - self(self#)(.add(n)(-1))
+    #
+  fib(fib#)(5)
+</q>.
 
 ## <a name="usage"></a>Usage
 
 Termcat is a console app and is invoked as follows.
 
-<pre>.lit(Usage: java -jar termcat.jar [options] <document[.tc]>
+<pre>.lit(Usage: java -jar termcat.jar [options] <document[\.tc]>
 
 The HTML output is stored in document.html.
 
@@ -200,6 +236,6 @@ Combine the switches <code>-b</code> and <code>-w</code> for a live preview of y
 
 ## <a name="status"></a>Status
 
-Termcat is written in Clojure and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Bug reports and pull requests are welcome!
+Termcat is written in Clojure and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Emails, bug reports, and pull requests are welcome!
 
-I consider the current version of Termcat an `advanced prototype'. I find it quite usable as-is but nothing is set in stone and a lot of features are still missing.
+The current version of Termcat should be considered an `advanced prototype'. You may or may not find it quite usable as-is, but nothing is set in stone and a lot of features are still missing.

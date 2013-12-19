@@ -153,11 +153,14 @@
                                (t/fragment (t/token :default %))
                                (t/rdelim :range))))))
 
-(defn if-fn [t1 t2 t3]
-  (protect (rw/unwrap (if (tval t1 #(or (= % true)
-                                        (= % false)))
-                        t2
-                        t3))))
+(defn eq-fn [t1 t2]
+  (let [v1 (tval t1 (constantly true))
+        v2 (tval t2 (constantly true))]
+    (->> (and (not= nil v1)
+              (= v1 v2))
+         str
+         (t/token :default)
+         vector)))
 
 (def fun-map {".identity" (unary-fun [x] (rw/unwrap x))
               ; ".rand" (constant-fun (t/token :default (str (rand))))
@@ -181,11 +184,10 @@
               ".litfork" (curry-fun litfork 1)
               ".nth" (curry-fun nth-fn 1)
               ".apply" (curry-fun apply-fn 2)
-              ".eq" (curry-fun (comp vector #(t/token :default %) str =) 2)
+              ".eq" (curry-fun eq-fn 2)
               ".add" (curry-fun plus 2)
               ".gt" (curry-fun greater-than 2)
               ".range" (curry-fun range-fn 2)
-              ".if" (curry-fun if-fn 3)
               ; ":math" math-cast
               ; ":mi" (math-wrapper :mi)
               ; ":mo" (math-wrapper :mo)

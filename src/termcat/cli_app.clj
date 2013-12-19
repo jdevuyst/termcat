@@ -111,14 +111,16 @@
                             (let [start (System/nanoTime)
                                   result (c/compile source cache)]
                               (->> (-> (System/nanoTime)
-                                           (- start)
-                                           (/ 1000000))
+                                       (- start)
+                                       (/ 1000000))
                                    (.format msec-fmt)
                                    (print "(Elapsed time:"))
                               result)
                             (c/compile source cache)))
                     (when verbose?
                       (println "; cache size:" (count @cache) "items)")))]
+      (when *assert*
+        (println "Assertions are enabled."))
       (when verbose?
         (print "Compiling... "))
       (main-f)

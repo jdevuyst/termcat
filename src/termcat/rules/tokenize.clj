@@ -276,6 +276,8 @@
                             :emptyline
                             [:ldelim :indent]
                             [:rdelim :indent]
+                            [:ldelim :bullet]
+                            [:rdelim :bullet]
                             nil)]
   [nil t3]
 

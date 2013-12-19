@@ -5,7 +5,7 @@
 
 (defrule introduce-section-calls
   [state t1 t2]
-  [_ (:or :fun [:block :lambda] [:block :lambda]) _] nil
+  [_ (:or :fun [:block :lambda]) _] nil
   [_ _ [:block :h1]] [nil t1 (lambda/fun-call-head ":h1") t2]
   [_ _ [:block :h2]] [nil t1 (lambda/fun-call-head ":h2") t2]
   [_ _ [:block :h3]] [nil t1 (lambda/fun-call-head ":h3") t2]
