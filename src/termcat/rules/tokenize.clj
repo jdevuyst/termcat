@@ -97,6 +97,8 @@
   [_ [:ldelim _] :tilde] [nil (token :tilded-delim (payload t1)) t2]
   [_ :tilde :greater-than] [nil t1 (token :default \⟩)]
   [_ :less-than :tilde] [nil (token :default \⟨) t2]
+  [_ (:or [:rdelim _] :greater-than) :tilde] nil
+  [_ :tilde (:or [:ldelim _] :less-than)] nil
   [_ :tilde _] [nil t1 (token :default (payload t2))]
   [_ _ :tilde] [nil (token :default (payload t1)) t2])
 

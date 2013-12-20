@@ -82,7 +82,7 @@
           #(match (t/tt %)
                   [:block (_ :guard :mrow)] (rw/unwrap %)
                   :else [%]) $)
-        (interpose [sep] $)
+        ; (interpose [sep] $) ; broken. puts sep between parentheses and identifiers
         (apply concat $)
         (t/fragmentcat $)
         (math-block $ :mrow)))
