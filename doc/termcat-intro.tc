@@ -121,7 +121,9 @@ Predictably, for prefix operators you can type <code>sin\~ x</code> or <code>x \
 
 When one tilde is used on either side of an operator, Termcat will use the default MathML spacing for that operator. Use two tildes to insert a `thick math space' and three tildes to use a `very very thick math space'.
 
-It may sometimes be necessary to type <code>(\~</code> and <code>\~)</code> to indicate that parentheses (or brackets or braces) should be interpreted as mathematical `fences'. Type <code>\<\~</code> and <code>\~\></code> to insert chevrons.
+It may sometimes be necessary to type <code>(\~</code> and <code>\~)</code> to indicate that parentheses (or brackets or braces) should be interpreted as mathematical `fences': <code>.lit((~ x ~,~ y ~])</code> TO <q>(~ x ~,~ y ~]</q>.
+
+Type <code>\<\~</code> and <code>\~\></code> to insert chevrons.
 
 Using some of the above knowledge we can use the following code
 <pre>.lit(!bind
@@ -216,6 +218,7 @@ It reduces to <q>.identity
           - self(self#)(.add(n)(-2))
           - self(self#)(.add(n)(-1))
     #
+
   fib(fib#)(5)
 </q>.
 
@@ -238,4 +241,4 @@ Combine the switches <code>-b</code> and <code>-w</code> for a live preview of y
 
 Termcat is written in Clojure and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Emails, bug reports, and pull requests are welcome!
 
-The current version of Termcat should be considered an `advanced prototype'. You may or may not find it quite usable as-is, but nothing is set in stone and a lot of features are still missing.
+The current version of Termcat should be considered an `advanced prototype'. I find it quite usable as-is, but nothing is set in stone and a lot of features are still missing.

@@ -93,10 +93,8 @@
   [_ :tilde :tilde] nil
   [_ :tilde (:or :whitespace :newline nil)] nil
   [_ (:or :whitespace :newline nil) :tilde] nil
-  [_ :tilde [(:or :ldelim
-                  :rdelim) _]] [nil t1 (token :tilded-delim (payload t2))]
-  [_ [(:or :ldelim
-           :rdelim) _] :tilde] [nil (token :tilded-delim (payload t1)) t2]
+  [_ :tilde [:rdelim _]] [nil t1 (token :tilded-delim (payload t2))]
+  [_ [:ldelim _] :tilde] [nil (token :tilded-delim (payload t1)) t2]
   [_ :tilde :greater-than] [nil t1 (token :default \⟩)]
   [_ :less-than :tilde] [nil (token :default \⟨) t2]
   [_ :tilde _] [nil t1 (token :default (payload t2))]

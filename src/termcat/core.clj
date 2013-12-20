@@ -103,7 +103,8 @@
       t/block?)
 
     (rw/recursive-procedure
-      (rw/fixpoint bind/introduce-bindings)
+      (rw/fixpoint
+        bind/introduce-bindings)
       t/block?
       rw/lexical-scope)
 

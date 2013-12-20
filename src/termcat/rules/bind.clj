@@ -4,31 +4,47 @@
             [termcat.term :refer :all]
             [termcat.util.lambda :as lambda]))
 
-(defrule introduce-bindings [state t1 t2 t3 t4 t5]
+(defn strongest-blank [t1 t2 default]
+  (condp #(contains? %2 %1) (hash-set (tt t1) (tt t2))
+    nil nil ; skip
+    :emptyline (token :emptyline)
+    :newline (token :newline)
+    :whitespace (token :whitespace)
+    default))
+
+(defrule introduce-bindings [state t1 t2 t3 t4 t5 t6]
   [_ (:or nil
           :whitespace
           :newline
           :emptyline
-          [:block _]) :bang :default [:block _] [:block _]]
+          [:block _])
+   :bang :default [:block _] [:block _] _]
   (if (= (payload t3) "bind")
     (let [ts (rw/unwrap t4)
           name (as-> (first ts) $
                      (if $ (payload $)))]
       (if (and (= 1 (count ts))
                (or (char? name) (string? name)))
-        [(assoc state name (rw/unwrap t5))
-         t1]
-        [state t1 (token :error
-                         (apply str
-                                "!bind: not a valid name — "
-                                name
-                                (if (> (count ts) 1)
-                                  (str " (and "
-                                       (-> ts count dec)
-                                       " more tokens)"))))])))
+        (conj [(assoc state name (rw/unwrap t5))
+               (strongest-blank t1 t6 t1)]
+              (if-not (contains? #{nil :whitespace
+                                   :newline :emptyline}
+                                 (tt t6))
+                t6))
+        [state
+         t1
+         (token :error
+                (apply str
+                       "!bind: not a valid name — "
+                       name
+                       (if (> (count ts) 1)
+                         (str " (and "
+                              (-> ts count dec)
+                              " more tokens)"))))
+         t6])))
 
-  [_ _ :arg _ _ _]
-  [(dissoc state (payload t2)) t1 t2 t3 t4 t5]
+  [_ _ :arg _ _ _ _]
+  [(dissoc state (payload t2)) t1 t2 t3 t4 t5 t6]
 
   [_ (:or nil
           :whitespace
@@ -39,7 +55,7 @@
                              :newline
                              :emptyline
                              [:block _]
-                             :hash) _ _]
+                             :hash) _ _ _]
   (if-let [ts (and (token? t2)
                    (get state (payload t2)))]
     [state
@@ -49,7 +65,8 @@
             (rdelim :identifier))
      t3
      t4
-     t5]))
+     t5
+     t6]))
 
 (defrule expand-bindings [state t1]
   [_ [:block :identifier]]
