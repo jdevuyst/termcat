@@ -73,7 +73,8 @@
                    :mi "mi"
                    :mn "mn"
                    (assert false))]
-    (concat [(token :html (str \< tag-name
+    (concat [(token :open-math)
+             (token :html (str \< tag-name
                                (if (contains? props :script)
                                  " mathvariant=script")
                                (condp #(contains? %2 %1) props
@@ -89,11 +90,14 @@
                                  :wide-right " rspace=veryverythickmathspace"
                                  :normal-right " rspace=thickmathspace"
                                  nil)
-                               \>))]
+                               \>))
+             (token :already-math)]
             (rw/unwrap t)
-            [(token :html (str \< \/ tag-name \>))])))
+            [(token :still-math)
+             (token :html (str \< \/ tag-name \>))
+             (token :close-math)])))
 
-(defrule introduce-math-tags [state t1]
+(defrule introduce-inner-math-tags [state t1]
   [_ [:block (_ :guard :text)]] nil
   [_ [:block (_ :guard :error)]] (concat [nil
                                           (token :open-math)
@@ -148,30 +152,52 @@
                                         (wrap-math-block t1 x)
                                         [(token :close-math)]))
 
-(def introduce-mtext-tags
-  (rw/window {:count 0} tt [state t1 t2]
-             [_ _ :already-math] [(update-in state [:count] inc) t1 t2]
-             [_ :close-math :still-math] [(update-in state [:count] dec) t1 t2]
-             [_ :close-math :open-math] nil
-             [_ _ :still-math] (concat [(update-in state [:count] dec)]
-                                       (if-not (= :whitespace (tt t1))
-                                         [t1])
-                                       [(token :html "</mtext>")])
-             [{:count 0} :close-math _] nil
-             [_ :close-math _] (concat [state
-                                        (token :html "<mtext>")]
-                                       (if-not (= :whitespace (tt t2))
-                                         [t2])))
-  )
+(defrule remove-double-math-tokens [state t1 t2]
+  [_ :already-math :already-math] [nil t1]
+  [_ :still-math :still-math] [nil t1]
+  [_ :close-math :close-math] [nil t1]
+  [_ :open-math :open-math] [nil t1])
 
-(defrule remove-math-tokens [state t1 t2]
+(defrule remove-canceling-math-tokens [state t1 t2]
   [_ :close-math :open-math] [nil]
   [_ :already-math :open-math] [nil]
-  [_ :already-math _] (assert false (tt t2))
-  [_ :close-math :still-math] [nil]
-  [_ _ :still-math] (assert false (tt t1))
+  [_ :close-math :still-math] [nil])
+
+(def introduce-mtext-tags
+  (rw/window {:count 0 :in-text false} tt [state t1 t2]
+             [{:in-text true} :still-math _]
+             [(assoc state :in-text false)
+              (token :html "</mtext>")
+              t2]
+
+             [{:in-text true} :open-math _]
+             [(-> state
+                  (assoc :in-text false)
+                  (update-in [:count] inc))
+              (token :html "</mtext>")
+              t2]
+
+             [_ :open-math _]
+             [(update-in state [:count] inc) t1 t2]
+
+             [_ :close-math (:or :still-math :open-math)]
+             [(update-in state [:count] dec) t1 t2]
+
+             [{:count 1} :close-math _]
+             [(assoc state :count 0) t1 t2]
+
+             [_ :close-math _]
+             (concat [(-> state
+                          (assoc :in-text true)
+                          (update-in [:count] dec))
+                      (token :html "<mtext>")]
+                     (if-not (= :whitespace (tt t2))
+                       [t2])))
+  )
+
+(defrule introduce-outer-math-tags [state t1 t2]
   [_ :close-math _] [nil (token :html "</math>") t2]
-  [_ _ :open-math] [nil t1 (token :html "<math>")])
+  [_ :open-math _] [nil (token :html "<math>") t2])
 
 (defn escape [s]
   (cond (string? s) (string/join (for [c s]

@@ -10,7 +10,7 @@
             [termcat.rules.math :as math-rules]
             [termcat.rules.html :as html]))
 
-(var-set (var *assert*) false)
+; (var-set (var *assert*) false)
 
 (def ^:dynamic *debug* nil)
 
@@ -155,23 +155,30 @@
       html/text-block?)
 
     (rw/recursion
-      (rw/procedure
-        html/remove-error-tokens)
-      t/block?)
-
-    (rw/recursion
-      (rw/procedure
-        html/introduce-math-tags)
+      (rw/sequence
+        (rw/procedure
+          html/remove-error-tokens)
+        (rw/procedure
+          html/introduce-inner-math-tags)
+        )
       t/block?)
 
     (rw/recursive-procedure
-      html/introduce-mtext-tags
+      (rw/sequence
+        (rw/fixpoint
+          html/remove-double-math-tokens)
+        (rw/fixpoint
+          html/introduce-mtext-tags))
       t/block?
       rw/flat-scope)
 
     (rw/recursion
-      (rw/procedure
-        html/remove-math-tokens)
+      (rw/sequence
+        (rw/procedure
+          (rw/fixpoint
+            html/remove-canceling-math-tokens))
+        (rw/procedure
+          html/introduce-outer-math-tags))
       t/block?)
 
     (debug-rule :final)

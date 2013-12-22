@@ -239,6 +239,6 @@ Combine the switches <code>-b</code> and <code>-w</code> for a live preview of y
 
 ## <a name="status"></a>Status
 
-Termcat is written in Clojure and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Emails, bug reports, and pull requests are welcome!
+Termcat is written in Clojure and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Email, bug reports, and pull requests are welcome!
 
-The current version of Termcat should be considered an `advanced prototype'. I find it quite usable as-is, but nothing is set in stone and a lot of features are still missing.
+The current version of Termcat should be considered a prototype. I find it quite usable as-is, but nothing is set in stone and a lot of features are still missing.
