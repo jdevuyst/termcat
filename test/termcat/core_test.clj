@@ -9,15 +9,8 @@
         pre-f #(do (f %) (str % \Z))
         repeat-pre-f #(binding [c/*debug* false]
                         (nth (iterate pre-f %2) %1))]
-    (->> ;(slurp "doc/termcat-intro.tc")
+    (->> (slurp "doc/termcat-intro.tc")
          ; (repeat-pre-f 20)
-         "((a)^((b c) blah)_(c))~ d
-
-         a ~<~ b
-
-         a~ ^b_c d
-
-         a^100"
          f
          (spit "doc/termcat-intro.html")
          time)

@@ -130,16 +130,20 @@
     (debug-rule :macro)
 
     (rw/recursion
-      (rw/fixpoint
+      (rw/sequence
+        (rw/fixpoint
+          (rw/procedure
+            (rw/fixpoint
+              (rw/disjunction
+                math-rules/remove-manual-casts
+                math-rules/introduce-math-operators
+                math-rules/introduce-msub-msup
+                math-rules/introduce-mfrac
+                math-rules/math-cast-next-token
+                ; math-rules/flatten-math-fences
+                ))))
         (rw/procedure
-          (rw/disjunction
-            math-rules/remove-manual-casts
-            math-rules/introduce-math-operators
-            math-rules/introduce-msub-msup
-            math-rules/introduce-mfrac
-            ; math-rules/math-cast-next-token
-            ; math-rules/flatten-math-fences
-            )))
+          math-rules/remove-superfluous-whitespace))
       t/block?)
 
     (debug-rule :math)

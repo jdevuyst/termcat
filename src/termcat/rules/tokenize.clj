@@ -25,14 +25,18 @@
                   [{:stage new-stage
                     :acc (conj (:acc state) tok)}
                    result])
-           (accept []
+           (accept [whitespace?]
                    [{:acc []}
-                    (conj (->> (conj (:acc state) tok)
-                               (map payload)
-                               (reduce str)
-                               (map (partial token :html))
-                               (into (conj result (token :whitespace))))
-                          (token :whitespace))])
+                    (let [r (->> (conj (:acc state) tok)
+                                 (map payload)
+                                 (reduce str)
+                                 (map (partial token :html)))]
+                      (if whitespace?
+                        (-> result
+                            (conj (token :whitespace))
+                            (into r)
+                            (conj (token :whitespace)))
+                        (into result r)))])
            (reject []
                    [{:acc []}
                     (-> result
@@ -53,7 +57,7 @@
              (_ :guard hexdigit?)] (segue :hex-num-entity)
             [(:or :named-entity
                   :dec-num-entity
-                  :hex-num-entity) \;] (accept)
+                  :hex-num-entity) \;] (accept false)
             [nil \<] (segue :before-tag-name)
             [:before-tag-name \/] (segue :maybe-in-tag-name)
             [(:or :before-tag-name
@@ -81,7 +85,7 @@
             [:in-double-quotes _] (segue :in-double-quotes)
             [(:or :in-tag-name
                   :in-val
-                  :after-val) \>] (accept)
+                  :after-val) \>] (accept true)
             :else (reject)))))
 
 (defrule remove-escape-tokens
@@ -93,12 +97,8 @@
   [_ :tilde :tilde] nil
   [_ :tilde (:or :whitespace :newline nil)] nil
   [_ (:or :whitespace :newline nil) :tilde] nil
-  [_ :tilde [:rdelim _]] [nil t1 (token :tilded-delim (payload t2))]
-  [_ [:ldelim _] :tilde] [nil (token :tilded-delim (payload t1)) t2]
   [_ :tilde :greater-than] [nil t1 (token :default \⟩)]
   [_ :less-than :tilde] [nil (token :default \⟨) t2]
-  [_ (:or [:rdelim _] :greater-than) :tilde] nil
-  [_ :tilde (:or [:ldelim _] :less-than)] nil
   [_ :tilde _] [nil t1 (token :default (payload t2))]
   [_ _ :tilde] [nil (token :default (payload t1)) t2])
 
@@ -254,15 +254,15 @@
   (do
     (if (and (or ((complement rdelim?) t1)
                  (item-type t1))
-           (item-type t2)
-           (not= (tt t1) [:rdelim (item-type t2)]))
-    [{:in-bullet true
-      :item-type (item-type t2)
-      :prev-state state}
-     t1
-     (token [:ldelim (item-type t2)]
-            (payload t2))
-     t3]))
+             (item-type t2)
+             (not= (tt t1) [:rdelim (item-type t2)]))
+      [{:in-bullet true
+        :item-type (item-type t2)
+        :prev-state state}
+       t1
+       (token [:ldelim (item-type t2)]
+              (payload t2))
+       t3]))
 
   [_ [:ldelim :indent] _ _]
   [{:in-bullet false :prev-state state} t1 t2 t3]

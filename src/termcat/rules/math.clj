@@ -5,8 +5,7 @@
             [termcat.term :refer :all]
             [termcat.util.math :as math]))
 
-(defrule remove-manual-casts
-  [state t1 t2 t3 t4]
+(defrule remove-manual-casts [state t1 t2 t3 t4]
   [_ _ _ (:or nil :whitespace :emptyline) _]
   nil
 
@@ -36,8 +35,7 @@
             (mapcat #(math/math-cast % #{:script}) ts)
             [t4])))
 
-(defrule introduce-math-operators
-  [state t1 t2 t3 t4 t5 t6 t7]
+(defrule introduce-math-operators [state t1 t2 t3 t4 t5 t6 t7]
   [_ _ :whitespace :tilde _ :tilde :whitespace _]
   (if-let [opt (concat (match (payload t3)
                               \~ []
@@ -59,6 +57,7 @@
                     :infix
                     opt)]
             (math/math-cast t7)))
+
   [_ _ :whitespace :tilde _ _ _ _]
   (if-let [opt (match (payload t3)
                       \~ []
@@ -75,6 +74,7 @@
                     :postfix
                     opt)]
             [t5 t6 t7]))
+
   [_ _ :tilde :whitespace _ _ _ _]
   (if-let [opt (match (payload t2)
                       \~ []
@@ -89,7 +89,10 @@
                     :mo
                     :prefix
                     opt)]
-            (math/math-cast t4)
+            (if (contains? #{:underscore :circumflex :right-quote}
+                           (tt t4))
+              [t4]
+              (math/math-cast t4))
             [t5 t6 t7])))
 
 (defn split-base-sub-sup [t]
@@ -130,8 +133,7 @@
                 [a b c] (math/math-block (fragment a b c)
                                          :msubsup)))))
 
-(defrule introduce-msub-msup
-  [state t1 t2 t3]
+(defrule introduce-msub-msup [state t1 t2 t3]
   [_
    [:block (_ :guard :math)]
    :right-quote
@@ -172,8 +174,7 @@
 
 
 
-(defrule introduce-mfrac
-  [state t1 t2 t3]
+(defrule introduce-mfrac [state t1 t2 t3]
   [_
    (:or :default
         [:block _])
@@ -185,34 +186,33 @@
                                   (math/math-row-cast t3))
                         :mfrac)])
 
-; (defrule math-cast-next-token
-;   [state t1 t2]
-;   tt
-;   block?
-;   [_ [:block (_ :guard :math)] (:or :default [:block _])]
-;   (concat [nil t1]
-;           (math/math-cast t2)))
+(defrule math-cast-next-token [state t1 t2]
+  [_ [:block (_ :guard :math)] (:or :default [:block _])]
+  (concat [nil t1]
+          (math/math-cast t2)))
 
-; (defrule flatten-math-fences
-;   [state t1]
-;   tt
-;   block?
+(defrule remove-superfluous-whitespace [state t1 t2 t3]
+  [_ [:block (_ :guard :math)] :whitespace [:block (_ :guard :math)]]
+  [nil t1 t3])
+
+; (defrule flatten-math-fences [state t1]
 ;   [_
 ;    [:block (:or :parenthesis
 ;                 :bracket
-;                 :brace)]] (let [subts (-> t1
-;                                           center
-;                                           .terms)]
-;                             (match [(tt (first subts))
-;                                     (tt (last subts))]
-;                                    [[:block (_ :guard :math)]
-;                                     [:block (_ :guard :math)]]
-;                                    (concat [nil
-;                                             (math/math-block
-;                                               (fragment (left t1))
-;                                               :mo)]
-;                                            subts
-;                                            [(math/math-block
-;                                               (fragment (right t1))
-;                                               :mo)])
-;                                    :else nil)))
+;                 :brace)]]
+;   (let [subts (-> t1
+;                   center
+;                   .terms)]
+;     (match [(tt (first subts))
+;             (tt (last subts))]
+;            [[:block (_ :guard :math)]
+;             [:block (_ :guard :math)]]
+;            (concat [nil
+;                     (math/math-block
+;                       (fragment (left t1))
+;                       :mo)]
+;                    subts
+;                    [(math/math-block
+;                       (fragment (right t1))
+;                       :mo)])
+;            :else nil)))
