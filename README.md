@@ -7,3 +7,5 @@ Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the u
 The [Termcat tutorial](http://jdevuyst.github.io/termcat/doc/termcat-intro.html) provides a general overview of Termcat.
 
 For technical details behind the implementation, please consult [my blog](https://jdevuyst.blogspot.com/search/label/Termcat).
+
+You can download Termcat [here](https://github.com/jdevuyst/termcat/tree/master/releases). You may also need to install [Java](http://java.com).

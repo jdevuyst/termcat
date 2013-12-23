@@ -9,7 +9,8 @@
             [termcat.rewrite :as rw])
   (:import [java.lang System Runtime]
            [java.text DecimalFormat]
-           [java.nio.file FileSystems StandardWatchEventKinds]))
+           [java.nio.file FileSystems StandardWatchEventKinds])
+  (:gen-class))
 
 (defn file-exists? [filename]
   (-> filename io/file .exists))

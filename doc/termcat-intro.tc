@@ -11,7 +11,7 @@
 
 Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the user-friendly syntax for titles, lists, links, emphasis, and so on. Termcat aims to be more powerful, however. Like LaTeX, Termcat is fully programmable and it also comes with special syntax for typographic features that are difficult to unlock using plain Markdown or HTML.
 
-This document was compiled using Termcat. You can find the source code [here](https://github.com/jdevuyst/termcat/blob/master/doc/termcat-intro.tc).
+This document was compiled using Termcat. You can find this document's source code [here](https://github.com/jdevuyst/termcat/blob/master/doc/termcat-intro.tc).
 
 **Contents**
 
