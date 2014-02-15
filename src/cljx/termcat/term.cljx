@@ -1,7 +1,9 @@
 (ns termcat.term
+  #+cljs (:require-macros [termcat.rewrite-macros :refer (window)])
   (:require [#+clj clojure.edn #+cljs cljs.reader :as edn]
             [clojure.core.reducers :as r]
-            [termcat.rewrite :as rw]))
+            [termcat.rewrite :as rw]
+            #+clj [termcat.rewrite-macros :refer (window)]))
 
 (defprotocol ITerm
   (tt [this]))
@@ -159,8 +161,8 @@
         [[& args] body] [(first rdecl) (next rdecl)]]
     (assert (>= (count args) 2))
     `(def ~fnname ~doc-str
-       (-> (rw/window ~init-state
-                      tt
-                      [~@args]
-                      ~@body)
+       (-> (window ~init-state
+                   tt
+                   [~@args]
+                   ~@body)
            rw/abstraction))))

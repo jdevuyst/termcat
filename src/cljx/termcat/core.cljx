@@ -1,6 +1,8 @@
 (ns termcat.core
   (:refer-clojure :exclude [compile])
+  #+cljs (:require-macros [termcat.rewrite-macros :refer (with-cache)])
   (:require [termcat.rewrite :as rw]
+            #+clj [termcat.rewrite-macros :refer (with-cache)]
             [termcat.term :as t]
             [termcat.rules.pretokenize :as pretok]
             [termcat.rules.tokenize :as tok]
@@ -216,7 +218,7 @@
   ([s]
    (compile s (rw/cache)))
   ([s cache]
-   (rw/with-cache
+   (with-cache
      cache
      (->> s
           pretok/map-to-tokens

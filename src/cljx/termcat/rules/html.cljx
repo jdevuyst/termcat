@@ -1,11 +1,13 @@
 (ns termcat.rules.html
   (:refer-clojure :exclude (flatten))
-  #+cljs (:require-macros [cljs.core.match.macros :refer (match)])
+  #+cljs (:require-macros [cljs.core.match.macros :refer (match)]
+                          [termcat.rewrite-macros :refer (window)])
   (:require #+clj [clojure.core.match :refer (match)]
             #+cljs [cljs.core.match]
             [clojure.core.reducers :as r]
             [clojure.string :as string]
             [termcat.rewrite :as rw]
+            #+clj [termcat.rewrite-macros :refer (with-cache)]
             [termcat.term :as t]
             [termcat.util.math :as math]))
 
@@ -166,35 +168,35 @@
            [_ :close-math :still-math] [nil])
 
 (def introduce-mtext-tags
-  (rw/window {:count 0 :in-text false} t/tt [state t1 t2]
-             [{:in-text true} :still-math _]
-             [(assoc state :in-text false)
-              (t/token :html "</mtext>")
-              t2]
+  (window {:count 0 :in-text false} t/tt [state t1 t2]
+          [{:in-text true} :still-math _]
+          [(assoc state :in-text false)
+           (t/token :html "</mtext>")
+           t2]
 
-             [{:in-text true} :open-math _]
-             [(-> state
-                  (assoc :in-text false)
-                  (update-in [:count] inc))
-              (t/token :html "</mtext>")
-              t2]
+          [{:in-text true} :open-math _]
+          [(-> state
+               (assoc :in-text false)
+               (update-in [:count] inc))
+           (t/token :html "</mtext>")
+           t2]
 
-             [_ :open-math _]
-             [(update-in state [:count] inc) t1 t2]
+          [_ :open-math _]
+          [(update-in state [:count] inc) t1 t2]
 
-             [_ :close-math (:or :still-math :open-math)]
-             [(update-in state [:count] dec) t1 t2]
+          [_ :close-math (:or :still-math :open-math)]
+          [(update-in state [:count] dec) t1 t2]
 
-             [{:count 1} :close-math _]
-             [(assoc state :count 0) t1 t2]
+          [{:count 1} :close-math _]
+          [(assoc state :count 0) t1 t2]
 
-             [_ :close-math _]
-             (concat [(-> state
-                          (assoc :in-text true)
-                          (update-in [:count] dec))
-                      (t/token :html "<mtext>")]
-                     (if-not (= :whitespace (t/tt t2))
-                       [t2])))
+          [_ :close-math _]
+          (concat [(-> state
+                       (assoc :in-text true)
+                       (update-in [:count] dec))
+                   (t/token :html "<mtext>")]
+                  (if-not (= :whitespace (t/tt t2))
+                    [t2])))
   )
 
 (t/defrule introduce-outer-math-tags [state t1 t2]
@@ -220,15 +222,15 @@
                    [(t/token :html (-> t1 t/right t/payload escape))]))
 
 (def separate-head-body
-  (rw/window {:context :body
-              :body []
-              :head []}
-             t/tt
-             [state t1]
-             [_ _] (match (-> t1 t/payload str string/lower-case)
-                          "<head>" [(assoc state :context :head)]
-                          "</head>" [(assoc state :context :body)]
-                          :else [(update-in state [(:context state)] conj t1)])))
+  (window {:context :body
+           :body []
+           :head []}
+          t/tt
+          [state t1]
+          [_ _] (match (-> t1 t/payload str string/lower-case)
+                       "<head>" [(assoc state :context :head)]
+                       "</head>" [(assoc state :context :body)]
+                       :else [(update-in state [(:context state)] conj t1)])))
 
 (defn add-boilerplate
   ([] nil)
