@@ -11,6 +11,9 @@
             [termcat.term :as t]
             [termcat.util.math :as math]))
 
+#+cljs (defn char? [c] (and (string? c)
+                            (= 1 (count c))))
+
 (defn text-block? [x]
   (and (t/block? x)
        (not (:math (second (t/tt x))))))

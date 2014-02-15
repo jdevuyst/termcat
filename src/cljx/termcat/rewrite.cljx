@@ -62,16 +62,18 @@
   (or (rule state input)
       [state input]))
 
-(defn apply-rule
-  ([rule input] (apply-rule rule (rule) input))
-  ([rule state input]
-   (let [[state2 input2] (->> input
-                              unwrap
-                              (apply-rule* rule state))]
-     (with-meta (rewrap input input2)
-                {:state state2}))))
+(declare apply-rule)
 
-(def apply-rule (memoize apply-rule))
+(def apply-rule
+  (memoize
+    (fn
+      ([rule input] (apply-rule rule (rule) input))
+      ([rule state input]
+       (let [[state2 input2] (->> input
+                                  unwrap
+                                  (apply-rule* rule state))]
+         (with-meta (rewrap input input2)
+                    {:state state2}))))))
 
 (defn disjunction [& orig-rules]
   (let [init-state (->> orig-rules

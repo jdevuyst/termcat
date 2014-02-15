@@ -8,6 +8,9 @@
             [termcat.term :as t]
             [termcat.util.lambda :as lambda]))
 
+#+cljs (defn char? [c] (and (string? c)
+                            (= 1 (count c))))
+
 (defn strongest-blank [t1 t2 default]
   (condp #(contains? %2 %1) (hash-set (t/tt t1) (t/tt t2))
     nil nil ; skip
