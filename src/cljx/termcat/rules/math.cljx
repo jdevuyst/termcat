@@ -206,7 +206,7 @@
 ;                 :brace)]]
 ;   (let [subts (-> t1
 ;                   center
-;                   .terms)]
+;                   .-terms)]
 ;     (match [(t/tt (first subts))
 ;             (t/tt (last subts))]
 ;            [[:block (_ :guard :math)]

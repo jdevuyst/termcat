@@ -155,12 +155,12 @@
   [(t/block (t/ldelim :lambda)
             (t/fragmentcat (->> args
                                 t/center
-                                .terms
+                                .-terms
                                 (filter #(not= (t/tt %) :whitespace))
                                 (map (fn [x] (t/token :arg (t/payload x)))))
                            (->> body
                                 t/center
-                                .terms))
+                                .-terms))
             (t/rdelim :lambda))])
 
 (defrule introduce-lambdas [state t1 t2 t3 t4 t5]

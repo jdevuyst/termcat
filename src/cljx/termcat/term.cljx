@@ -109,10 +109,10 @@
 (extend-type Token
   ITerm
   (tt [this]
-      (.tag this))
+      (.-tag this))
   IToken
   (payload [this]
-           (.payload this)))
+           (.-payload this)))
 
 (extend-type Fragment
   ITerm
@@ -120,13 +120,13 @@
   IFragment
   (ednval [this]
           (if (->> this
-                   .terms
+                   .-terms
                    (r/filter (complement token?))
                    (r/reduce (constantly (reduced false))
                              true))
             (try
               (->> this
-                   .terms
+                   .-terms
                    (r/map payload)
                    (r/fold str)
                    edn/read-string)
@@ -135,14 +135,14 @@
 
 (extend-type Block
   ITerm
-  (tt [this] [:block (dt (.left this))])
+  (tt [this] [:block (dt (.-left this))])
   IBlock
-  (left [this] (.left this))
-  (center [this] (.center this))
-  (right [this] (.right this))
+  (left [this] (.-left this))
+  (center [this] (.-center this))
+  (right [this] (.-right this))
   rw/IWrapped
   (unwrap [orig]
-          (.terms (.center orig)))
+          (.-terms (.-center orig)))
   (rewrap [orig result]
           (block (left orig)
                  (fragmentcat result)

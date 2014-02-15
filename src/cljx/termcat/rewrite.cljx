@@ -11,14 +11,15 @@
   (rewrap [orig result]))
 
 (extend-protocol IWrapped
-  clojure.lang.IPersistentVector
+  #+clj clojure.lang.IPersistentVector
+  #+cljs object
   (unwrap [orig] orig)
   (rewrap [orig result] result))
 
 (def ^:dynamic !*cache*)
 
-(defn cache [] (atom #+clj (cache/soft-cache-factory {})
-                     #+cljs {}))
+(defn ^:export cache [] (atom #+clj (cache/soft-cache-factory {})
+                              #+cljs {}))
 
 (defn- cache-update! [f & args]
   (reset! !*cache* (apply f @!*cache* args)))

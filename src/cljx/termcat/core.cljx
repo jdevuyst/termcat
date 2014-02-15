@@ -214,13 +214,14 @@
       t/block?)
     ))
 
-(defn compile
+(defn ^:export compile
   ([s]
    (compile s (rw/cache)))
   ([s cache]
    (with-cache
      cache
      (->> s
+          #+cljs vec
           pretok/map-to-tokens
           (rw/apply-rule compile-rule)
           html/to-string))))
