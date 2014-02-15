@@ -2,15 +2,14 @@
   #+cljs (:require-macros [cljs.core.match.macros :refer (match)])
   (:require #+clj [clojure.core.match :refer (match)]
             #+cljs [cljs.core.match]
-            #+clj [clojure.edn :as edn]
+            [#+clj clojure.edn #+cljs cljs.reader :as edn]
             [clojure.core.reducers :as r]
             [termcat.rewrite :as rw]
             [termcat.term :as t]))
 
 (defn number-string? [s]
   (try
-    (number? #+clj (edn/read-string s)
-             #+cljs (read-string s))
+    (number? (edn/read-string s))
     (catch java.lang.Exception x false)))
 
 (defn math-opts [t]

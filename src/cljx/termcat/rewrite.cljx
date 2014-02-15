@@ -3,8 +3,8 @@
   #+cljs (:require-macros [cljs.core.match.macros :refer (match)])
   (:require #+clj [clojure.core.match :refer (match)]
             #+cljs [cljs.core.match]
-            [clojure.core.reducers :as r]
-            [clojure.core.cache :as cache]))
+            #+clj [clojure.core.cache :as cache]
+            [clojure.core.reducers :as r]))
 
 (defprotocol IWrapped
   (unwrap [orig])
@@ -17,13 +17,14 @@
 
 (def ^:dynamic !*cache*)
 
-(defn cache [] (atom (cache/soft-cache-factory {})))
+(defn cache [] (atom #+clj (cache/soft-cache-factory {})
+                     #+cljs {}))
 
 (defn- cache-update! [f & args]
   (reset! !*cache* (apply f @!*cache* args)))
 
 (defn- cache-get [k]
-  (cache/lookup @!*cache* k))
+  (#+clj cache/lookup @!*cache* k))
 
 (defmacro with-cache [cache & body]
   `(binding [!*cache* ~cache]
@@ -33,10 +34,12 @@
   (fn [& args]
     (if-let [result (cache-get [f args])]
       (do
-        (cache-update! cache/hit [f args])
+        #+clj (cache-update! cache/hit [f args])
         result)
       (let [result (apply f args)]
-        (cache-update! cache/miss [f args] result)
+        (cache-update! #+clj cache/miss #+cljs assoc
+                       [f args]
+                       result)
         result))))
 
 (defn- pad-1 [v]
