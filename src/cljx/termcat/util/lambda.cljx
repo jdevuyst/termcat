@@ -1,4 +1,5 @@
 (ns termcat.util.lambda
+  (:require-macros [termcat.util.lambda-macros :refer (protect constant-fun unary-fun)])
   (:require [clojure.string :as string]
             [termcat.rewrite :as rw]
             [termcat.term :as t]
@@ -12,24 +13,6 @@
                 $
                 (throw (java.lang.Exception.
                          "Wrong type"))))))
-
-(defmacro protect [& expr]
-  `(try ~@expr
-     (catch java.lang.Exception x#
-       [(t/token :error (.getMessage x#))])))
-
-(defmacro constant-fun [& body]
-  (let [x (gensym 'constant-fun-x)]
-    `(fn [self# ~x]
-       (if ~x
-         [~@body ~x]
-         [~@body]))))
-
-(defmacro unary-fun [[x] & body]
-  `(fn [self# ~x]
-     (if ~x
-       (do ~@body)
-       [(t/token :error "Missing (system) function argument(s)")])))
 
 (defn curry-fun
   ([f]

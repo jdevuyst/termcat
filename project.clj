@@ -20,7 +20,7 @@
   :hooks [cljx.hooks]
   :main ^:skip-aot termcat.cli-app
   :profiles {:uberjar {:aot :all}}
-  :cljsbuild {:builds [{:source-paths ["target/cljs"]
+  :cljsbuild {:builds [{:source-paths ["src/clj" "target/cljs"]
                         :compiler {:output-to "target/termcat.js"
                                    :optimizations :advanced
                                    :pretty-print true}}]})
