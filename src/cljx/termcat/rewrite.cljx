@@ -1,7 +1,9 @@
 (ns termcat.rewrite
   (:refer-clojure :exclude [memoize sequence])
-  (:require [clojure.core.reducers :as r]
-            [clojure.core.match :refer (match)]
+  #+cljs (:require-macros [cljs.core.match.macros :refer (match)])
+  (:require #+clj [clojure.core.match :refer (match)]
+            #+cljs [cljs.core.match]
+            [clojure.core.reducers :as r]
             [clojure.core.cache :as cache]))
 
 (defprotocol IWrapped

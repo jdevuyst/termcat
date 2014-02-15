@@ -1,5 +1,7 @@
 (ns termcat.rules.math
-  (:require [clojure.core.match :refer (match)]
+  #+cljs (:require-macros [cljs.core.match.macros :refer (match)])
+  (:require #+clj [clojure.core.match :refer (match)]
+            #+cljs [cljs.core.match]
             [clojure.string :as string]
             [termcat.rewrite :as rw]
             [termcat.term :as t]

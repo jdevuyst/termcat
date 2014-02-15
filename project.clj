@@ -17,6 +17,7 @@
                   {:source-paths ["src/cljx"]
                    :output-path "target/cljs"
                    :rules :cljs}]}
+  :hooks [cljx.hooks]
   :main ^:skip-aot termcat.cli-app
   :profiles {:uberjar {:aot :all}}
   :cljsbuild {:builds [{:source-paths ["target/cljs"]

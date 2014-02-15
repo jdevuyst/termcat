@@ -1,6 +1,6 @@
 (ns termcat.term
-  (:require [clojure.core.reducers :as r]
-            [clojure.edn :as edn]
+  (:require #+clj [clojure.edn :as edn]
+            [clojure.core.reducers :as r]
             [termcat.rewrite :as rw]))
 
 (defprotocol ITerm
@@ -129,7 +129,8 @@
                    .terms
                    (r/map payload)
                    (r/fold str)
-                   edn/read-string)
+                   #+clj edn/read-string
+                   #+cljs read-string)
               (catch java.lang.Exception x
                 nil)))))
 

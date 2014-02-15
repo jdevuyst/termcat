@@ -1,6 +1,8 @@
 (ns termcat.rules.html
   (:refer-clojure :exclude (flatten))
-  (:require [clojure.core.match :refer (match)]
+  #+cljs (:require-macros [cljs.core.match.macros :refer (match)])
+  (:require #+clj [clojure.core.match :refer (match)]
+            #+cljs [cljs.core.match]
             [clojure.core.reducers :as r]
             [clojure.string :as string]
             [termcat.rewrite :as rw]

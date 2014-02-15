@@ -1,13 +1,16 @@
 (ns termcat.util.math
-  (:require [clojure.core.match :refer (match)]
+  #+cljs (:require-macros [cljs.core.match.macros :refer (match)])
+  (:require #+clj [clojure.core.match :refer (match)]
+            #+cljs [cljs.core.match]
+            #+clj [clojure.edn :as edn]
             [clojure.core.reducers :as r]
-            [clojure.edn :as edn]
             [termcat.rewrite :as rw]
             [termcat.term :as t]))
 
 (defn number-string? [s]
   (try
-    (number? (edn/read-string s))
+    (number? #+clj (edn/read-string s)
+             #+cljs (read-string s))
     (catch java.lang.Exception x false)))
 
 (defn math-opts [t]
