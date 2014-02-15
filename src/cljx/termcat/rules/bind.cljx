@@ -1,7 +1,9 @@
 (ns termcat.rules.bind
-  #+cljs (:require-macros [cljs.core.match.macros :refer (match)])
-  (:require #+clj [clojure.core.match :refer (match)]
-            #+cljs [cljs.core.match]
+  #+cljs (:require-macros [cljs.core.match.macros :refer (match)]
+                          [termcat.core-macros-cljs :refer (defrule)])
+  (:require #+cljs [cljs.core.match]
+            #+clj [clojure.core.match :refer (match)]
+            #+clj [termcat.core-macros :refer (defrule)]
             [termcat.rewrite :as rw]
             [termcat.term :as t]
             [termcat.util.lambda :as lambda]))
@@ -14,68 +16,68 @@
     :whitespace (t/token :whitespace)
     default))
 
-(t/defrule introduce-bindings [state t1 t2 t3 t4 t5 t6]
-           [_ (:or nil
-                   :whitespace
-                   :newline
-                   :emptyline
-                   [:block _])
-            :bang :default [:block _] [:block _] _]
-           (if (= (t/payload t3) "bind")
-             (let [ts (rw/unwrap t4)
-                   name (as-> (first ts) $
-                              (if $ (t/payload $)))]
-               (if (and (= 1 (count ts))
-                        (or (char? name) (string? name)))
-                 (conj [(assoc state name (rw/unwrap t5))
-                        (strongest-blank t1 t6 t1)]
-                       (if-not (contains? #{nil :whitespace
-                                            :newline :emptyline}
-                                          (t/tt t6))
-                         t6))
-                 [state
-                  t1
-                  (t/token :error
-                           (apply str
-                                  "!bind: not a valid name — "
-                                  name
-                                  (if (> (count ts) 1)
-                                    (str " (and "
-                                         (-> ts count dec)
-                                         " more tokens)"))))
-                  t6])))
+(defrule introduce-bindings [state t1 t2 t3 t4 t5 t6]
+  [_ (:or nil
+          :whitespace
+          :newline
+          :emptyline
+          [:block _])
+   :bang :default [:block _] [:block _] _]
+  (if (= (t/payload t3) "bind")
+    (let [ts (rw/unwrap t4)
+          name (as-> (first ts) $
+                     (if $ (t/payload $)))]
+      (if (and (= 1 (count ts))
+               (or (char? name) (string? name)))
+        (conj [(assoc state name (rw/unwrap t5))
+               (strongest-blank t1 t6 t1)]
+              (if-not (contains? #{nil :whitespace
+                                   :newline :emptyline}
+                                 (t/tt t6))
+                t6))
+        [state
+         t1
+         (t/token :error
+                  (apply str
+                         "!bind: not a valid name — "
+                         name
+                         (if (> (count ts) 1)
+                           (str " (and "
+                                (-> ts count dec)
+                                " more tokens)"))))
+         t6])))
 
-           [_ _ :arg _ _ _ _]
-           [(dissoc state (t/payload t2)) t1 t2 t3 t4 t5 t6]
+  [_ _ :arg _ _ _ _]
+  [(dissoc state (t/payload t2)) t1 t2 t3 t4 t5 t6]
 
-           [_ (:or nil
-                   :whitespace
-                   :newline
-                   :emptyline
-                   [:block _]) _ (:or nil
-                                      :whitespace
-                                      :newline
-                                      :emptyline
-                                      [:block _]
-                                      :hash) _ _ _]
-           (if-let [ts (and (t/token? t2)
-                            (get state (t/payload t2)))]
-             [state
-              t1
-              (t/block (t/ldelim :identifier)
-                       (t/fragmentcat ts)
-                       (t/rdelim :identifier))
-              t3
-              t4
-              t5
-              t6]))
+  [_ (:or nil
+          :whitespace
+          :newline
+          :emptyline
+          [:block _]) _ (:or nil
+                             :whitespace
+                             :newline
+                             :emptyline
+                             [:block _]
+                             :hash) _ _ _]
+  (if-let [ts (and (t/token? t2)
+                   (get state (t/payload t2)))]
+    [state
+     t1
+     (t/block (t/ldelim :identifier)
+              (t/fragmentcat ts)
+              (t/rdelim :identifier))
+     t3
+     t4
+     t5
+     t6]))
 
-(t/defrule expand-bindings [state t1]
-           [_ [:block :identifier]]
-           (cons nil (as-> (rw/unwrap t1) $
-                           (if (-> $ last t/tt (= :hash))
-                             (butlast $)
-                             $))))
+(defrule expand-bindings [state t1]
+  [_ [:block :identifier]]
+  (cons nil (as-> (rw/unwrap t1) $
+                  (if (-> $ last t/tt (= :hash))
+                    (butlast $)
+                    $))))
 
 (defn non-dormant-block? [x]
   (and (t/block? x)
@@ -134,17 +136,17 @@
     :fun (apply-fun fterm arg)
     [:block :lambda] (apply-lambda fterm arg)))
 
-(t/defrule evaluate-fun-calls [state t1 t2]
-           [_ (:or :fun [:block :lambda]) [:block _]]
-           (cons nil (apply-function t1 t2))
+(defrule evaluate-fun-calls [state t1 t2]
+  [_ (:or :fun [:block :lambda]) [:block _]]
+  (cons nil (apply-function t1 t2))
 
-           [_ (:or :fun [:block :lambda]) :hash]
-           nil
+  [_ (:or :fun [:block :lambda]) :hash]
+  nil
 
-           [_ (:or :fun [:block :lambda]) _]
-           (concat [nil]
-                   (apply-function t1 nil)
-                   [t2]))
+  [_ (:or :fun [:block :lambda]) _]
+  (concat [nil]
+          (apply-function t1 nil)
+          [t2]))
 
 (defn make-lambda [args body]
   [(t/block (t/ldelim :lambda)
@@ -158,14 +160,14 @@
                                 .terms))
             (t/rdelim :lambda))])
 
-(t/defrule introduce-lambdas [state t1 t2 t3 t4 t5]
-           [_ (:or nil :whitespace :emptyline :newline)
-            :period :default [:block _] [:block _]]
-           (if (contains? #{"fn" "recfn"} (t/payload t3))
-             (concat [nil (if (or (= (t/tt t1) :emptyline)
-                                  (t/payload t1))
-                            t1)]
-                     (make-lambda t4 t5))))
+(defrule introduce-lambdas [state t1 t2 t3 t4 t5]
+  [_ (:or nil :whitespace :emptyline :newline)
+   :period :default [:block _] [:block _]]
+  (if (contains? #{"fn" "recfn"} (t/payload t3))
+    (concat [nil (if (or (= (t/tt t1) :emptyline)
+                         (t/payload t1))
+                   t1)]
+            (make-lambda t4 t5))))
 
 (defn if-fn [t1 t2 t3]
   (->> (if (lambda/tval t1 #(or (= % true)
@@ -182,32 +184,32 @@
                  evaluate-fun-calls)))
            non-dormant-block?))))
 
-(t/defrule introduce-fun-calls [state t1 t2 t3 t4 t5 t6]
-           [_
-            (:or nil :whitespace :newline :emptyline :arg)
-            (:or :period :colon) :default _ _ _]
-           (if (and (= (t/tt t2) :period)
-                    (= (t/payload t3) "if"))
-             [t1
-              (t/token :fun (lambda/curry-fun if-fn 3))
-              t4
-              (if (t/block? t5)
-                (t/block (t/ldelim :if-branch)
-                         (t/fragmentcat (rw/unwrap t5))
-                         (t/rdelim :if-branch))
-                t5)
-              (if (t/block? t6)
-                (t/block (t/ldelim :if-branch)
-                         (t/fragmentcat (rw/unwrap t6))
-                         (t/rdelim :if-branch))
-                t6)]
-             [nil
-              t1
-              (lambda/fun-call-head (str (t/payload t2)
-                                         (t/payload t3)))
-              t4 t5 t6]))
+(defrule introduce-fun-calls [state t1 t2 t3 t4 t5 t6]
+  [_
+   (:or nil :whitespace :newline :emptyline :arg)
+   (:or :period :colon) :default _ _ _]
+  (if (and (= (t/tt t2) :period)
+           (= (t/payload t3) "if"))
+    [t1
+     (t/token :fun (lambda/curry-fun if-fn 3))
+     t4
+     (if (t/block? t5)
+       (t/block (t/ldelim :if-branch)
+                (t/fragmentcat (rw/unwrap t5))
+                (t/rdelim :if-branch))
+       t5)
+     (if (t/block? t6)
+       (t/block (t/ldelim :if-branch)
+                (t/fragmentcat (rw/unwrap t6))
+                (t/rdelim :if-branch))
+       t6)]
+    [nil
+     t1
+     (lambda/fun-call-head (str (t/payload t2)
+                                (t/payload t3)))
+     t4 t5 t6]))
 
-; (t/defrule remove-superfluous-whitespace [state t1 t2]
+; (defrule remove-superfluous-whitespace [state t1 t2]
 ;   [_ (:or nil
 ;           :whitespace
 ;           :newline

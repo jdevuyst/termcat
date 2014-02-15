@@ -1,6 +1,7 @@
-(ns termcat.rewrite-macros
-  (:require [clojure.core.match :refer (match)]
+(ns termcat.core-macros-cljs
+  (:require [cljs.core.match.macros :refer (match)]
             [clojure.core.reducers :as r]
+            [termcat.term :as t]
             [termcat.rewrite :as rw]))
 
 (defmacro with-cache [cache & body]
@@ -26,3 +27,20 @@
             [(or (first r#) state#)
              (concat (next r#)
                      (drop ~argc input#))]))))))
+
+(defmacro defrule [fnname & rdecl]
+  (assert (symbol? fnname))
+  (let [[doc-str rdecl] (if (string? (first rdecl))
+                          [(first rdecl) (next rdecl)]
+                          ["" rdecl])
+        [init-state rdecl] (if (vector? (first rdecl))
+                             [nil rdecl]
+                             [(first rdecl) (next rdecl)])
+        [[& args] body] [(first rdecl) (next rdecl)]]
+    (assert (>= (count args) 2))
+    `(def ~fnname ~doc-str
+       (-> (window ~init-state
+                   t/tt
+                   [~@args]
+                   ~@body)
+           rw/abstraction))))

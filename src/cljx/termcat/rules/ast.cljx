@@ -1,5 +1,7 @@
 (ns termcat.rules.ast
-  (:require [termcat.rewrite :as rw]
+  #+cljs (:require-macros [termcat.core-macros-cljs :refer (defrule)])
+  (:require #+clj [termcat.core-macros :refer (defrule)]
+            [termcat.rewrite :as rw]
             [termcat.term :as t]))
 
 (defn- pop-n [coll n]
@@ -43,9 +45,9 @@
      :else [(update-in state [:distance] inc)
             (conj result tok)])))
 
-(t/defrule introduce-delim-errors
-           [state t1]
-           [_ [(:or :ldelim :rdelim) _]] [nil (t/token :error (t/payload t1))])
+(defrule introduce-delim-errors
+  [state t1]
+  [_ [(:or :ldelim :rdelim) _]] [nil (t/token :error (t/payload t1))])
 
 (defn- merge-blocks [b1 t b2]
   (assert (t/block? b1))
@@ -56,27 +58,27 @@
                           (rw/unwrap b2))
            (t/right b1)))
 
-(t/defrule remove-superfluous-whitespace
-           [state t1 t2]
-           [_ (:or nil
-                   :emptyline
-                   [:block :indent]
-                   [:block :bullet]) (:or :whitespace
-                                          :newline)]
-           [nil t1]
+(defrule remove-superfluous-whitespace
+  [state t1 t2]
+  [_ (:or nil
+          :emptyline
+          [:block :indent]
+          [:block :bullet]) (:or :whitespace
+                                 :newline)]
+  [nil t1]
 
-           [_ (:or :whitespace
-                   :newline) (:or nil
-                                  :emptyline
-                                  [:block :indent]
-                                  [:block :bullet])]
-           [nil t2])
+  [_ (:or :whitespace
+          :newline) (:or nil
+                         :emptyline
+                         [:block :indent]
+                         [:block :bullet])]
+  [nil t2])
 
-(t/defrule convert-newlines-to-whitespace
-           [state t1]
-           [_ :newline] [nil (t/token :whitespace \newline)])
+(defrule convert-newlines-to-whitespace
+  [state t1]
+  [_ :newline] [nil (t/token :whitespace \newline)])
 
-(t/defrule fix-bullet-continuations
-           [state t1 t2 t3]
-           [_ [:block :bullet] (:or :emptyline :newline) [:block :indent]]
-           [nil (merge-blocks t1 t2 t3)])
+(defrule fix-bullet-continuations
+  [state t1 t2 t3]
+  [_ [:block :bullet] (:or :emptyline :newline) [:block :indent]]
+  [nil (merge-blocks t1 t2 t3)])

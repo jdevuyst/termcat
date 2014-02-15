@@ -1,8 +1,8 @@
 (ns termcat.rewrite
   (:refer-clojure :exclude [memoize sequence])
   #+cljs (:require-macros [cljs.core.match.macros :refer (match)])
-  (:require #+clj [clojure.core.match :refer (match)]
-            #+cljs [cljs.core.match]
+  (:require #+cljs [cljs.core.match]
+            #+clj [clojure.core.match :refer (match)]
             #+clj [clojure.core.cache :as cache]
             [clojure.core.reducers :as r]))
 

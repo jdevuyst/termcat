@@ -1,9 +1,7 @@
 (ns termcat.term
-  #+cljs (:require-macros [termcat.rewrite-macros :refer (window)])
   (:require [#+clj clojure.edn #+cljs cljs.reader :as edn]
             [clojure.core.reducers :as r]
-            [termcat.rewrite :as rw]
-            #+clj [termcat.rewrite-macros :refer (window)]))
+            [termcat.rewrite :as rw]))
 
 (defprotocol ITerm
   (tt [this]))
@@ -149,20 +147,3 @@
           (block (left orig)
                  (fragmentcat result)
                  (right orig))))
-
-(defmacro defrule [fnname & rdecl]
-  (assert (symbol? fnname))
-  (let [[doc-str rdecl] (if (string? (first rdecl))
-                          [(first rdecl) (next rdecl)]
-                          ["" rdecl])
-        [init-state rdecl] (if (vector? (first rdecl))
-                             [nil rdecl]
-                             [(first rdecl) (next rdecl)])
-        [[& args] body] [(first rdecl) (next rdecl)]]
-    (assert (>= (count args) 2))
-    `(def ~fnname ~doc-str
-       (-> (window ~init-state
-                   tt
-                   [~@args]
-                   ~@body)
-           rw/abstraction))))

@@ -1,8 +1,8 @@
 (ns termcat.core
   (:refer-clojure :exclude [compile])
-  #+cljs (:require-macros [termcat.rewrite-macros :refer (with-cache)])
+  #+cljs (:require-macros [termcat.core-macros-cljs :refer (with-cache)])
   (:require [termcat.rewrite :as rw]
-            #+clj [termcat.rewrite-macros :refer (with-cache)]
+            #+clj [termcat.core-macros :refer (with-cache)]
             [termcat.term :as t]
             [termcat.rules.pretokenize :as pretok]
             [termcat.rules.tokenize :as tok]

@@ -1,6 +1,7 @@
 (ns termcat.util.lambda
-  (:require-macros [termcat.util.lambda-macros :refer (protect constant-fun unary-fun)])
-  (:require [clojure.string :as string]
+  #+cljs (:require-macros [termcat.util.lambda-macros :refer (protect constant-fun unary-fun)])
+  (:require #+clj [termcat.util.lambda-macros :refer (protect constant-fun unary-fun)]
+            [clojure.string :as string]
             [termcat.rewrite :as rw]
             [termcat.term :as t]
             [termcat.util.math :as math]))
