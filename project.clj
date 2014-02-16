@@ -25,6 +25,6 @@
                         :compiler {:output-dir "target/js"
                                    :output-to "target/termcat.js"
                                    :source-map "target/termcat.js.map"
-                                   :optimizations :advanced
+                                   :optimizations :whitespace
                                    :elide-asserts true
                                    :pretty-print true}}]})

@@ -218,6 +218,7 @@
   ([s]
    (compile s (rw/cache)))
   ([s cache]
+   #+cljs (enable-console-print!)
    (with-cache
      cache
      (->> s

@@ -87,7 +87,7 @@
        (not= (t/tt x) [:block :lambda])
        (not= (t/tt x) [:block :if-branch])))
 
-(defn apply-fun [fun-token arg]
+(defn ^:export apply-fun [fun-token arg]
   (let [f (t/payload fun-token)
         retval (f fun-token arg)]
     (if (string? retval)
@@ -136,7 +136,11 @@
 
 (defn apply-function [fterm arg]
   (case (t/tt fterm)
-    :fun (apply-fun fterm arg)
+    :fun (do
+           (println :start)
+           (let [x (apply-fun fterm arg)]
+             (println :fin)
+             x))
     [:block :lambda] (apply-lambda fterm arg)))
 
 (defrule evaluate-fun-calls [state t1 t2]
