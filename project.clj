@@ -10,8 +10,6 @@
                  [org.clojure/tools.cli "0.3.0-beta1"]]
   :plugins [[com.keminglabs/cljx "0.3.2"]
             [lein-cljsbuild "1.0.2"]]
-  :hooks [cljx.hooks
-          leiningen.cljsbuild]
   :source-paths ["src/cljx" "src/clj" "target/clj"]
   :cljx {:builds [{:source-paths ["src/cljx"]
                    :output-path "target/clj"
