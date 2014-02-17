@@ -129,5 +129,5 @@ termcat.rules.pretokenize.char_to_token = (function char_to_token(c){return term
 })(),c);
 });
 termcat.rules.pretokenize.map_to_tokens = (function map_to_tokens(code){return cljs.core.first.call(null,clojure.core.reducers.reduce.call(null,(function (p__10040,c){var vec__10041 = p__10040;var result = cljs.core.nth.call(null,vec__10041,0,null);var pos = cljs.core.nth.call(null,vec__10041,1,null);return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.conj.call(null,result,cljs.core.with_meta.call(null,termcat.rules.pretokenize.char_to_token.call(null,c),new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"src","src",1014018390),code,new cljs.core.Keyword(null,"lpos","lpos",1017232858),pos,new cljs.core.Keyword(null,"rpos","rpos",1017411604),pos], null))),(pos + 1)], null);
-}),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.PersistentVector.EMPTY,0], null),code));
+}),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.PersistentVector.EMPTY,0], null),cljs.core.vec.call(null,code)));
 });

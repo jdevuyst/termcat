@@ -4,7 +4,7 @@ goog.require('cljs.core');
 goog.require('termcat.term');
 goog.require('termcat.term');
 goog.require('cljs.core.match');
-termcat.rules.tokenize.letters = cljs.core.set.call(null,cljs.core.map.call(null,cljs.core.char$,cljs.core.concat.call(null,cljs.core.range.call(null,("a" | 0),(("z" | 0) + 1)),cljs.core.range.call(null,("A" | 0),(("Z" | 0) + 1)))));
+termcat.rules.tokenize.letters = new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 52, ["A",null,"a",null,"B",null,"b",null,"C",null,"c",null,"D",null,"d",null,"E",null,"e",null,"F",null,"f",null,"G",null,"g",null,"H",null,"h",null,"I",null,"i",null,"J",null,"j",null,"K",null,"k",null,"L",null,"l",null,"M",null,"m",null,"N",null,"n",null,"O",null,"o",null,"P",null,"p",null,"Q",null,"q",null,"R",null,"r",null,"S",null,"s",null,"T",null,"t",null,"U",null,"u",null,"V",null,"v",null,"W",null,"w",null,"X",null,"x",null,"Y",null,"y",null,"Z",null,"z",null], null), null);
 termcat.rules.tokenize.letter_QMARK_ = (function letter_QMARK_(x){return cljs.core.contains_QMARK_.call(null,termcat.rules.tokenize.letters,x);
 });
 termcat.rules.tokenize.digit_QMARK_ = (function digit_QMARK_(x){return cljs.core.contains_QMARK_.call(null,new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 10, ["0",null,"1",null,"2",null,"3",null,"4",null,"5",null,"6",null,"7",null,"8",null,"9",null], null), null),x);

@@ -11,9 +11,6 @@
             [termcat.term :as t]
             [termcat.util.math :as math]))
 
-#+cljs (defn char? [c] (and (string? c)
-                            (= 1 (count c))))
-
 (defn text-block? [x]
   (and (t/block? x)
        (not (:math (second (t/tt x))))))
@@ -214,7 +211,7 @@
                                      \& "&amp;"
                                      \' "&apos;"
                                      \" "&quot;" c)))
-        (char? s) (escape (str s))
+        #+clj (char? s) #+clj (escape (str s))
         :else ""))
 
 (defrule flatten [state t1]

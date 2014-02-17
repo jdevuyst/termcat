@@ -26980,7 +26980,7 @@ termcat.rules.pretokenize.map_to_tokens = function map_to_tokens(code) {
     var result = cljs.core.nth.call(null, vec__10041, 0, null);
     var pos = cljs.core.nth.call(null, vec__10041, 1, null);
     return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.conj.call(null, result, cljs.core.with_meta.call(null, termcat.rules.pretokenize.char_to_token.call(null, c), new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "src", "src", 1014018390), code, new cljs.core.Keyword(null, "lpos", "lpos", 1017232858), pos, new cljs.core.Keyword(null, "rpos", "rpos", 1017411604), pos], null))), pos + 1], null);
-  }, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.PersistentVector.EMPTY, 0], null), code));
+  }, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.PersistentVector.EMPTY, 0], null), cljs.core.vec.call(null, code)));
 };
 goog.provide("clojure.string");
 goog.require("cljs.core");
@@ -29979,9 +29979,6 @@ goog.require("termcat.rewrite");
 goog.require("termcat.util.math");
 goog.require("clojure.string");
 goog.require("cljs.core.match");
-termcat.rules.html.char_QMARK_ = function char_QMARK_(c) {
-  return typeof c === "string" && cljs.core._EQ_.call(null, 1, cljs.core.count.call(null, c));
-};
 termcat.rules.html.text_block_QMARK_ = function text_block_QMARK_(x) {
   return termcat.term.block_QMARK_.call(null, x) && cljs.core.not.call(null, (new cljs.core.Keyword(null, "math", "math", 1017248378)).cljs$core$IFn$_invoke$arity$1(cljs.core.second.call(null, termcat.term.tt.call(null, x))));
 };
@@ -32617,14 +32614,10 @@ termcat.rules.html.escape = function escape__$1(s) {
       return iter__4120__auto__.call(null, s);
     }());
   } else {
-    if (termcat.rules.html.char_QMARK_.call(null, s)) {
-      return escape__$1.call(null, [cljs.core.str(s)].join(""));
+    if (new cljs.core.Keyword(null, "else", "else", 1017020587)) {
+      return "";
     } else {
-      if (new cljs.core.Keyword(null, "else", "else", 1017020587)) {
-        return "";
-      } else {
-        return null;
-      }
+      return null;
     }
   }
 };
@@ -35763,9 +35756,6 @@ goog.require("termcat.term");
 goog.require("termcat.rewrite");
 goog.require("termcat.rewrite");
 goog.require("cljs.core.match");
-termcat.rules.bind.char_QMARK_ = function char_QMARK_(c) {
-  return typeof c === "string" && cljs.core._EQ_.call(null, 1, cljs.core.count.call(null, c));
-};
 termcat.rules.bind.strongest_blank = function strongest_blank(t1, t2, default$) {
   var pred__8925 = function(p1__8921_SHARP_, p2__8920_SHARP_) {
     return cljs.core.contains_QMARK_.call(null, p2__8920_SHARP_, p1__8921_SHARP_);
@@ -35836,7 +35826,7 @@ termcat.rules.bind.introduce_bindings = termcat.rewrite.abstraction.call(null, f
                                           var $__$1 = cljs.core.truth_($) ? termcat.term.payload.call(null, $) : null;
                                           return $__$1;
                                         }();
-                                        if (cljs.core._EQ_.call(null, 1, cljs.core.count.call(null, ts)) && (termcat.rules.bind.char_QMARK_.call(null, name) || typeof name === "string")) {
+                                        if (cljs.core._EQ_.call(null, 1, cljs.core.count.call(null, ts)) && typeof name === "string") {
                                           return cljs.core.conj.call(null, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.assoc.call(null, state, name, termcat.rewrite.unwrap.call(null, t5)), termcat.rules.bind.strongest_blank.call(null, t1, t6, t1)], null), !cljs.core.contains_QMARK_.call(null, new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 4, [null, null, new cljs.core.Keyword(null, "emptyline", "emptyline", 3889609267), 
                                           null, new cljs.core.Keyword(null, "newline", "newline", 2859826438), null, new cljs.core.Keyword(null, "whitespace", "whitespace", 1290815983), null], null), null), termcat.term.tt.call(null, t6)) ? t6 : null);
                                         } else {
@@ -35984,7 +35974,7 @@ termcat.rules.bind.introduce_bindings = termcat.rewrite.abstraction.call(null, f
                                             var $__$1 = cljs.core.truth_($) ? termcat.term.payload.call(null, $) : null;
                                             return $__$1;
                                           }();
-                                          if (cljs.core._EQ_.call(null, 1, cljs.core.count.call(null, ts)) && (termcat.rules.bind.char_QMARK_.call(null, name) || typeof name === "string")) {
+                                          if (cljs.core._EQ_.call(null, 1, cljs.core.count.call(null, ts)) && typeof name === "string") {
                                             return cljs.core.conj.call(null, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.assoc.call(null, state, name, termcat.rewrite.unwrap.call(null, t5)), termcat.rules.bind.strongest_blank.call(null, t1, t6, t1)], null), !cljs.core.contains_QMARK_.call(null, new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 4, [null, null, new cljs.core.Keyword(null, "emptyline", "emptyline", 3889609267), 
                                             null, new cljs.core.Keyword(null, "newline", "newline", 2859826438), null, new cljs.core.Keyword(null, "whitespace", "whitespace", 1290815983), null], null), null), termcat.term.tt.call(null, t6)) ? t6 : null);
                                           } else {
@@ -36132,7 +36122,7 @@ termcat.rules.bind.introduce_bindings = termcat.rewrite.abstraction.call(null, f
                                               var $__$1 = cljs.core.truth_($) ? termcat.term.payload.call(null, $) : null;
                                               return $__$1;
                                             }();
-                                            if (cljs.core._EQ_.call(null, 1, cljs.core.count.call(null, ts)) && (termcat.rules.bind.char_QMARK_.call(null, name) || typeof name === "string")) {
+                                            if (cljs.core._EQ_.call(null, 1, cljs.core.count.call(null, ts)) && typeof name === "string") {
                                               return cljs.core.conj.call(null, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.assoc.call(null, state, name, termcat.rewrite.unwrap.call(null, t5)), termcat.rules.bind.strongest_blank.call(null, t1, t6, t1)], null), !cljs.core.contains_QMARK_.call(null, new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 4, [null, null, new cljs.core.Keyword(null, "emptyline", "emptyline", 3889609267), 
                                               null, new cljs.core.Keyword(null, "newline", "newline", 2859826438), null, new cljs.core.Keyword(null, "whitespace", "whitespace", 1290815983), null], null), null), termcat.term.tt.call(null, t6)) ? t6 : null);
                                             } else {
@@ -36280,7 +36270,7 @@ termcat.rules.bind.introduce_bindings = termcat.rewrite.abstraction.call(null, f
                                                 var $__$1 = cljs.core.truth_($) ? termcat.term.payload.call(null, $) : null;
                                                 return $__$1;
                                               }();
-                                              if (cljs.core._EQ_.call(null, 1, cljs.core.count.call(null, ts)) && (termcat.rules.bind.char_QMARK_.call(null, name) || typeof name === "string")) {
+                                              if (cljs.core._EQ_.call(null, 1, cljs.core.count.call(null, ts)) && typeof name === "string") {
                                                 return cljs.core.conj.call(null, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.assoc.call(null, state, name, termcat.rewrite.unwrap.call(null, t5)), termcat.rules.bind.strongest_blank.call(null, t1, t6, t1)], null), !cljs.core.contains_QMARK_.call(null, new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 4, [null, null, new cljs.core.Keyword(null, "emptyline", "emptyline", 3889609267), 
                                                 null, new cljs.core.Keyword(null, "newline", "newline", 2859826438), null, new cljs.core.Keyword(null, "whitespace", "whitespace", 1290815983), null], null), null), termcat.term.tt.call(null, t6)) ? t6 : null);
                                               } else {
@@ -36446,7 +36436,7 @@ termcat.rules.bind.introduce_bindings = termcat.rewrite.abstraction.call(null, f
                                                     var $__$1 = cljs.core.truth_($) ? termcat.term.payload.call(null, $) : null;
                                                     return $__$1;
                                                   }();
-                                                  if (cljs.core._EQ_.call(null, 1, cljs.core.count.call(null, ts)) && (termcat.rules.bind.char_QMARK_.call(null, name) || typeof name === "string")) {
+                                                  if (cljs.core._EQ_.call(null, 1, cljs.core.count.call(null, ts)) && typeof name === "string") {
                                                     return cljs.core.conj.call(null, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.assoc.call(null, state, name, termcat.rewrite.unwrap.call(null, t5)), termcat.rules.bind.strongest_blank.call(null, t1, t6, t1)], null), !cljs.core.contains_QMARK_.call(null, new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 4, [null, null, new cljs.core.Keyword(null, "emptyline", "emptyline", 3889609267), 
                                                     null, new cljs.core.Keyword(null, "newline", "newline", 2859826438), null, new cljs.core.Keyword(null, "whitespace", "whitespace", 1290815983), null], null), null), termcat.term.tt.call(null, t6)) ? t6 : null);
                                                   } else {
@@ -39854,7 +39844,8 @@ goog.require("cljs.core");
 goog.require("termcat.term");
 goog.require("termcat.term");
 goog.require("cljs.core.match");
-termcat.rules.tokenize.letters = cljs.core.set.call(null, cljs.core.map.call(null, cljs.core.char$, cljs.core.concat.call(null, cljs.core.range.call(null, "a" | 0, ("z" | 0) + 1), cljs.core.range.call(null, "A" | 0, ("Z" | 0) + 1))));
+termcat.rules.tokenize.letters = new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 52, ["A", null, "a", null, "B", null, "b", null, "C", null, "c", null, "D", null, "d", null, "E", null, "e", null, "F", null, "f", null, "G", null, "g", null, "H", null, "h", null, "I", null, "i", null, "J", null, "j", null, "K", null, "k", null, "L", null, "l", null, "M", null, "m", null, "N", null, "n", null, "O", null, "o", null, "P", null, "p", null, "Q", null, "q", null, "R", null, "r", 
+null, "S", null, "s", null, "T", null, "t", null, "U", null, "u", null, "V", null, "v", null, "W", null, "w", null, "X", null, "x", null, "Y", null, "y", null, "Z", null, "z", null], null), null);
 termcat.rules.tokenize.letter_QMARK_ = function letter_QMARK_(x) {
   return cljs.core.contains_QMARK_.call(null, termcat.rules.tokenize.letters, x);
 };
@@ -47943,7 +47934,7 @@ termcat.core.compile = function() {
     var _BANG__STAR_cache_STAR_8766 = termcat.rewrite._BANG__STAR_cache_STAR_;
     try {
       termcat.rewrite._BANG__STAR_cache_STAR_ = cache;
-      return termcat.rules.html.to_string.call(null, termcat.rewrite.apply_rule.call(null, termcat.core.compile_rule, termcat.rules.pretokenize.map_to_tokens.call(null, cljs.core.vec.call(null, s))));
+      return termcat.rules.html.to_string.call(null, termcat.rewrite.apply_rule.call(null, termcat.core.compile_rule, termcat.rules.pretokenize.map_to_tokens.call(null, s)));
     } finally {
       termcat.rewrite._BANG__STAR_cache_STAR_ = _BANG__STAR_cache_STAR_8766;
     }

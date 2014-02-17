@@ -222,7 +222,6 @@
    (with-cache
      cache
      (->> s
-                 vec
           pretok/map-to-tokens
           (rw/apply-rule compile-rule)
           html/to-string))))

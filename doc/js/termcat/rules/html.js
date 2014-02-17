@@ -12,8 +12,6 @@ goog.require('termcat.rewrite');
 goog.require('termcat.util.math');
 goog.require('clojure.string');
 goog.require('cljs.core.match');
-termcat.rules.html.char_QMARK_ = (function char_QMARK_(c){return (typeof c === 'string') && (cljs.core._EQ_.call(null,1,cljs.core.count.call(null,c)));
-});
 termcat.rules.html.text_block_QMARK_ = (function text_block_QMARK_(x){return (termcat.term.block_QMARK_.call(null,x)) && (cljs.core.not.call(null,new cljs.core.Keyword(null,"math","math",1017248378).cljs$core$IFn$_invoke$arity$1(cljs.core.second.call(null,termcat.term.tt.call(null,x)))));
 });
 /**
@@ -2131,14 +2129,10 @@ break;
 });return iter__4120__auto__.call(null,s);
 })());
 } else
-{if(termcat.rules.html.char_QMARK_.call(null,s))
-{return escape__$1.call(null,[cljs.core.str(s)].join(''));
-} else
 {if(new cljs.core.Keyword(null,"else","else",1017020587))
 {return "";
 } else
 {return null;
-}
 }
 }
 });

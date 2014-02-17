@@ -140,7 +140,7 @@ var compile__1 = (function (s){return compile.call(null,s,termcat.rewrite.cache.
 });
 var compile__2 = (function (s,cache){cljs.core.enable_console_print_BANG_.call(null);
 var _BANG__STAR_cache_STAR_8766 = termcat.rewrite._BANG__STAR_cache_STAR_;try{termcat.rewrite._BANG__STAR_cache_STAR_ = cache;
-return termcat.rules.html.to_string.call(null,termcat.rewrite.apply_rule.call(null,termcat.core.compile_rule,termcat.rules.pretokenize.map_to_tokens.call(null,cljs.core.vec.call(null,s))));
+return termcat.rules.html.to_string.call(null,termcat.rewrite.apply_rule.call(null,termcat.core.compile_rule,termcat.rules.pretokenize.map_to_tokens.call(null,s)));
 }finally {termcat.rewrite._BANG__STAR_cache_STAR_ = _BANG__STAR_cache_STAR_8766;
 }});
 compile = function(s,cache){

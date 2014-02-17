@@ -40,6 +40,7 @@
 
 (defn map-to-tokens [code]
   (->> code
+              vec
        (r/reduce (fn [[result pos] c]
                    [(conj result
                           (with-meta (char-to-token c)

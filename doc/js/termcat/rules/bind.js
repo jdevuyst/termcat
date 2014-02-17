@@ -8,8 +8,6 @@ goog.require('termcat.term');
 goog.require('termcat.rewrite');
 goog.require('termcat.rewrite');
 goog.require('cljs.core.match');
-termcat.rules.bind.char_QMARK_ = (function char_QMARK_(c){return (typeof c === 'string') && (cljs.core._EQ_.call(null,1,cljs.core.count.call(null,c)));
-});
 termcat.rules.bind.strongest_blank = (function strongest_blank(t1,t2,default$){var pred__8925 = (function (p1__8921_SHARP_,p2__8920_SHARP_){return cljs.core.contains_QMARK_.call(null,p2__8920_SHARP_,p1__8921_SHARP_);
 });var expr__8926 = cljs.core.PersistentHashSet.fromArray.call(null,[termcat.term.tt.call(null,t1),termcat.term.tt.call(null,t2)],true);if(pred__8925.call(null,null,expr__8926))
 {return null;
@@ -46,7 +44,7 @@ var G__9043__2 = (function (state__6468__auto__,input__6469__auto__){var padded_
 {try{var ocr_8929_5__8954_0__8958 = cljs.core.nth.call(null,ocr_8929_5__8954,0);if(cljs.core.keyword_identical_QMARK_.call(null,ocr_8929_5__8954_0__8958,new cljs.core.Keyword(null,"block","block",1107736575)))
 {if(cljs.core._EQ_.call(null,termcat.term.payload.call(null,t3),"bind"))
 {var ts = termcat.rewrite.unwrap.call(null,t4);var name = (function (){var $ = cljs.core.first.call(null,ts);var $__$1 = (cljs.core.truth_($)?termcat.term.payload.call(null,$):null);return $__$1;
-})();if((cljs.core._EQ_.call(null,1,cljs.core.count.call(null,ts))) && ((termcat.rules.bind.char_QMARK_.call(null,name)) || (typeof name === 'string')))
+})();if((cljs.core._EQ_.call(null,1,cljs.core.count.call(null,ts))) && (typeof name === 'string'))
 {return cljs.core.conj.call(null,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.assoc.call(null,state,name,termcat.rewrite.unwrap.call(null,t5)),termcat.rules.bind.strongest_blank.call(null,t1,t6,t1)], null),((!(cljs.core.contains_QMARK_.call(null,new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 4, [null,null,new cljs.core.Keyword(null,"emptyline","emptyline",3889609267),null,new cljs.core.Keyword(null,"newline","newline",2859826438),null,new cljs.core.Keyword(null,"whitespace","whitespace",1290815983),null], null), null),termcat.term.tt.call(null,t6))))?t6:null));
 } else
 {return new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [state,t1,termcat.term.token.call(null,new cljs.core.Keyword(null,"error","error",1110689146),cljs.core.apply.call(null,cljs.core.str,"!bind: not a valid name \u2014 ",name,(((cljs.core.count.call(null,ts) > 1))?[cljs.core.str(" (and "),cljs.core.str((cljs.core.count.call(null,ts) - 1)),cljs.core.str(" more tokens)")].join(''):null))),t6], null);
@@ -163,7 +161,7 @@ var G__9043__2 = (function (state__6468__auto__,input__6469__auto__){var padded_
 {try{var ocr_8929_5__8954_0__8962 = cljs.core.nth.call(null,ocr_8929_5__8954,0);if(cljs.core.keyword_identical_QMARK_.call(null,ocr_8929_5__8954_0__8962,new cljs.core.Keyword(null,"block","block",1107736575)))
 {if(cljs.core._EQ_.call(null,termcat.term.payload.call(null,t3),"bind"))
 {var ts = termcat.rewrite.unwrap.call(null,t4);var name = (function (){var $ = cljs.core.first.call(null,ts);var $__$1 = (cljs.core.truth_($)?termcat.term.payload.call(null,$):null);return $__$1;
-})();if((cljs.core._EQ_.call(null,1,cljs.core.count.call(null,ts))) && ((termcat.rules.bind.char_QMARK_.call(null,name)) || (typeof name === 'string')))
+})();if((cljs.core._EQ_.call(null,1,cljs.core.count.call(null,ts))) && (typeof name === 'string'))
 {return cljs.core.conj.call(null,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.assoc.call(null,state,name,termcat.rewrite.unwrap.call(null,t5)),termcat.rules.bind.strongest_blank.call(null,t1,t6,t1)], null),((!(cljs.core.contains_QMARK_.call(null,new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 4, [null,null,new cljs.core.Keyword(null,"emptyline","emptyline",3889609267),null,new cljs.core.Keyword(null,"newline","newline",2859826438),null,new cljs.core.Keyword(null,"whitespace","whitespace",1290815983),null], null), null),termcat.term.tt.call(null,t6))))?t6:null));
 } else
 {return new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [state,t1,termcat.term.token.call(null,new cljs.core.Keyword(null,"error","error",1110689146),cljs.core.apply.call(null,cljs.core.str,"!bind: not a valid name \u2014 ",name,(((cljs.core.count.call(null,ts) > 1))?[cljs.core.str(" (and "),cljs.core.str((cljs.core.count.call(null,ts) - 1)),cljs.core.str(" more tokens)")].join(''):null))),t6], null);
@@ -280,7 +278,7 @@ var G__9043__2 = (function (state__6468__auto__,input__6469__auto__){var padded_
 {try{var ocr_8929_5__8954_0__8966 = cljs.core.nth.call(null,ocr_8929_5__8954,0);if(cljs.core.keyword_identical_QMARK_.call(null,ocr_8929_5__8954_0__8966,new cljs.core.Keyword(null,"block","block",1107736575)))
 {if(cljs.core._EQ_.call(null,termcat.term.payload.call(null,t3),"bind"))
 {var ts = termcat.rewrite.unwrap.call(null,t4);var name = (function (){var $ = cljs.core.first.call(null,ts);var $__$1 = (cljs.core.truth_($)?termcat.term.payload.call(null,$):null);return $__$1;
-})();if((cljs.core._EQ_.call(null,1,cljs.core.count.call(null,ts))) && ((termcat.rules.bind.char_QMARK_.call(null,name)) || (typeof name === 'string')))
+})();if((cljs.core._EQ_.call(null,1,cljs.core.count.call(null,ts))) && (typeof name === 'string'))
 {return cljs.core.conj.call(null,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.assoc.call(null,state,name,termcat.rewrite.unwrap.call(null,t5)),termcat.rules.bind.strongest_blank.call(null,t1,t6,t1)], null),((!(cljs.core.contains_QMARK_.call(null,new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 4, [null,null,new cljs.core.Keyword(null,"emptyline","emptyline",3889609267),null,new cljs.core.Keyword(null,"newline","newline",2859826438),null,new cljs.core.Keyword(null,"whitespace","whitespace",1290815983),null], null), null),termcat.term.tt.call(null,t6))))?t6:null));
 } else
 {return new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [state,t1,termcat.term.token.call(null,new cljs.core.Keyword(null,"error","error",1110689146),cljs.core.apply.call(null,cljs.core.str,"!bind: not a valid name \u2014 ",name,(((cljs.core.count.call(null,ts) > 1))?[cljs.core.str(" (and "),cljs.core.str((cljs.core.count.call(null,ts) - 1)),cljs.core.str(" more tokens)")].join(''):null))),t6], null);
@@ -397,7 +395,7 @@ var G__9043__2 = (function (state__6468__auto__,input__6469__auto__){var padded_
 {try{var ocr_8929_5__8954_0__8970 = cljs.core.nth.call(null,ocr_8929_5__8954,0);if(cljs.core.keyword_identical_QMARK_.call(null,ocr_8929_5__8954_0__8970,new cljs.core.Keyword(null,"block","block",1107736575)))
 {if(cljs.core._EQ_.call(null,termcat.term.payload.call(null,t3),"bind"))
 {var ts = termcat.rewrite.unwrap.call(null,t4);var name = (function (){var $ = cljs.core.first.call(null,ts);var $__$1 = (cljs.core.truth_($)?termcat.term.payload.call(null,$):null);return $__$1;
-})();if((cljs.core._EQ_.call(null,1,cljs.core.count.call(null,ts))) && ((termcat.rules.bind.char_QMARK_.call(null,name)) || (typeof name === 'string')))
+})();if((cljs.core._EQ_.call(null,1,cljs.core.count.call(null,ts))) && (typeof name === 'string'))
 {return cljs.core.conj.call(null,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.assoc.call(null,state,name,termcat.rewrite.unwrap.call(null,t5)),termcat.rules.bind.strongest_blank.call(null,t1,t6,t1)], null),((!(cljs.core.contains_QMARK_.call(null,new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 4, [null,null,new cljs.core.Keyword(null,"emptyline","emptyline",3889609267),null,new cljs.core.Keyword(null,"newline","newline",2859826438),null,new cljs.core.Keyword(null,"whitespace","whitespace",1290815983),null], null), null),termcat.term.tt.call(null,t6))))?t6:null));
 } else
 {return new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [state,t1,termcat.term.token.call(null,new cljs.core.Keyword(null,"error","error",1110689146),cljs.core.apply.call(null,cljs.core.str,"!bind: not a valid name \u2014 ",name,(((cljs.core.count.call(null,ts) > 1))?[cljs.core.str(" (and "),cljs.core.str((cljs.core.count.call(null,ts) - 1)),cljs.core.str(" more tokens)")].join(''):null))),t6], null);
@@ -526,7 +524,7 @@ var G__9043__2 = (function (state__6468__auto__,input__6469__auto__){var padded_
 {try{var ocr_8929_5__8954_0__8976 = cljs.core.nth.call(null,ocr_8929_5__8954,0);if(cljs.core.keyword_identical_QMARK_.call(null,ocr_8929_5__8954_0__8976,new cljs.core.Keyword(null,"block","block",1107736575)))
 {if(cljs.core._EQ_.call(null,termcat.term.payload.call(null,t3),"bind"))
 {var ts = termcat.rewrite.unwrap.call(null,t4);var name = (function (){var $ = cljs.core.first.call(null,ts);var $__$1 = (cljs.core.truth_($)?termcat.term.payload.call(null,$):null);return $__$1;
-})();if((cljs.core._EQ_.call(null,1,cljs.core.count.call(null,ts))) && ((termcat.rules.bind.char_QMARK_.call(null,name)) || (typeof name === 'string')))
+})();if((cljs.core._EQ_.call(null,1,cljs.core.count.call(null,ts))) && (typeof name === 'string'))
 {return cljs.core.conj.call(null,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.assoc.call(null,state,name,termcat.rewrite.unwrap.call(null,t5)),termcat.rules.bind.strongest_blank.call(null,t1,t6,t1)], null),((!(cljs.core.contains_QMARK_.call(null,new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 4, [null,null,new cljs.core.Keyword(null,"emptyline","emptyline",3889609267),null,new cljs.core.Keyword(null,"newline","newline",2859826438),null,new cljs.core.Keyword(null,"whitespace","whitespace",1290815983),null], null), null),termcat.term.tt.call(null,t6))))?t6:null));
 } else
 {return new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [state,t1,termcat.term.token.call(null,new cljs.core.Keyword(null,"error","error",1110689146),cljs.core.apply.call(null,cljs.core.str,"!bind: not a valid name \u2014 ",name,(((cljs.core.count.call(null,ts) > 1))?[cljs.core.str(" (and "),cljs.core.str((cljs.core.count.call(null,ts) - 1)),cljs.core.str(" more tokens)")].join(''):null))),t6], null);

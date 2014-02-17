@@ -8,9 +8,6 @@
             [termcat.term :as t]
             [termcat.util.lambda :as lambda]))
 
-#+cljs (defn char? [c] (and (string? c)
-                            (= 1 (count c))))
-
 (defn strongest-blank [t1 t2 default]
   (condp #(contains? %2 %1) (hash-set (t/tt t1) (t/tt t2))
     nil nil ; skip
@@ -31,7 +28,7 @@
           name (as-> (first ts) $
                      (if $ (t/payload $)))]
       (if (and (= 1 (count ts))
-               (or (char? name) (string? name)))
+               (or #+clj (char? name) (string? name)))
         (conj [(assoc state name (rw/unwrap t5))
                (strongest-blank t1 t6 t1)]
               (if-not (contains? #{nil :whitespace
