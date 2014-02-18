@@ -1,7 +1,7 @@
-<html><head><meta charset='utf-8'><title>Termcat ClojureScript Demo</title><style>iframe { width: 100%; height: 100%; }</style><script src='termcat.js'></script><script id='in' type='text/termcat'><head>
-<title>The Termcat Markup Language</title>
-<link rel="stylesheet" href="termcat-intro.css">
-</head>
+<html><head><meta charset='utf-8'><title>Termcat ‘ClojureScript Edition’ Demo</title><style>body { padding: 0; margin: 0 }iframe { position: absolute; width: 50%; height: 100%; }#in { left: 0; white-space: pre }#out { left: 50% }</style><script src='termcat.js'></script></head><body><iframe id='in' srcdoc='&lt;html&gt;&lt;head&gt;&lt;style&gt;body { white-space: pre-wrap }&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&amp;lt;head&amp;gt;
+&amp;lt;title&amp;gt;The Termcat Markup Language&amp;lt;/title&amp;gt;
+&amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;termcat-intro.css&amp;quot;&amp;gt;
+&amp;lt;/head&amp;gt;
 
 # The Termcat Markup Language
 
@@ -11,7 +11,7 @@
 
 Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the user-friendly syntax for titles, lists, links, emphasis, and so on. Termcat aims to be more powerful, however. Like LaTeX, Termcat is fully programmable and it also comes with special syntax for typographic features that are difficult to unlock using plain Markdown or HTML.
 
-This document was compiled using Termcat. You can find this document's source code [here](https://github.com/jdevuyst/termcat/blob/master/doc/termcat-intro.tc).
+This document was compiled using Termcat. You can find this document&amp;apos;s source code [here](https://github.com/jdevuyst/termcat/blob/master/doc/termcat-intro.tc).
 
 **Contents**
 
@@ -23,21 +23,21 @@ This document was compiled using Termcat. You can find this document's source co
 - [Usage](#usage)
 - [Status](#status)
 
-## <a name="basics"></a>The Basics
+## &amp;lt;a name=&amp;quot;basics&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;The Basics
 
 The syntax for titles is the same as in Markdown.
 
-<pre>\# This is a document title
-&#10;&#10;## This is a section title
-&#10;&#10;### This is a subsection title</pre>
+&amp;lt;pre&amp;gt;\# This is a document title
+&amp;amp;#10;&amp;amp;#10;## This is a section title
+&amp;amp;#10;&amp;amp;#10;### This is a subsection title&amp;lt;/pre&amp;gt;
 
-So are the syntax for <q>*emphasis*</q> (<code>\*emphasis\*</code>), <q>_underline_</q> (<code>\_underline_</code>), and <q>[links](http://example.com)</q> (<code>\[links\](http://example.com)</code>). Caveat: To emphasize or underline more than one word, it's necessary to enclose the text fragment in a block. Parentheses can be used for this purpose: <code>\*\*(This is strong text)\*\*</code> renders as <q>**(This is strong text)**</q>.
+So are the syntax for &amp;lt;q&amp;gt;*emphasis*&amp;lt;/q&amp;gt; (&amp;lt;code&amp;gt;\*emphasis\*&amp;lt;/code&amp;gt;), &amp;lt;q&amp;gt;_underline_&amp;lt;/q&amp;gt; (&amp;lt;code&amp;gt;\_underline_&amp;lt;/code&amp;gt;), and &amp;lt;q&amp;gt;[links](http://example.com)&amp;lt;/q&amp;gt; (&amp;lt;code&amp;gt;\[links\](http://example.com)&amp;lt;/code&amp;gt;). Caveat: To emphasize or underline more than one word, it&amp;apos;s necessary to enclose the text fragment in a block. Parentheses can be used for this purpose: &amp;lt;code&amp;gt;\*\*(This is strong text)\*\*&amp;lt;/code&amp;gt; renders as &amp;lt;q&amp;gt;**(This is strong text)**&amp;lt;/q&amp;gt;.
 
 Bullet lists can be created by starting a line with a hyphen followed by a space.
 
 Consider the following code:
 
-<pre>.lit(
+&amp;lt;pre&amp;gt;.lit(
 - Item 1
 - Item 2
 - Bullet items can consist of multiple paragraphs.
@@ -46,7 +46,7 @@ Consider the following code:
 
   - Bullet lists can also be nested
     - Once more the trick is to indent the nested lists with two extra spaces.
-)</pre>
+)&amp;lt;/pre&amp;gt;
 
 This renders as follows:
 
@@ -61,72 +61,72 @@ This renders as follows:
 
 By default, blocks of text that are indented with two spaces are considered blockquotes.
 
-The syntax <code>!\[alt text\](filename.png)</code> includes an image in the document.
+The syntax &amp;lt;code&amp;gt;!\[alt text\](filename.png)&amp;lt;/code&amp;gt; includes an image in the document.
 
   ![One symbol of anarcho-syndicalism is a black cat, drawn by Ralph Chaplin. It was also the logo of my go-to Bagel place when I lived in Brooklyn.](norbert.png)
 
-Upright single quotes <code>\'</code> render as right quotes <q>'</q> (or apostrophes) and backticks <code>\`</code> render as left quotes <q>`</q>. Termcat automatically inserts extra horizontal whitespace after periods, question marks, exclamation marks, and colons, but o.c. not after acronyms.
-Long dashes can be included using double (<code>-\-</code> TO <q>--</q>) or triple (<q>---</q>) hyphens.
+Upright single quotes &amp;lt;code&amp;gt;\&amp;apos;&amp;lt;/code&amp;gt; render as right quotes &amp;lt;q&amp;gt;&amp;apos;&amp;lt;/q&amp;gt; (or apostrophes) and backticks &amp;lt;code&amp;gt;\`&amp;lt;/code&amp;gt; render as left quotes &amp;lt;q&amp;gt;`&amp;lt;/q&amp;gt;. Termcat automatically inserts extra horizontal whitespace after periods, question marks, exclamation marks, and colons, but o.c. not after acronyms.
+Long dashes can be included using double (&amp;lt;code&amp;gt;-\-&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;--&amp;lt;/q&amp;gt;) or triple (&amp;lt;q&amp;gt;---&amp;lt;/q&amp;gt;) hyphens.
 
-There's special syntax for diactritics:
-- <code>r\%\^ole</code> TO <q>r%^ole</q>
-- <code>n\%\'ee</code> TO <q>n%'ee</q>
-- <code>Gruy\%\`ere</code> TO <q>Gruy%`ere</q>
-- <code>co\%\"option</code> TO <q>co%"option</q>
+There&amp;apos;s special syntax for diactritics:
+- &amp;lt;code&amp;gt;r\%\^ole&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;r%^ole&amp;lt;/q&amp;gt;
+- &amp;lt;code&amp;gt;n\%\&amp;apos;ee&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;n%&amp;apos;ee&amp;lt;/q&amp;gt;
+- &amp;lt;code&amp;gt;Gruy\%\`ere&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;Gruy%`ere&amp;lt;/q&amp;gt;
+- &amp;lt;code&amp;gt;co\%\&amp;quot;option&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;co%&amp;quot;option&amp;lt;/q&amp;gt;
 
-Users of p%1iny%1in can also use the notation <code>\%1e</code>, <code>\%2e</code>, <code>\%3e</code>, <code>\%4e</code> for <q>%1e</q>, <q>%2e</q>, <q>%3e</q>, and <q>%4e</q>.
+Users of p%1iny%1in can also use the notation &amp;lt;code&amp;gt;\%1e&amp;lt;/code&amp;gt;, &amp;lt;code&amp;gt;\%2e&amp;lt;/code&amp;gt;, &amp;lt;code&amp;gt;\%3e&amp;lt;/code&amp;gt;, &amp;lt;code&amp;gt;\%4e&amp;lt;/code&amp;gt; for &amp;lt;q&amp;gt;%1e&amp;lt;/q&amp;gt;, &amp;lt;q&amp;gt;%2e&amp;lt;/q&amp;gt;, &amp;lt;q&amp;gt;%3e&amp;lt;/q&amp;gt;, and &amp;lt;q&amp;gt;%4e&amp;lt;/q&amp;gt;.
 
-It's possible to change the space between characters: <code>l\%-2pt\%ess is m\%+0.4ex\%ore</code> TO <q>l%-2pt%ess is m%+0.4ex%ore</q>.
+It&amp;apos;s possible to change the space between characters: &amp;lt;code&amp;gt;l\%-2pt\%ess is m\%+0.4ex\%ore&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;l%-2pt%ess is m%+0.4ex%ore&amp;lt;/q&amp;gt;.
 
-Similarly, spaces<q>%_1em</q>of<q>%_1em</q>variable<q>%_1em</q>width can be created using the syntax <code>\%\_1em</code>. Like in LaTeX, tildes can be used for non-breaking spaces: <code>100\~kg</code> TO <q>100~kg</q>.
+Similarly, spaces&amp;lt;q&amp;gt;%_1em&amp;lt;/q&amp;gt;of&amp;lt;q&amp;gt;%_1em&amp;lt;/q&amp;gt;variable&amp;lt;q&amp;gt;%_1em&amp;lt;/q&amp;gt;width can be created using the syntax &amp;lt;code&amp;gt;\%\_1em&amp;lt;/code&amp;gt;. Like in LaTeX, tildes can be used for non-breaking spaces: &amp;lt;code&amp;gt;100\~kg&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;100~kg&amp;lt;/q&amp;gt;.
 
-Two subsequent percent symbols <code>\%\%</code> indicate the start of a comment. The comment continues until a newline character is encountered. %% This is a comment
+Two subsequent percent symbols &amp;lt;code&amp;gt;\%\%&amp;lt;/code&amp;gt; indicate the start of a comment. The comment continues until a newline character is encountered. %% This is a comment
 
-When <code>\%</code> is used in other contexts then it inserts a zero-width space. This space will not make it into the output HTML document. This is useful when you want to trigger syntactic sugar that only works after or before whitespace. For example, type <code>.lit(a%**b**%c)</code> for <q>a%**b**%c</q>.
+When &amp;lt;code&amp;gt;\%&amp;lt;/code&amp;gt; is used in other contexts then it inserts a zero-width space. This space will not make it into the output HTML document. This is useful when you want to trigger syntactic sugar that only works after or before whitespace. For example, type &amp;lt;code&amp;gt;.lit(a%**b**%c)&amp;lt;/code&amp;gt; for &amp;lt;q&amp;gt;a%**b**%c&amp;lt;/q&amp;gt;.
 
-Put a backslash <code>\\</code> in front of a symbol to indicate that the symbol is content, not syntax: <code>.lit(\%)</code> TO <q>\%</q>.
+Put a backslash &amp;lt;code&amp;gt;\\&amp;lt;/code&amp;gt; in front of a symbol to indicate that the symbol is content, not syntax: &amp;lt;code&amp;gt;.lit(\%)&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;\%&amp;lt;/q&amp;gt;.
 
-## <a name="html"></a>HTML
+## &amp;lt;a name=&amp;quot;html&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;HTML
 
-When HTML tags are encountered in Termcat documents, they `fall through' to the HTML output. Hence <code>\<b>this\</b></code> renders as <q><b>this</b></q>.
+When HTML tags are encountered in Termcat documents, they `fall through&amp;apos; to the HTML output. Hence &amp;lt;code&amp;gt;\&amp;lt;b&amp;gt;this\&amp;lt;/b&amp;gt;&amp;lt;/code&amp;gt; renders as &amp;lt;q&amp;gt;&amp;lt;b&amp;gt;this&amp;lt;/b&amp;gt;&amp;lt;/q&amp;gt;.
 
-When a <code>\<head></code> block is encountered, the code within that block is moved to the head of the output HTML document. This way the title of the document, stylesheets, and so on can be changed.
+When a &amp;lt;code&amp;gt;\&amp;lt;head&amp;gt;&amp;lt;/code&amp;gt; block is encountered, the code within that block is moved to the head of the output HTML document. This way the title of the document, stylesheets, and so on can be changed.
 
-## <a name="struct"></a>The Structure of a Termcat Document
+## &amp;lt;a name=&amp;quot;struct&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;The Structure of a Termcat Document
 
-Termcat documents are trees. The nodes of these trees---`blocks' in Termcat parlance---are delimited by parentheses <code>()</code>, brackets <code>[]</code>, braces <code>{}</code>, indentation, or bullet marks. One important consequence of this is that parentheses, brackets, and braces must at all times be balanced (unless they're escaped by backslashes).
+Termcat documents are trees. The nodes of these trees---`blocks&amp;apos; in Termcat parlance---are delimited by parentheses &amp;lt;code&amp;gt;()&amp;lt;/code&amp;gt;, brackets &amp;lt;code&amp;gt;[]&amp;lt;/code&amp;gt;, braces &amp;lt;code&amp;gt;{}&amp;lt;/code&amp;gt;, indentation, or bullet marks. One important consequence of this is that parentheses, brackets, and braces must at all times be balanced (unless they&amp;apos;re escaped by backslashes).
 
-For many purposes it doesn't matter how a block is delimited. For instance, a numbered list can be created using the notation:
-<pre>\:numbered-list<br>\- item 1<br>\- item 2</pre>
+For many purposes it doesn&amp;apos;t matter how a block is delimited. For instance, a numbered list can be created using the notation:
+&amp;lt;pre&amp;gt;\:numbered-list&amp;lt;br&amp;gt;\- item 1&amp;lt;br&amp;gt;\- item 2&amp;lt;/pre&amp;gt;
 or
-<pre>\:numbered-list(item 1)[item 2]</pre>
+&amp;lt;pre&amp;gt;\:numbered-list(item 1)[item 2]&amp;lt;/pre&amp;gt;
 and it will render as
   :numbered-list(item 1)[item 2]
 
-## <a name="math"></a>Math
+## &amp;lt;a name=&amp;quot;math&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;Math
 
 Termcat has a novel syntax for mathematics. Rather than having delimiters that indicate the start and end of a mathematical expression, Termcat expects to be told what (i) the identifiers, and what (ii) the operators, functions, and predicates are in an expression.
 
 At least it expects to be told these things for *some* of the expressions that you type. Termcat can be programmed to recognize common operators and identifiers, and it can also draw inferences.
 
-To mark a character as a mathematical identifier, prefix it with an asterisk <code>\*</code>: <code>\*a</code> TO <q>*a</q>. Similarly, when Termcat encounters the expression <code>\*abc</code> then it will infer that `b' and `c' are also identifiers. The result is <q>*abc</q>. To turn a word into a single identifier, type <code>\*(op)</code>. This renders as <q>*(op)</q>---as in LaTeX, multi-character indentifiers are not italicized. Mathematical identifiers can also be typeset in a caligraphic font by using <code>\+</code> instead of <code>\*</code>. Thus, <code>\+M</code> becomes <q>+M</q>.
+To mark a character as a mathematical identifier, prefix it with an asterisk &amp;lt;code&amp;gt;\*&amp;lt;/code&amp;gt;: &amp;lt;code&amp;gt;\*a&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;*a&amp;lt;/q&amp;gt;. Similarly, when Termcat encounters the expression &amp;lt;code&amp;gt;\*abc&amp;lt;/code&amp;gt; then it will infer that `b&amp;apos; and `c&amp;apos; are also identifiers. The result is &amp;lt;q&amp;gt;*abc&amp;lt;/q&amp;gt;. To turn a word into a single identifier, type &amp;lt;code&amp;gt;\*(op)&amp;lt;/code&amp;gt;. This renders as &amp;lt;q&amp;gt;*(op)&amp;lt;/q&amp;gt;---as in LaTeX, multi-character indentifiers are not italicized. Mathematical identifiers can also be typeset in a caligraphic font by using &amp;lt;code&amp;gt;\+&amp;lt;/code&amp;gt; instead of &amp;lt;code&amp;gt;\*&amp;lt;/code&amp;gt;. Thus, &amp;lt;code&amp;gt;\+M&amp;lt;/code&amp;gt; becomes &amp;lt;q&amp;gt;+M&amp;lt;/q&amp;gt;.
 
-To use the binary minus operator, type <code>x \~\-\~ y</code>. This yields <q>x ~-~ y</q>.
+To use the binary minus operator, type &amp;lt;code&amp;gt;x \~\-\~ y&amp;lt;/code&amp;gt;. This yields &amp;lt;q&amp;gt;x ~-~ y&amp;lt;/q&amp;gt;.
 
-Does typing <code>\~-\~</code> over and over again sound like a chore? No problem. Simply include the following code at the top of your document:
-  \!bind<br>\- -<br>"- \~-\~
+Does typing &amp;lt;code&amp;gt;\~-\~&amp;lt;/code&amp;gt; over and over again sound like a chore? No problem. Simply include the following code at the top of your document:
+  \!bind&amp;lt;br&amp;gt;\- -&amp;lt;br&amp;gt;&amp;quot;- \~-\~
 From that point onwards, Termcat will interpret every minus sign surrounded by whitespace on both sides as a binary infix operator.
 
-Predictably, for prefix operators you can type <code>sin\~ x</code> or <code>x \~!</code>. This renders as <q>sin~ x</q> or <q>x ~!</q>.
+Predictably, for prefix operators you can type &amp;lt;code&amp;gt;sin\~ x&amp;lt;/code&amp;gt; or &amp;lt;code&amp;gt;x \~!&amp;lt;/code&amp;gt;. This renders as &amp;lt;q&amp;gt;sin~ x&amp;lt;/q&amp;gt; or &amp;lt;q&amp;gt;x ~!&amp;lt;/q&amp;gt;.
 
-When one tilde is used on either side of an operator, Termcat will use the default MathML spacing for that operator. Use two tildes to insert a `thick math space' and three tildes to use a `very very thick math space'.
+When one tilde is used on either side of an operator, Termcat will use the default MathML spacing for that operator. Use two tildes to insert a `thick math space&amp;apos; and three tildes to use a `very very thick math space&amp;apos;.
 
-It may sometimes be necessary to type <code>(\~</code> and <code>\~)</code> to indicate that parentheses (or brackets or braces) should be interpreted as mathematical `fences': <code>.lit((~ x ~,~ y ~])</code> TO <q>(~ x ~,~ y ~]</q>.
+It may sometimes be necessary to type &amp;lt;code&amp;gt;(\~&amp;lt;/code&amp;gt; and &amp;lt;code&amp;gt;\~)&amp;lt;/code&amp;gt; to indicate that parentheses (or brackets or braces) should be interpreted as mathematical `fences&amp;apos;: &amp;lt;code&amp;gt;.lit((~ x ~,~ y ~])&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;(~ x ~,~ y ~]&amp;lt;/q&amp;gt;.
 
-Type <code>\<\~</code> and <code>\~\></code> to insert chevrons.
+Type &amp;lt;code&amp;gt;\&amp;lt;\~&amp;lt;/code&amp;gt; and &amp;lt;code&amp;gt;\~\&amp;gt;&amp;lt;/code&amp;gt; to insert chevrons.
 
 Using some of the above knowledge we can use the following code
-<pre>.lit(!bind
+&amp;lt;pre&amp;gt;.lit(!bind
 - =
 - ~=~
 !bind
@@ -145,10 +145,10 @@ Using some of the above knowledge we can use the following code
 - |
 - ~~|~~
 !bind
-- <
-- ~<~
+- &amp;lt;
+- ~&amp;lt;~
 
-E = {<~ a , n , n' ~> SUBSETEQ A * N * N | Pa and n < n'})</pre>
+E = {&amp;lt;~ a , n , n&amp;apos; ~&amp;gt; SUBSETEQ A * N * N | Pa and n &amp;lt; n&amp;apos;})&amp;lt;/pre&amp;gt;
 
 to generate
   !bind
@@ -170,24 +170,24 @@ to generate
   - |
   - ~~|~~
   !bind
-  - <
-  - ~<~
+  - &amp;lt;
+  - ~&amp;lt;~
 
-  E = {<~ a , n , n' ~> SUBSETEQ A * N * N | Pa and n < n'}
+  E = {&amp;lt;~ a , n , n&amp;apos; ~&amp;gt; SUBSETEQ A * N * N | Pa and n &amp;lt; n&amp;apos;}
 
-Notice that Termcat also correctly recognizes primes. It's also possible to use subscripts, superscripts, and fractions using syntax like this:
-- <code>(a\^b\_c)\|d</code> TO <q>(a^b_c)|d</q>
-- <code>.lit(&int;~ ^a_b *f(x) &dd;~ x)</code> TO <q>&int;~ ^a_b *f(x) &dd;~ x</q>
+Notice that Termcat also correctly recognizes primes. It&amp;apos;s also possible to use subscripts, superscripts, and fractions using syntax like this:
+- &amp;lt;code&amp;gt;(a\^b\_c)\|d&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;(a^b_c)|d&amp;lt;/q&amp;gt;
+- &amp;lt;code&amp;gt;.lit(&amp;amp;int;~ ^a_b *f(x) &amp;amp;dd;~ x)&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;&amp;amp;int;~ ^a_b *f(x) &amp;amp;dd;~ x&amp;lt;/q&amp;gt;
 
-To coerce something to be text, prefix it with a double upright quotes "character <code>\"</code>.
+To coerce something to be text, prefix it with a double upright quotes &amp;quot;character &amp;lt;code&amp;gt;\&amp;quot;&amp;lt;/code&amp;gt;.
 
-## <a name="prog"></a>Programming
+## &amp;lt;a name=&amp;quot;prog&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;Programming
 
-Functions are invoked using the syntax <code>function-name(arg 1)(arg 2)(arg 3)</code>. The arguments are blocks and can be delimited by parentheses, brackets, braces, indentation, or bullet list marks as usual. The numbered list in the section [The Structure of a Termcat Document](#struct) is an example of a function call.
+Functions are invoked using the syntax &amp;lt;code&amp;gt;function-name(arg 1)(arg 2)(arg 3)&amp;lt;/code&amp;gt;. The arguments are blocks and can be delimited by parentheses, brackets, braces, indentation, or bullet list marks as usual. The numbered list in the section [The Structure of a Termcat Document](#struct) is an example of a function call.
 
-There's also experimental support for user-defined functions. The following Termcat code computes the fifth Fibonacci number:
+There&amp;apos;s also experimental support for user-defined functions. The following Termcat code computes the fifth Fibonacci number:
 
-<pre>.lit(
+&amp;lt;pre&amp;gt;.lit(
 !bind
 - fib
 - .fn
@@ -203,9 +203,9 @@ There's also experimental support for user-defined functions. The following Term
         - self(self#)(.add(n)(-1))
   #
 
-fib(fib#)(5))</pre>
+fib(fib#)(5))&amp;lt;/pre&amp;gt;
 
-It reduces to <q>.identity
+It reduces to &amp;lt;q&amp;gt;.identity
   !bind
   - fib
   - .fn
@@ -222,25 +222,25 @@ It reduces to <q>.identity
     #
 
   fib(fib#)(5)
-</q>.
+&amp;lt;/q&amp;gt;.
 
-## <a name="usage"></a>Usage
+## &amp;lt;a name=&amp;quot;usage&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;Usage
 
 Termcat is a console app and is invoked as follows.
 
-<pre>.lit(Usage: java -jar termcat.jar [options] <document[.tc]>
+&amp;lt;pre&amp;gt;.lit(Usage: java -jar termcat.jar [options] &amp;lt;document[.tc]&amp;gt;
 
 The HTML output is stored in document.html.
 
   -b, --browse   Open HTML output in browser
   -w, --watch    Watch document for changes and recompile when changed
   -v, --verbose  Use verbose output
-)</pre>
+)&amp;lt;/pre&amp;gt;
 
-Combine the switches <code>-b</code> and <code>-w</code> for a live preview of your Termcat document: Any change you make in the source document will be automatically reflected in your browser.
+Combine the switches &amp;lt;code&amp;gt;-b&amp;lt;/code&amp;gt; and &amp;lt;code&amp;gt;-w&amp;lt;/code&amp;gt; for a live preview of your Termcat document: Any change you make in the source document will be automatically reflected in your browser.
 
-## <a name="status"></a>Status
+## &amp;lt;a name=&amp;quot;status&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;Status
 
 Termcat is written in Clojure and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Email, bug reports, and pull requests are welcome!
 
-The current version of Termcat should be considered a prototype. I find it quite usable as-is, but nothing is set in stone and a lot of features are still missing.</script></head><body><iframe id='out'></iframe><script>var input = document.getElementById('in').innerText;var output = termcat.core.compile(input);var iframe = document.getElementById('out');iframe.srcdoc = output;</script></body></html>
+The current version of Termcat should be considered a prototype. I find it quite usable as-is, but nothing is set in stone and a lot of features are still missing.&lt;/body&gt;&lt;/html&gt;'></iframe><iframe id='out'></iframe><script>var inframe = document.getElementById('in');var outframe = document.getElementById('out');window.onload = function () {  inframe.contentDocument.designMode = 'on';  var input = inframe.contentDocument.body.textContent;  var output = termcat.core.compile(input);  outframe.srcdoc = output;}</script></body></html>
