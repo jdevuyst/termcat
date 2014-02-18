@@ -42002,7 +42002,7 @@ termcat.rules.tokenize.remove_magic_tokens = termcat.rewrite.abstraction.call(nu
                                 try {
                                   var ocr_10219_3__10232 = cljs.core.nth.call(null, ocr_10219, 3);
                                   if (cljs.core.keyword_identical_QMARK_.call(null, ocr_10219_3__10232, new cljs.core.Keyword(null, "default", "default", 2558708147))) {
-                                    if (!(cljs.core._EQ_.call(null, termcat.term.tt.call(null, t2), new cljs.core.Keyword(null, "dash", "dash", 1016980228)) && typeof termcat.term.payload.call(null, t2) === "string")) {
+                                    if (!(cljs.core._EQ_.call(null, termcat.term.tt.call(null, t2), new cljs.core.Keyword(null, "dash", "dash", 1016980228)) && (typeof termcat.term.payload.call(null, t2) === "string" && cljs.core.count.call(null, termcat.term.payload.call(null, t2)) > 1))) {
                                       return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [null, termcat.term.token.call(null, new cljs.core.Keyword(null, "default", "default", 2558708147), [cljs.core.str(termcat.term.payload.call(null, t1)), cljs.core.str(termcat.term.payload.call(null, t2)), cljs.core.str(termcat.term.payload.call(null, t3))].join(""))], null);
                                     } else {
                                       return null;

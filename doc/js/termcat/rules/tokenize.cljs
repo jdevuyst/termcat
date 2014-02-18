@@ -137,7 +137,8 @@
             :left-quote
             :right-quote) _] nil
   [_ :default _ :default] (if-not (and (= (t/tt t2) :dash)
-                                       (string? (t/payload t2)))
+                                       (string? (t/payload t2))
+                                              (> (count (t/payload t2)) 1))
                             [nil (t/token :default
                                           (str (t/payload t1)
                                                (t/payload t2)
