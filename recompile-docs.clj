@@ -13,13 +13,13 @@
     \" "&quot;"
     [c]))
 
-; (future (sh "lein" "run" "doc/termcat-intro"))
+(future (sh "lein" "run" "doc/termcat-intro"))
 
-; (sh "lein" "cljx")
-; (sh "lein" "cljsbuild" "once")
+(sh "lein" "cljx")
+(sh "lein" "cljsbuild" "once")
 
-; (sh "rm" "-r" "doc/js")
-; (future (sh "cp" "-r" "target/js" "target/termcat.js.map" "doc/"))
+(sh "rm" "-r" "doc/js")
+(future (sh "cp" "-r" "target/js" "target/termcat.js.map" "doc/"))
 
 (->> "target/termcat.js"
      slurp
@@ -72,7 +72,7 @@
           "  recompile();"
           "});"
           "var timeoutID;"
-          "inframe.contentWindow.addEventListener('keypress', function () {"
+          "inframe.contentWindow.addEventListener('keyup', function () {"
           "  clearTimeout(timeoutID);"
           "  timeoutID = setTimeout(recompile, 100);"
           "});"
