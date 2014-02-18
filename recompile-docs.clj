@@ -19,7 +19,14 @@
 ; (sh "lein" "cljsbuild" "once")
 
 ; (sh "rm" "-r" "doc/js")
-; (future (sh "cp" "-r" "target/js" "target/termcat.js" "target/termcat.js.map" "doc/"))
+; (future (sh "cp" "-r" "target/js" "target/termcat.js.map" "doc/"))
+
+(->> "target/termcat.js"
+     slurp
+     (str "self.addEventListener('message', function(e) {\n"
+          "  self.postMessage(termcat.core.compile(e.data));\n"
+          "}, false);\n")
+     (spit "doc/termcat.js"))
 
 (->> (str "<html>"
           "<head>"
@@ -51,15 +58,23 @@
           "var inframe = document.getElementById('in');"
           "var outframe = document.getElementById('out');"
           "var worker = new Worker('termcat.js');"
-          "worker.addEventListener('message', function (e) {"
-          "  outframe.srcdoc = e.data;"
-          "}, false);"
+          "function recompile() {"
+          "  var input = inframe.contentDocument.body.textContent;"
+          "  worker.terminate();"
+          "  worker = new Worker('termcat.js');"
+          "  worker.postMessage(input);"
+          "  worker.addEventListener('message', function (e) {"
+          "    outframe.srcdoc = e.data;"
+          "  }, false);"
+          "}"
           "addEventListener('load', function () {"
           "  inframe.contentDocument.designMode = 'on';"
-          "  var input = inframe.contentDocument.body.textContent;"
-          "  worker.postMessage(input);"
-          ; "  var output = termcat.core.compile(input);"
-          ; "  outframe.srcdoc = output;"
+          "  recompile();"
+          "});"
+          "var timeoutID;"
+          "inframe.contentWindow.addEventListener('keypress', function () {"
+          "  clearTimeout(timeoutID);"
+          "  timeoutID = setTimeout(recompile, 100);"
           "});"
           "</script>"
           "</body>"
