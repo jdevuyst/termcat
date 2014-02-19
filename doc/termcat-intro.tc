@@ -239,8 +239,12 @@ The HTML output is stored in document.html.
 
 Combine the switches <code>-b</code> and <code>-w</code> for a live preview of your Termcat document: Any change you make in the source document will be automatically reflected in your browser.
 
+Termcat can also be embedded in web pages. For an example, see the [live demo](http://jdevuyst.github.io/termcat/doc/termcat-demo.html).
+
+Finally, it's worth noting that when a document is changed, Termcat is smart enough not to recompile the nodes that were not modified.
+
 ## <a name="status"></a>Status
 
-Termcat is written in Clojure and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Email, bug reports, and pull requests are welcome!
+Termcat is written in Clojure(Script) and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Email, bug reports, and pull requests are welcome!
 
-The current version of Termcat should be considered a prototype. I find it quite usable as-is, but nothing is set in stone and a lot of features are still missing.
+The current version of Termcat should be considered a prototype. I find it quite usable as-is, but nothing is set in stone and a lot of features are still missing. There's a lot of room for performance enhancements too.

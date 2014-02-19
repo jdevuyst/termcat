@@ -11,15 +11,7 @@ goog.require('cljs.reader');
 goog.require('cljs.reader');
 goog.require('cljs.core.match');
 termcat.util.math.number_string_QMARK_ = (function number_string_QMARK_(s){try{return typeof cljs.reader.read_string(s) === 'number';
-}catch (e10515){if((e10515 instanceof java.lang.Exception))
-{var x = e10515;return false;
-} else
-{if(cljs.core.constant$keyword$6)
-{throw e10515;
-} else
-{return null;
-}
-}
+}catch (e10515){var x = e10515;return false;
 }});
 termcat.util.math.math_opts = (function math_opts(t){var ocr_10523 = termcat.term.tt(t);try{if((cljs.core.vector_QMARK_(ocr_10523)) && ((cljs.core.count(ocr_10523) === 2)))
 {try{var ocr_10523_0__10525 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_10523,0);if(cljs.core.keyword_identical_QMARK_(ocr_10523_0__10525,cljs.core.constant$keyword$26))

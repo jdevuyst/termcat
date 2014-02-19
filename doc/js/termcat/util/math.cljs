@@ -10,7 +10,7 @@
 (defn number-string? [s]
   (try
     (number? (edn/read-string s))
-    (catch java.lang.Exception x false)))
+    (catch                                  :default  x false)))
 
 (defn math-opts [t]
   (match (t/tt t)

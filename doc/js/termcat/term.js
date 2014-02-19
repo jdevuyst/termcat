@@ -640,15 +640,7 @@ termcat.term.Token.prototype.termcat$term$ITerm$tt$arity$1 = (function (this$){v
 termcat.term.Fragment.prototype.termcat$term$IFragment$ = true;
 termcat.term.Fragment.prototype.termcat$term$IFragment$ednval$arity$1 = (function (this$){var this$__$1 = this;if(cljs.core.truth_(clojure.core.reducers.reduce.cljs$core$IFn$_invoke$arity$3(cljs.core.constantly(cljs.core.reduced(false)),true,clojure.core.reducers.filter.cljs$core$IFn$_invoke$arity$2(cljs.core.complement(termcat.term.token_QMARK_),this$__$1.terms))))
 {try{return cljs.reader.read_string(clojure.core.reducers.fold.cljs$core$IFn$_invoke$arity$2(cljs.core.str,clojure.core.reducers.map.cljs$core$IFn$_invoke$arity$2(termcat.term.payload,this$__$1.terms)));
-}catch (e10487){if((e10487 instanceof java.lang.Exception))
-{var x = e10487;return null;
-} else
-{if(cljs.core.constant$keyword$6)
-{throw e10487;
-} else
-{return null;
-}
-}
+}catch (e10487){var x = e10487;return null;
 }} else
 {return null;
 }

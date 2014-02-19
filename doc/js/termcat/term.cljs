@@ -130,7 +130,7 @@
                    (r/map payload)
                    (r/fold str)
                    edn/read-string)
-              (catch java.lang.Exception x
+              (catch                                  :default x
                 nil)))))
 
 (extend-type Block

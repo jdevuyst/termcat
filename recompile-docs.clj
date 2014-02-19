@@ -19,6 +19,8 @@
     \" "&quot;"
     [c]))
 
+(sh "rm" "doc/termcat-intro.html" "doc/termcat-demo.html" "doc/termcat.js" "doc/termcat.js.map")
+
 (def f1 (future (do
                   (sh "lein" "run" "doc/termcat-intro")
                   (browse "doc/termcat-intro.html"))))
