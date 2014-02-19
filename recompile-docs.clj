@@ -46,8 +46,11 @@
           "<head>"
           "<meta charset='utf-8'>"
           "<title>Termcat Live Demo</title>"
+          "<script>var worker = new Worker('termcat.js');</script>"
+          "<script src='termcat-demo.js'></script>"
+          "<link rel='stylesheet' href='termcat-intro.css'>"
           "<style>"
-          "body { padding: 0; margin: 0 }"
+          "body { padding: 0; margin: 0; }"
           "iframe { border: none; position: absolute; width: 50vw; height: 100vh; }"
           "#in { left: 0; white-space: pre }"
           "#out { left: 50% }"
@@ -57,7 +60,7 @@
           "<iframe id='in' srcdoc='"
           (->> (str "<html><head>"
                     "<link rel='stylesheet' href='termcat-intro.css'>"
-                    "<style>body { white-space: pre-wrap; line-height: 100%; height: 100vw }</style>"
+                    "<style>body { white-space: pre-wrap; line-height: 100% }</style>"
                     "</head><body>")
                (mapcat escape)
                string/join)
@@ -83,7 +86,6 @@
                (mapcat escape)
                string/join)
           "'></iframe>"
-          "<script src='termcat-demo.js'></script>"
           "</body>"
           "</html>")
      (spit "doc/termcat-demo.html"))
