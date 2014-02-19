@@ -1,5 +1,3 @@
-var forEach = Array.prototype.forEach;
-
 var inframe = document.getElementById('in');
 var outframe = document.getElementById('out');
 var inbody;
@@ -14,7 +12,7 @@ function render() {
     busy = true;
     dirty = false;
     worker.postMessage(inbody.textContent);
-}
+  }
 }
 
 worker.addEventListener('message', function (e) {
@@ -32,14 +30,20 @@ addEventListener('load', function () {
 inframe.contentWindow.addEventListener('keydown', function (e) {
   if(e.keyCode == 13) {
     var sel = inframe.contentWindow.getSelection();
+
+    sel.getRangeAt(0).deleteContents();
+
     var linebreak = inframe.contentDocument.createTextNode('\n');
+
     sel.getRangeAt(0).insertNode(linebreak);
     sel.removeAllRanges();
+
     var newrange = inframe.contentDocument.createRange();
-    newrange.setStart(linebreak, 1);
-    newrange.setEnd(linebreak, 1);
+    newrange.setStartAfter(linebreak);
     sel.addRange(newrange);
+
     e.preventDefault();
+
     dirty = true;
     setTimeout(render, 1);
   }
