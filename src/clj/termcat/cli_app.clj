@@ -88,18 +88,18 @@
   (System/exit status))
 
 (defn -main [& args]
-  (let [{:keys [options arguments errors summary]} (cli/parse-opts args cli-options)]
+  (let [{:keys [options arguments errors summary]} (cli/parse-opts args cli-options)
+        prefix (some->> arguments
+                        first
+                        (re-find #"^(.+?)(?:\.[Tt][Cc])?$")
+                        second)
+        tc-filename (str prefix ".tc")]
     (cond
       (:help options) (exit 0 (usage summary))
       (-> arguments count (not= 1)) (exit 1 (usage summary))
-      (-> arguments first file-exists? not) (exit 1 (error-msg (conj errors (str "File not found: \"" (first arguments) \"))))
+      (-> tc-filename file-exists? not) (exit 1 (error-msg (conj errors (str "File not found: \"" tc-filename ".tc\""))))
       errors (exit 1 (error-msg errors)))
-    (let [tc-filename (first arguments)
-          tc-path (resolve-path tc-filename)
-          prefix (->> arguments
-                      first
-                      (re-find #"^(.+?)(?:\.[Tt][Cc])?$")
-                      second)
+    (let [tc-path (resolve-path tc-filename)
           html-filename (str prefix ".html")
           html-path (resolve-path html-filename)
           verbose? (get options :verbose options)
