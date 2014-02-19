@@ -1,4 +1,4 @@
-<html><head><meta charset='utf-8'><title>Termcat Live Demo</title><script>var worker = new Worker('termcat.js');</script><script src='termcat-demo.js'></script><link rel='stylesheet' href='termcat-intro.css'><style>body { padding: 0; margin: 0; }iframe { border: none; position: absolute; width: 50vw; height: 100vh; }#in { left: 0; white-space: pre }#out { left: 50% }</style></head><body><iframe id='in' srcdoc='&lt;html&gt;&lt;head&gt;&lt;link rel=&apos;stylesheet&apos; href=&apos;termcat-intro.css&apos;&gt;&lt;style&gt;body { white-space: pre-wrap; line-height: 100% }&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&amp;lt;head&amp;gt;
+<html><head><meta charset='utf-8'><title>Termcat Live Demo</title><script>var worker = new Worker('termcat.js');</script><script src='termcat-demo.js'></script><style>body { padding: 0; margin: 0; background: white }iframe { border: none; position: absolute; width: 50vw; height: 100vh; }#in { left: 0; white-space: pre }#out { left: 50% }</style></head><body><iframe id='in' srcdoc='&lt;html&gt;&lt;head&gt;&lt;link rel=&apos;stylesheet&apos; href=&apos;termcat-intro.css&apos;&gt;&lt;style&gt;body { white-space: pre-wrap; line-height: 100% }&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&amp;lt;head&amp;gt;
 &amp;lt;title&amp;gt;The Termcat Markup Language&amp;lt;/title&amp;gt;
 &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;termcat-intro.css&amp;quot;&amp;gt;
 &amp;lt;/head&amp;gt;
@@ -10,8 +10,6 @@
 [Termcat](https://github.com/jdevuyst/termcat) is a markup language optimized for scientific and technical writing. It compiles to HTML and MathML (using [MathJax](http://mathjax.com)). To generate PDFs, [Prince](http://www.princexml.com) can be used.
 
 Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the user-friendly syntax for titles, lists, links, emphasis, and so on. Termcat aims to be more powerful, however. Like LaTeX, Termcat is fully programmable and it also comes with special syntax for typographic features that are difficult to unlock using plain Markdown or HTML.
-
-This document was compiled using Termcat. You can find this document&amp;apos;s source code [here](https://github.com/jdevuyst/termcat/blob/master/doc/termcat-intro.tc).
 
 **Contents**
 
@@ -96,7 +94,7 @@ When a &amp;lt;code&amp;gt;\&amp;lt;head&amp;gt;&amp;lt;/code&amp;gt; block is e
 
 Termcat documents are trees. The nodes of these trees---`blocks&amp;apos; in Termcat parlance---are delimited by parentheses &amp;lt;code&amp;gt;()&amp;lt;/code&amp;gt;, brackets &amp;lt;code&amp;gt;[]&amp;lt;/code&amp;gt;, braces &amp;lt;code&amp;gt;{}&amp;lt;/code&amp;gt;, indentation, or bullet marks. One important consequence of this is that parentheses, brackets, and braces must at all times be balanced (unless they&amp;apos;re escaped by backslashes).
 
-For many purposes it doesn&amp;apos;t matter how a block is delimited. For instance, a numbered list can be created using the notation:
+For many purposes it doesn&amp;apos;t matter how a block is delimited. For instance, a numbered list can be created using the notation
 &amp;lt;pre&amp;gt;\:numbered-list&amp;lt;br&amp;gt;\- item 1&amp;lt;br&amp;gt;\- item 2&amp;lt;/pre&amp;gt;
 or
 &amp;lt;pre&amp;gt;\:numbered-list(item 1)[item 2]&amp;lt;/pre&amp;gt;
@@ -226,7 +224,7 @@ It reduces to &amp;lt;q&amp;gt;.identity
 
 ## &amp;lt;a name=&amp;quot;usage&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;Usage
 
-Termcat is a console app and is invoked as follows.
+Termcat is invoked from the terminal as follows.
 
 &amp;lt;pre&amp;gt;.lit(Usage: java -jar termcat.jar [options] &amp;lt;document[.tc]&amp;gt;
 
@@ -239,12 +237,12 @@ The HTML output is stored in document.html.
 
 Combine the switches &amp;lt;code&amp;gt;-b&amp;lt;/code&amp;gt; and &amp;lt;code&amp;gt;-w&amp;lt;/code&amp;gt; for a live preview of your Termcat document: Any change you make in the source document will be automatically reflected in your browser.
 
-Termcat can also be embedded in web pages. For an example, see the [live demo](http://jdevuyst.github.io/termcat/doc/termcat-demo.html).
+Termcat can also be embedded in web pages.
 
-Finally, it&amp;apos;s worth noting that when a document is changed, Termcat is smart enough not to recompile the nodes that it already compiled previously.
+Finally, it&amp;apos;s worth noting that when a document is changed, Termcat is smart enough not to recompile the blocks that it already compiled previously.
 
 ## &amp;lt;a name=&amp;quot;status&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;Status
 
 Termcat is written in Clojure(Script) and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Email, bug reports, and pull requests are welcome!
 
-The current version of Termcat should be considered a prototype. I find it quite usable as-is, but nothing is set in stone and a lot of features are still missing. There&amp;apos;s a lot of room for performance enhancements too.&lt;/body&gt;&lt;/html&gt;'></iframe><iframe id='out' srcdoc='&lt;html&gt;&lt;head&gt;&lt;link rel=&apos;stylesheet&apos; href=&apos;termcat-intro.css&apos;&gt;&lt;link rel=&apos;stylesheet&apos; href=&apos;http://css-spinners.com/css/spinner/throbber.css&apos;&gt;&lt;style&gt;html { background: white; display: table; height: 100vh; width: 100vw }body { color: gray; display: table-cell; vertical-align: middle; text-align: center }&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&apos;throbber&apos;&gt;Loading preview pane&amp;hellip;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;'></iframe></body></html>
+The current version of Termcat should be considered a prototype. I find it quite usable as-is, but nothing is set in stone and a lot of features are still missing. There&amp;apos;s a lot of room for performance enhancements too.&lt;/body&gt;&lt;/html&gt;'></iframe><iframe id='out' src='termcat-intro.html'></iframe></body></html>

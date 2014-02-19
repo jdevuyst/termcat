@@ -94,7 +94,7 @@ When a <code>\<head></code> block is encountered, the code within that block is 
 
 Termcat documents are trees. The nodes of these trees---`blocks' in Termcat parlance---are delimited by parentheses <code>()</code>, brackets <code>[]</code>, braces <code>{}</code>, indentation, or bullet marks. One important consequence of this is that parentheses, brackets, and braces must at all times be balanced (unless they're escaped by backslashes).
 
-For many purposes it doesn't matter how a block is delimited. For instance, a numbered list can be created using the notation:
+For many purposes it doesn't matter how a block is delimited. For instance, a numbered list can be created using the notation
 <pre>\:numbered-list<br>\- item 1<br>\- item 2</pre>
 or
 <pre>\:numbered-list(item 1)[item 2]</pre>

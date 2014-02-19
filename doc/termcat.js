@@ -1,6 +1,7 @@
 var cache;
 self.addEventListener('message', function(e) {
-  cache = cache || termcat.rewrite.cache();  self.postMessage(termcat.core.compile(e.data, cache));
+  cache = cache || termcat.rewrite.cache();
+  self.postMessage(termcat.core.compile(e.data, cache));
 }, false);
 ;(function(){
 var d, ea = this;

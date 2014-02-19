@@ -21,9 +21,7 @@
 
 (sh "rm" "doc/termcat-intro.html" "doc/termcat-demo.html" "doc/termcat.js" "doc/termcat.js.map")
 
-(def f1 (future (do
-                  (sh "lein" "run" "doc/termcat-intro")
-                  (browse "doc/termcat-intro.html"))))
+(def f1 (future (sh "lein" "run" "doc/termcat-intro")))
 
 (def f2 (future (sh "rm" "-r" "doc/js")))
 
@@ -37,7 +35,7 @@
      slurp
      (str "var cache;\n"
           "self.addEventListener('message', function(e) {\n"
-          "  cache = cache || termcat.rewrite.cache();"
+          "  cache = cache || termcat.rewrite.cache();\n"
           "  self.postMessage(termcat.core.compile(e.data, cache));\n"
           "}, false);\n")
      (spit "doc/termcat.js"))
@@ -48,9 +46,8 @@
           "<title>Termcat Live Demo</title>"
           "<script>var worker = new Worker('termcat.js');</script>"
           "<script src='termcat-demo.js'></script>"
-          "<link rel='stylesheet' href='termcat-intro.css'>"
           "<style>"
-          "body { padding: 0; margin: 0; }"
+          "body { padding: 0; margin: 0; background: white }"
           "iframe { border: none; position: absolute; width: 50vw; height: 100vh; }"
           "#in { left: 0; white-space: pre }"
           "#out { left: 50% }"
@@ -73,19 +70,7 @@
                (mapcat escape)
                string/join)
           "'></iframe>"
-          "<iframe id='out' srcdoc='"
-          (->> (str "<html><head>"
-                    "<link rel='stylesheet' href='termcat-intro.css'>"
-                    "<link rel='stylesheet' href='http://css-spinners.com/css/spinner/throbber.css'>"
-                    "<style>"
-                    "html { background: white; display: table; height: 100vh; width: 100vw }"
-                    "body { color: gray; display: table-cell; vertical-align: middle; text-align: center }"
-                    "</style></head><body>"
-                    "<div class='throbber'>Loading preview pane&hellip;</div>"
-                    "</body></html>")
-               (mapcat escape)
-               string/join)
-          "'></iframe>"
+          "<iframe id='out' src='termcat-intro.html'></iframe>"
           "</body>"
           "</html>")
      (spit "doc/termcat-demo.html"))
