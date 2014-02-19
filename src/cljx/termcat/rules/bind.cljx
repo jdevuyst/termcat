@@ -85,10 +85,9 @@
        (not= (t/tt x) [:block :if-branch])))
 
 (defn apply-fun [fun-token arg]
-  (let [f (t/payload fun-token)
-        retval (f fun-token arg)]
+  (let [retval ((t/payload fun-token) fun-token arg)]
     (if (string? retval)
-      [(t/token :error (str retval " – " (:fun-name (meta f))))]
+      [(t/token :error (str retval " – " (-> fun-token t/payload meta :fun-name)))]
       retval)))
 
 (def evaluate-fun-calls)

@@ -59,7 +59,7 @@
           "</html>")
      (spit "doc/termcat-demo.html"))
 
-(-> (.resolve (.toPath (io/file "."))
-              (.toPath (io/file "doc/termcat-demo.html")))
-    (.. toUri toString)
-    browse-url)
+; (-> (.resolve (.toPath (io/file "."))
+;               (.toPath (io/file "doc/termcat-demo.html")))
+;     (.. toUri toString)
+;     browse-url)

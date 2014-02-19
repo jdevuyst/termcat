@@ -23,6 +23,6 @@
                         :compiler {:output-dir "target/js"
                                    :output-to "target/termcat.js"
                                    :source-map "target/termcat.js.map"
-                                   :optimizations :whitespace
+                                   :optimizations :advanced
                                    :elide-asserts true
                                    :pretty-print true}}]})

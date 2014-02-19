@@ -9,92 +9,92 @@ goog.require('clojure.core.reducers');
 * Converts all characters to tokens. Here the term/token-type
 * a function from characters to keywords. That is, we guess.
 */
-termcat.rules.pretokenize.char_to_token = (function char_to_token(c){return termcat.term.token.call(null,(function (){var G__10037 = c;if(cljs.core._EQ_.call(null," ",G__10037))
-{return new cljs.core.Keyword(null,"whitespace","whitespace",1290815983);
+termcat.rules.pretokenize.char_to_token = (function char_to_token(c){return termcat.term.token.cljs$core$IFn$_invoke$arity$2((function (){var G__10037 = c;if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(" ",G__10037))
+{return cljs.core.constant$keyword$40;
 } else
-{if(cljs.core._EQ_.call(null,"`",G__10037))
-{return new cljs.core.Keyword(null,"left-quote","left-quote",2041480360);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("`",G__10037))
+{return cljs.core.constant$keyword$60;
 } else
-{if(cljs.core._EQ_.call(null,"!",G__10037))
-{return new cljs.core.Keyword(null,"bang","bang",1016920490);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("!",G__10037))
+{return cljs.core.constant$keyword$63;
 } else
-{if(cljs.core._EQ_.call(null,"\"",G__10037))
-{return new cljs.core.Keyword(null,"double-quote","double-quote",969793778);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("\"",G__10037))
+{return cljs.core.constant$keyword$42;
 } else
-{if(cljs.core._EQ_.call(null,"#",G__10037))
-{return new cljs.core.Keyword(null,"hash","hash",1017099392);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("#",G__10037))
+{return cljs.core.constant$keyword$97;
 } else
-{if(cljs.core._EQ_.call(null,"%",G__10037))
-{return new cljs.core.Keyword(null,"percent","percent",4629944247);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("%",G__10037))
+{return cljs.core.constant$keyword$98;
 } else
-{if(cljs.core._EQ_.call(null,"'",G__10037))
-{return new cljs.core.Keyword(null,"right-quote","right-quote",3807707901);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("'",G__10037))
+{return cljs.core.constant$keyword$35;
 } else
-{if(cljs.core._EQ_.call(null,"(",G__10037))
-{return termcat.term.ldelim_t.call(null,new cljs.core.Keyword(null,"parenthesis","parenthesis",2036987848));
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("(",G__10037))
+{return termcat.term.ldelim_t(cljs.core.constant$keyword$96);
 } else
-{if(cljs.core._EQ_.call(null,")",G__10037))
-{return termcat.term.rdelim_t.call(null,new cljs.core.Keyword(null,"parenthesis","parenthesis",2036987848));
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(")",G__10037))
+{return termcat.term.rdelim_t(cljs.core.constant$keyword$96);
 } else
-{if(cljs.core._EQ_.call(null,"\n",G__10037))
-{return new cljs.core.Keyword(null,"newline","newline",2859826438);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("\n",G__10037))
+{return cljs.core.constant$keyword$99;
 } else
-{if(cljs.core._EQ_.call(null,"*",G__10037))
-{return new cljs.core.Keyword(null,"asterisk","asterisk",669280996);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("*",G__10037))
+{return cljs.core.constant$keyword$41;
 } else
-{if(cljs.core._EQ_.call(null,"+",G__10037))
-{return new cljs.core.Keyword(null,"plus","plus",1017348364);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("+",G__10037))
+{return cljs.core.constant$keyword$38;
 } else
-{if(cljs.core._EQ_.call(null,",",G__10037))
-{return new cljs.core.Keyword(null,"comma","comma",1108747847);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(",",G__10037))
+{return cljs.core.constant$keyword$100;
 } else
-{if(cljs.core._EQ_.call(null,"-",G__10037))
-{return new cljs.core.Keyword(null,"dash","dash",1016980228);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("-",G__10037))
+{return cljs.core.constant$keyword$31;
 } else
-{if(cljs.core._EQ_.call(null,".",G__10037))
-{return new cljs.core.Keyword(null,"period","period",4317145395);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(".",G__10037))
+{return cljs.core.constant$keyword$61;
 } else
-{if(cljs.core._EQ_.call(null,":",G__10037))
-{return new cljs.core.Keyword(null,"colon","colon",1108746961);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(":",G__10037))
+{return cljs.core.constant$keyword$62;
 } else
-{if(cljs.core._EQ_.call(null,"[",G__10037))
-{return termcat.term.ldelim_t.call(null,new cljs.core.Keyword(null,"bracket","bracket",1151311898));
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("[",G__10037))
+{return termcat.term.ldelim_t(cljs.core.constant$keyword$95);
 } else
-{if(cljs.core._EQ_.call(null,"{",G__10037))
-{return termcat.term.ldelim_t.call(null,new cljs.core.Keyword(null,"brace","brace",1107901861));
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("{",G__10037))
+{return termcat.term.ldelim_t(cljs.core.constant$keyword$101);
 } else
-{if(cljs.core._EQ_.call(null,"<",G__10037))
-{return new cljs.core.Keyword(null,"less-than","less-than",1333713095);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("<",G__10037))
+{return cljs.core.constant$keyword$102;
 } else
-{if(cljs.core._EQ_.call(null,"\\",G__10037))
-{return new cljs.core.Keyword(null,"escape","escape",4014699507);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("\\",G__10037))
+{return cljs.core.constant$keyword$103;
 } else
-{if(cljs.core._EQ_.call(null,"|",G__10037))
-{return new cljs.core.Keyword(null,"bar","bar",1014001541);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("|",G__10037))
+{return cljs.core.constant$keyword$57;
 } else
-{if(cljs.core._EQ_.call(null,"]",G__10037))
-{return termcat.term.rdelim_t.call(null,new cljs.core.Keyword(null,"bracket","bracket",1151311898));
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("]",G__10037))
+{return termcat.term.rdelim_t(cljs.core.constant$keyword$95);
 } else
-{if(cljs.core._EQ_.call(null,"}",G__10037))
-{return termcat.term.rdelim_t.call(null,new cljs.core.Keyword(null,"brace","brace",1107901861));
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("}",G__10037))
+{return termcat.term.rdelim_t(cljs.core.constant$keyword$101);
 } else
-{if(cljs.core._EQ_.call(null,">",G__10037))
-{return new cljs.core.Keyword(null,"greater-than","greater-than",3888014086);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(">",G__10037))
+{return cljs.core.constant$keyword$104;
 } else
-{if(cljs.core._EQ_.call(null,"^",G__10037))
-{return new cljs.core.Keyword(null,"circumflex","circumflex",4463600090);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("^",G__10037))
+{return cljs.core.constant$keyword$50;
 } else
-{if(cljs.core._EQ_.call(null,"~",G__10037))
-{return new cljs.core.Keyword(null,"tilde","tilde",1124267722);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("~",G__10037))
+{return cljs.core.constant$keyword$44;
 } else
-{if(cljs.core._EQ_.call(null,"?",G__10037))
-{return new cljs.core.Keyword(null,"question-mark","question-mark",4232142790);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("?",G__10037))
+{return cljs.core.constant$keyword$64;
 } else
-{if(cljs.core._EQ_.call(null,"_",G__10037))
-{return new cljs.core.Keyword(null,"underscore","underscore",3544053292);
+{if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("_",G__10037))
+{return cljs.core.constant$keyword$51;
 } else
-{if(new cljs.core.Keyword(null,"else","else",1017020587))
-{return new cljs.core.Keyword(null,"default","default",2558708147);
+{if(cljs.core.constant$keyword$6)
+{return cljs.core.constant$keyword$7;
 } else
 {return null;
 }
@@ -128,6 +128,6 @@ termcat.rules.pretokenize.char_to_token = (function char_to_token(c){return term
 }
 })(),c);
 });
-termcat.rules.pretokenize.map_to_tokens = (function map_to_tokens(code){return cljs.core.first.call(null,clojure.core.reducers.reduce.call(null,(function (p__10040,c){var vec__10041 = p__10040;var result = cljs.core.nth.call(null,vec__10041,0,null);var pos = cljs.core.nth.call(null,vec__10041,1,null);return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.conj.call(null,result,cljs.core.with_meta.call(null,termcat.rules.pretokenize.char_to_token.call(null,c),new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"src","src",1014018390),code,new cljs.core.Keyword(null,"lpos","lpos",1017232858),pos,new cljs.core.Keyword(null,"rpos","rpos",1017411604),pos], null))),(pos + 1)], null);
-}),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.PersistentVector.EMPTY,0], null),cljs.core.vec.call(null,code)));
+termcat.rules.pretokenize.map_to_tokens = (function map_to_tokens(code){return cljs.core.first(clojure.core.reducers.reduce.cljs$core$IFn$_invoke$arity$3((function (p__10040,c){var vec__10041 = p__10040;var result = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__10041,0,null);var pos = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__10041,1,null);return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.conj.cljs$core$IFn$_invoke$arity$2(result,cljs.core.with_meta(termcat.rules.pretokenize.char_to_token(c),new cljs.core.PersistentArrayMap(null, 3, [cljs.core.constant$keyword$81,code,cljs.core.constant$keyword$79,pos,cljs.core.constant$keyword$80,pos], null))),(pos + 1)], null);
+}),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.PersistentVector.EMPTY,0], null),cljs.core.vec(code)));
 });
