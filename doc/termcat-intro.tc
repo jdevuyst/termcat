@@ -11,8 +11,6 @@
 
 Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the user-friendly syntax for titles, lists, links, emphasis, and so on. Termcat aims to be more powerful, however. Like LaTeX, Termcat is fully programmable and it also comes with special syntax for typographic features that are difficult to unlock using plain Markdown or HTML.
 
-This document was compiled using Termcat. You can find this document's source code [here](https://github.com/jdevuyst/termcat/blob/master/doc/termcat-intro.tc).
-
 **Contents**
 
 - [The Basics](#basics)
@@ -226,7 +224,7 @@ It reduces to <q>.identity
 
 ## <a name="usage"></a>Usage
 
-Termcat is a console app and is invoked as follows.
+Termcat is invoked from the terminal as follows.
 
 <pre>.lit(Usage: java -jar termcat.jar [options] <document[.tc]>
 
@@ -239,7 +237,7 @@ The HTML output is stored in document.html.
 
 Combine the switches <code>-b</code> and <code>-w</code> for a live preview of your Termcat document: Any change you make in the source document will be automatically reflected in your browser.
 
-Termcat can also be embedded in web pages. For an example, see the [live demo](http://jdevuyst.github.io/termcat/doc/termcat-demo.html).
+Termcat can also be embedded in web pages.
 
 Finally, it's worth noting that when a document is changed, Termcat is smart enough not to recompile the nodes that it already compiled previously.
 
