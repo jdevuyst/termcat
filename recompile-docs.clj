@@ -35,8 +35,10 @@
 
 (->> "target/termcat.js"
      slurp
-     (str "self.addEventListener('message', function(e) {\n"
-          "  self.postMessage(termcat.core.compile(e.data));\n"
+     (str "var cache;\n"
+          "self.addEventListener('message', function(e) {\n"
+          "  cache = cache || termcat.rewrite.cache();"
+          "  self.postMessage(termcat.core.compile(e.data, cache));\n"
           "}, false);\n")
      (spit "doc/termcat.js"))
 
@@ -55,7 +57,7 @@
           "<iframe id='in' srcdoc='"
           (->> (str "<html><head>"
                     "<link rel='stylesheet' href='termcat-intro.css'>"
-                    "<style>body { white-space: pre-wrap; line-height: 100% }</style>"
+                    "<style>body { white-space: pre-wrap; line-height: 100%; height: 100vw }</style>"
                     "</head><body>")
                (mapcat escape)
                string/join)

@@ -241,7 +241,7 @@ Combine the switches <code>-b</code> and <code>-w</code> for a live preview of y
 
 Termcat can also be embedded in web pages. For an example, see the [live demo](http://jdevuyst.github.io/termcat/doc/termcat-demo.html).
 
-Finally, it's worth noting that when a document is changed, Termcat is smart enough not to recompile the nodes that were not modified.
+Finally, it's worth noting that when a document is changed, Termcat is smart enough not to recompile the nodes that it already compiled once.
 
 ## <a name="status"></a>Status
 
