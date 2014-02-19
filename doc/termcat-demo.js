@@ -32,6 +32,7 @@ addEventListener('DOMContentLoaded', function () {
       var linebreak = inframe.contentDocument.createTextNode('\n');
 
       sel.getRangeAt(0).insertNode(linebreak);
+      linebreak.scrollIntoView();
       sel.removeAllRanges();
 
       var newrange = inframe.contentDocument.createRange();
