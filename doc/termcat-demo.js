@@ -24,6 +24,7 @@ worker.addEventListener('message', function (e) {
 addEventListener('load', function () {
   inbody = inframe.contentDocument.body;
   inframe.contentDocument.designMode = 'on';
+  inframe.contentWindow.focus();
   render();
 });
 

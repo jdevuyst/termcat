@@ -4,6 +4,12 @@
             [clojure.java.browse :refer (browse-url)]
             [clojure.java.io :as io]))
 
+(defn browse [filename]
+  (-> (.resolve (.toPath (io/file "."))
+                (.toPath (io/file filename)))
+      (.. toUri toString)
+      browse-url))
+
 (defn escape [c]
   (case c
     \< "&lt;"
@@ -13,13 +19,17 @@
     \" "&quot;"
     [c]))
 
-(future (sh "lein" "run" "doc/termcat-intro"))
+(def f1 (future (do
+                  (sh "lein" "run" "doc/termcat-intro")
+                  (browse "doc/termcat-intro.html"))))
+
+(def f2 (future (sh "rm" "-r" "doc/js")))
 
 (sh "lein" "cljx")
 (sh "lein" "cljsbuild" "once")
 
-(sh "rm" "-r" "doc/js")
-(future (sh "cp" "-r" "target/js" "target/termcat.js.map" "doc/"))
+@f2
+(def f3 (future (sh "cp" "-r" "target/js" "target/termcat.js.map" "doc/")))
 
 (->> "target/termcat.js"
      slurp
@@ -31,17 +41,20 @@
 (->> (str "<html>"
           "<head>"
           "<meta charset='utf-8'>"
-          "<title>Termcat ‘ClojureScript Edition’ Demo</title>"
+          "<title>Termcat Live Demo</title>"
           "<style>"
           "body { padding: 0; margin: 0 }"
-          "iframe { position: absolute; width: 50%; height: 100%; }"
+          "iframe { border: none; position: absolute; width: 50vw; height: 100vh; }"
           "#in { left: 0; white-space: pre }"
           "#out { left: 50% }"
           "</style>"
           "</head>"
           "<body>"
           "<iframe id='in' srcdoc='"
-          (->> "<html><head><style>body { white-space: pre-wrap }</style></head><body>"
+          (->> (str "<html><head>"
+                    "<link rel='stylesheet' href='termcat-intro.css'>"
+                    "<style>body { white-space: pre-wrap; line-height: 100% }</style>"
+                    "</head><body>")
                (mapcat escape)
                string/join)
           (->> "doc/termcat-intro.tc"
@@ -53,13 +66,26 @@
                (mapcat escape)
                string/join)
           "'></iframe>"
-          "<iframe id='out'></iframe>"
+          "<iframe id='out' srcdoc='"
+          (->> (str "<html><head>"
+                    "<link rel='stylesheet' href='termcat-intro.css'>"
+                    "<link rel='stylesheet' href='http://css-spinners.com/css/spinner/throbber.css'>"
+                    "<style>"
+                    "html { background: white; display: table; height: 100vh; width: 100vw }"
+                    "body { color: gray; display: table-cell; vertical-align: middle; text-align: center }"
+                    "</style></head><body>"
+                    "<div class='throbber'>Loading preview pane&hellip;</div>"
+                    "</body></html>")
+               (mapcat escape)
+               string/join)
+          "'></iframe>"
           "<script src='termcat-demo.js'></script>"
           "</body>"
           "</html>")
      (spit "doc/termcat-demo.html"))
 
-; (-> (.resolve (.toPath (io/file "."))
-;               (.toPath (io/file "doc/termcat-demo.html")))
-;     (.. toUri toString)
-;     browse-url)
+@f1 @f3
+
+(browse "doc/termcat-demo.html")
+
+(System/exit 0)

@@ -3,9 +3,9 @@
 <link rel="stylesheet" href="termcat-intro.css">
 </head>
 
-# The Termcat Markup Language
-
 !bind(TO)(→)
+
+# The Termcat Markup Language
 
 [Termcat](https://github.com/jdevuyst/termcat) is a markup language optimized for scientific and technical writing. It compiles to HTML and MathML (using [MathJax](http://mathjax.com)). To generate PDFs, [Prince](http://www.princexml.com) can be used.
 
