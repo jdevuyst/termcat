@@ -86,7 +86,7 @@ Put a backslash &amp;lt;code&amp;gt;\\&amp;lt;/code&amp;gt; in front of a symbol
 
 ## &amp;lt;a name=&amp;quot;html&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;HTML
 
-When HTML tags are encountered in Termcat documents, they `fall through&amp;apos; to the HTML output. Hence &amp;lt;code&amp;gt;\&amp;lt;b&amp;gt;this\&amp;lt;/b&amp;gt;&amp;lt;/code&amp;gt; renders as &amp;lt;q&amp;gt;&amp;lt;b&amp;gt;this&amp;lt;/b&amp;gt;&amp;lt;/q&amp;gt;.
+When HTML tags or entities are encountered in Termcat documents, they `fall through&amp;apos; to the HTML output. Hence &amp;lt;code&amp;gt;\&amp;lt;b&amp;gt;this \&amp;amp;amp; that\&amp;lt;/b&amp;gt;&amp;lt;/code&amp;gt; renders as &amp;lt;q&amp;gt;&amp;lt;b&amp;gt;this &amp;amp;amp; that&amp;lt;/b&amp;gt;&amp;lt;/q&amp;gt;.
 
 When a &amp;lt;code&amp;gt;\&amp;lt;head&amp;gt;&amp;lt;/code&amp;gt; block is encountered, the code within that block is moved to the head of the output HTML document. This way the title of the document, stylesheets, and so on can be changed.
 
@@ -109,7 +109,7 @@ At least it expects to be told these things for *some* of the expressions that y
 
 To mark a character as a mathematical identifier, prefix it with an asterisk &amp;lt;code&amp;gt;\*&amp;lt;/code&amp;gt;: &amp;lt;code&amp;gt;\*a&amp;lt;/code&amp;gt; TO &amp;lt;q&amp;gt;*a&amp;lt;/q&amp;gt;. Similarly, when Termcat encounters the expression &amp;lt;code&amp;gt;\*abc&amp;lt;/code&amp;gt; then it will infer that `b&amp;apos; and `c&amp;apos; are also identifiers. The result is &amp;lt;q&amp;gt;*abc&amp;lt;/q&amp;gt;. To turn a word into a single identifier, type &amp;lt;code&amp;gt;\*(op)&amp;lt;/code&amp;gt;. This renders as &amp;lt;q&amp;gt;*(op)&amp;lt;/q&amp;gt;---as in LaTeX, multi-character indentifiers are not italicized. Mathematical identifiers can also be typeset in a caligraphic font by using &amp;lt;code&amp;gt;\+&amp;lt;/code&amp;gt; instead of &amp;lt;code&amp;gt;\*&amp;lt;/code&amp;gt;. Thus, &amp;lt;code&amp;gt;\+M&amp;lt;/code&amp;gt; becomes &amp;lt;q&amp;gt;+M&amp;lt;/q&amp;gt;.
 
-To use the binary minus operator, type &amp;lt;code&amp;gt;x \~\-\~ y&amp;lt;/code&amp;gt;. This yields &amp;lt;q&amp;gt;x ~-~ y&amp;lt;/q&amp;gt;.
+To use the infix minus operator, type &amp;lt;code&amp;gt;x \~\-\~ y&amp;lt;/code&amp;gt;. This yields &amp;lt;q&amp;gt;x ~-~ y&amp;lt;/q&amp;gt;. Termcat automatically infers that the expressions to the left and to the right of the infix operator are mathematical identifiers.
 
 Does typing &amp;lt;code&amp;gt;\~-\~&amp;lt;/code&amp;gt; over and over again sound like a chore? No problem. Simply include the following code at the top of your document:
   \!bind&amp;lt;br&amp;gt;\- -&amp;lt;br&amp;gt;&amp;quot;- \~-\~
@@ -224,7 +224,7 @@ It reduces to &amp;lt;q&amp;gt;.identity
 
 ## &amp;lt;a name=&amp;quot;usage&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;Usage
 
-Termcat is invoked from the terminal as follows.
+Termcat can be embedded in web pages or it can be used from the terminal. Here&amp;apos;s the syntax for calling it from the terminal:
 
 &amp;lt;pre&amp;gt;.lit(Usage: java -jar termcat.jar [options] &amp;lt;document[.tc]&amp;gt;
 
@@ -236,8 +236,6 @@ The HTML output is stored in document.html.
 )&amp;lt;/pre&amp;gt;
 
 Combine the switches &amp;lt;code&amp;gt;-b&amp;lt;/code&amp;gt; and &amp;lt;code&amp;gt;-w&amp;lt;/code&amp;gt; for a live preview of your Termcat document: Any change you make in the source document will be automatically reflected in your browser.
-
-Termcat can also be embedded in web pages.
 
 Finally, it&amp;apos;s worth noting that when a document is changed, Termcat is smart enough not to recompile the blocks that it already compiled previously.
 

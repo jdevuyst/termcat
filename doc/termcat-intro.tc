@@ -86,7 +86,7 @@ Put a backslash <code>\\</code> in front of a symbol to indicate that the symbol
 
 ## <a name="html"></a>HTML
 
-When HTML tags are encountered in Termcat documents, they `fall through' to the HTML output. Hence <code>\<b>this\</b></code> renders as <q><b>this</b></q>.
+When HTML tags or entities are encountered in Termcat documents, they `fall through' to the HTML output. Hence <code>\<b>this \&amp; that\</b></code> renders as <q><b>this &amp; that</b></q>.
 
 When a <code>\<head></code> block is encountered, the code within that block is moved to the head of the output HTML document. This way the title of the document, stylesheets, and so on can be changed.
 
@@ -109,7 +109,7 @@ At least it expects to be told these things for *some* of the expressions that y
 
 To mark a character as a mathematical identifier, prefix it with an asterisk <code>\*</code>: <code>\*a</code> TO <q>*a</q>. Similarly, when Termcat encounters the expression <code>\*abc</code> then it will infer that `b' and `c' are also identifiers. The result is <q>*abc</q>. To turn a word into a single identifier, type <code>\*(op)</code>. This renders as <q>*(op)</q>---as in LaTeX, multi-character indentifiers are not italicized. Mathematical identifiers can also be typeset in a caligraphic font by using <code>\+</code> instead of <code>\*</code>. Thus, <code>\+M</code> becomes <q>+M</q>.
 
-To use the binary minus operator, type <code>x \~\-\~ y</code>. This yields <q>x ~-~ y</q>.
+To use the infix minus operator, type <code>x \~\-\~ y</code>. This yields <q>x ~-~ y</q>. Termcat automatically infers that the expressions to the left and to the right of the infix operator are mathematical identifiers.
 
 Does typing <code>\~-\~</code> over and over again sound like a chore? No problem. Simply include the following code at the top of your document:
   \!bind<br>\- -<br>"- \~-\~
@@ -224,7 +224,7 @@ It reduces to <q>.identity
 
 ## <a name="usage"></a>Usage
 
-Termcat is invoked from the terminal as follows.
+Termcat can be embedded in web pages or it can be used from the terminal. Here's the syntax for calling it from the terminal:
 
 <pre>.lit(Usage: java -jar termcat.jar [options] <document[.tc]>
 
@@ -236,8 +236,6 @@ The HTML output is stored in document.html.
 )</pre>
 
 Combine the switches <code>-b</code> and <code>-w</code> for a live preview of your Termcat document: Any change you make in the source document will be automatically reflected in your browser.
-
-Termcat can also be embedded in web pages.
 
 Finally, it's worth noting that when a document is changed, Termcat is smart enough not to recompile the blocks that it already compiled previously.
 
