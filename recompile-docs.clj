@@ -46,6 +46,7 @@
           "<title>Termcat Live Demo</title>"
           "<script>var worker = new Worker('termcat.js');</script>"
           "<script src='termcat-demo.js'></script>"
+          "<script defer src='react.js'></script>"
           "<style>"
           "body { padding: 0; margin: 0; background: white }"
           "iframe { border: none; position: absolute; width: 50vw; height: 100vh; }"

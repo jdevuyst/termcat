@@ -5,6 +5,8 @@ var inbody;
 var busy = false;
 var dirty = true;
 
+var reactapp;
+
 function render() {
   if(! busy && dirty) {
     busy = true;
@@ -19,7 +21,7 @@ addEventListener('DOMContentLoaded', function () {
 
   worker.addEventListener('message', function (e) {
     busy = false;
-    outframe.srcdoc = e.data;
+    React.renderComponent(reactapp({doc: e.data}), outframe.contentDocument.documentElement);
     setTimeout(render, 400);
   }, false);
 
@@ -30,9 +32,7 @@ addEventListener('DOMContentLoaded', function () {
       sel.getRangeAt(0).deleteContents();
 
       var linebreak = inframe.contentDocument.createTextNode('\n');
-
       sel.getRangeAt(0).insertNode(linebreak);
-      linebreak.scrollIntoView();
       sel.removeAllRanges();
 
       var newrange = inframe.contentDocument.createRange();
@@ -48,7 +48,13 @@ addEventListener('DOMContentLoaded', function () {
 
   inframe.contentWindow.addEventListener('input', function () {
        dirty = true;
-       setTimeout(render, 300);
+       setTimeout(render, 350);
+  });
+
+  reactapp = React.createClass({
+    render: function() {
+      return React.DOM.html({dangerouslySetInnerHTML:{__html: this.props.doc}});
+    }
   });
 });
 
