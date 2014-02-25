@@ -31,13 +31,19 @@ addEventListener('DOMContentLoaded', function () {
 
       sel.getRangeAt(0).deleteContents();
 
-      var linebreak = inframe.contentDocument.createTextNode('\n');
+      var linebreak = inframe.contentDocument.createElement("span");
+      linebreak.appendChild(inframe.contentDocument.createTextNode('\n'));
       sel.getRangeAt(0).insertNode(linebreak);
       sel.removeAllRanges();
 
       var newrange = inframe.contentDocument.createRange();
       newrange.setStartAfter(linebreak);
       sel.addRange(newrange);
+
+      var minTop = linebreak.offsetTop - inframe.contentWindow.innerHeight + linebreak.offsetHeight * 2;
+      if(inframe.contentWindow.scrollY < minTop) {
+        inframe.contentWindow.scroll(0, minTop);
+      }
 
       e.preventDefault();
 
