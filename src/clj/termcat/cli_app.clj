@@ -89,15 +89,16 @@
 
 (defn -main [& args]
   (let [{:keys [options arguments errors summary]} (cli/parse-opts args cli-options)
-        prefix (some->> arguments
-                        first
-                        (re-find #"^(.+?)(?:\.[Tt][Cc])?$")
-                        second)
-        tc-filename (str prefix ".tc")]
+        matches (some->> arguments
+                         first
+                         (re-find #"^(.+?)(\.[Tt][Cc])?$"))
+        prefix (second matches)
+        tc-filename (str prefix (or (nth matches 2)
+                                    ".tc"))]
     (cond
       (:help options) (exit 0 (usage summary))
       (-> arguments count (not= 1)) (exit 1 (usage summary))
-      (-> tc-filename file-exists? not) (exit 1 (error-msg (conj errors (str "File not found: \"" tc-filename ".tc\""))))
+      (-> tc-filename file-exists? not) (exit 1 (error-msg (conj errors (str "File not found: \"" tc-filename))))
       errors (exit 1 (error-msg errors)))
     (let [tc-path (resolve-path tc-filename)
           html-filename (str prefix ".html")
