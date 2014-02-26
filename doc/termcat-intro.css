@@ -17,6 +17,8 @@ body {
   margin: 0 auto;
   padding: 2.5em;
   max-width: 40em;
+  min-height: 100vh;
+  overflow: auto;
 }
 
 a {
