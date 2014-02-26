@@ -46,49 +46,51 @@ function scrollToCaret() {
 addEventListener('DOMContentLoaded', function () {
   inframe = document.getElementById('in');
   outframe = document.getElementById('out');
-  inwin = inframe.contentWindow;
 
-  inwin.addEventListener('load', function () {
+  inframe.addEventListener('load', function () {
+    inwin = inframe.contentWindow;
     indoc = inframe.contentDocument;
     inbody = indoc.body;
     indoc.designMode = 'on';
     inwin.focus();
-  });
 
-  inwin.addEventListener('keydown', function (e) {
-    if(e.keyCode == 13) {
+    console.log("moo" + indoc.body);
+
+    inwin.addEventListener('keydown', function (e) {
+      if(e.keyCode == 13) {
+        e.preventDefault();
+
+        indoc.execCommand("insertHTML", false, "\n");
+
+        scrollToCaret();
+
+        dirty = true;
+        setTimeout(render, 1);
+      }
+    });
+
+    inwin.addEventListener('input', function () {
+      dirty = true;
+      setTimeout(render, 450);
+    });
+
+    inwin.addEventListener("paste", function (e) {
       e.preventDefault();
 
-      indoc.execCommand("insertHTML", false, "\n");
+      var text = e.clipboardData.getData("text/plain");
+      text = text.replace(/[<>&'"]/g, escape)
+      indoc.execCommand("insertHTML", false, text);
 
       scrollToCaret();
 
       dirty = true;
       setTimeout(render, 1);
-    }
-  });
+    });
 
-  inwin.addEventListener('input', function () {
-       dirty = true;
-       setTimeout(render, 450);
-  });
-
-  inwin.addEventListener("paste", function(e) {
-    e.preventDefault();
-
-    var text = e.clipboardData.getData("text/plain");
-    text = text.replace(/[<>&'"]/g, escape)
-    indoc.execCommand("insertHTML", false, text);
-
-    scrollToCaret();
-
-    dirty = true;
-    setTimeout(render, 1);
-  });
-
-  worker.addEventListener('message', function (e) {
-    busy = false;
-    React.renderComponent(reactapp({doc: e.data}), outframe.contentDocument.documentElement);
-    setTimeout(render, 400);
-  }, false);
+    worker.addEventListener('message', function (e) {
+      busy = false;
+      React.renderComponent(reactapp({doc: e.data}), outframe.contentDocument.documentElement);
+      setTimeout(render, 400);
+    }, false);
+  })
 });
