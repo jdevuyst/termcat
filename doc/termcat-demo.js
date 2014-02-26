@@ -7,7 +7,11 @@ var inbody;
 var busy = false;
 var dirty = true;
 
-var reactapp;
+var reactapp = React.createClass({
+  render: function() {
+    return React.DOM.html({dangerouslySetInnerHTML:{__html: this.props.doc}});
+  }
+});
 
 function escape(c) {
   switch(c) {
@@ -87,10 +91,4 @@ addEventListener('DOMContentLoaded', function () {
     React.renderComponent(reactapp({doc: e.data}), outframe.contentDocument.documentElement);
     setTimeout(render, 400);
   }, false);
-
-  reactapp = React.createClass({
-    render: function() {
-      return React.DOM.html({dangerouslySetInnerHTML:{__html: this.props.doc}});
-    }
-  });
 });
