@@ -17,8 +17,9 @@
                   {:source-paths ["src/cljx"]
                    :output-path "target/cljs"
                    :rules :cljs}]}
-  :main ^:skip-aot termcat.cli-app
-  :profiles {:uberjar {:aot :all}}
+  :main termcat.cli-app
+  :aot :all
+  :profiles {:uberjar {:global-vars {*assert* false}}}
   :cljsbuild {:builds [{:source-paths ["src/clj" "target/cljs"]
                         :compiler {:output-dir "target/js"
                                    :output-to "target/termcat.js"

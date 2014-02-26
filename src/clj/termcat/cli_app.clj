@@ -93,8 +93,10 @@
                          first
                          (re-find #"^(.+?)(\.[Tt][Cc])?$"))
         prefix (second matches)
-        tc-filename (str prefix (or (nth matches 2)
-                                    ".tc"))]
+        tc-filename (if (-> matches first file-exists?)
+                      (first matches)
+                      (str prefix (or (nth matches 2)
+                                      ".tc")))]
     (cond
       (:help options) (exit 0 (usage summary))
       (-> arguments count (not= 1)) (exit 1 (usage summary))
@@ -103,7 +105,7 @@
     (let [tc-path (resolve-path tc-filename)
           html-filename (str prefix ".html")
           html-path (resolve-path html-filename)
-          verbose? (get options :verbose options)
+          verbose? (:verbose options)
           watch? (:watch options)
           browse? (:browse options)
           cache (rw/cache)
@@ -121,9 +123,9 @@
                             (c/compile source cache)))
                     (when verbose?
                       (println "; cache size:" (count @cache) "items)")))]
-      (when *assert*
-        (println "Assertions are enabled."))
       (when verbose?
+        (when *assert*
+          (println "Assertions are enabled."))
         (print "Compiling... "))
       (main-f)
       (when verbose?

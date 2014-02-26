@@ -9,7 +9,7 @@
 
 [Termcat](https://github.com/jdevuyst/termcat) is a markup language optimized for scientific and technical writing. It compiles to HTML and MathML (using [MathJax](http://mathjax.com)). To generate PDFs, [Prince](http://www.princexml.com) can be used.
 
-Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the user-friendly syntax for titles, lists, links, emphasis, and so on. Termcat aims to be more powerful, however. Like LaTeX, Termcat is fully programmable and it also comes with special syntax for typographic features that are difficult to unlock using plain Markdown or HTML.
+Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the user-friendly syntax for titles, lists, links, emphasis, and so on. Termcat aims to be more powerful, however. Like LaTeX, it is a programming language and it also comes with special syntax for typographic features that are difficult to unlock using plain Markdown or HTML.
 
 **Contents**
 
@@ -18,8 +18,7 @@ Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the u
 - [The Structure of a Termcat Document](#struct)
 - [Math](#math)
 - [Programming](#prog)
-- [Usage](#usage)
-- [Status](#status)
+- [Usage Instructions](#usage)
 
 ## <a name="basics"></a>The Basics
 
@@ -222,7 +221,7 @@ It reduces to <q>.identity
   fib(fib#)(5)
 </q>.
 
-## <a name="usage"></a>Usage
+## <a name="usage"></a>Usage Instructions
 
 Termcat can be embedded in web pages or it can be used from the terminal. Here's the syntax for calling it from the terminal:
 
@@ -236,10 +235,9 @@ The HTML output is stored in document.html.
 )</pre>
 
 Combine the switches <code>-b</code> and <code>-w</code> for a live preview of your Termcat document: Any change you make in the source document will be automatically reflected in your browser.
+It's worth noting that when a document is changed, Termcat is smart enough not to recompile the blocks that it already processed previously.
 
-Finally, it's worth noting that when a document is changed, Termcat is smart enough not to recompile the blocks that it already compiled previously.
-
-## <a name="status"></a>Status
+To use Termcat from JavaScript, first load <code>termcat.js</code>. Next, call the function <code>termcat.core.compile</code> with a string for argument to transform Termcat documents into HTML code. Optionally, a mutable cache can be passed as a second argument; <code>termcat.rewrite.cache()</code> returns a new cache.
 
 Termcat is written in Clojure(Script) and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Email, bug reports, and pull requests are welcome!
 
