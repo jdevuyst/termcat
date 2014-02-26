@@ -3,15 +3,13 @@
 <link rel="stylesheet" href="termcat-intro.css">
 </head>
 
-# The Termcat Markup Language
-
 !bind(TO)(→)
+
+# The Termcat Markup Language
 
 [Termcat](https://github.com/jdevuyst/termcat) is a markup language optimized for scientific and technical writing. It compiles to HTML and MathML (using [MathJax](http://mathjax.com)). To generate PDFs, [Prince](http://www.princexml.com) can be used.
 
-Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the user-friendly syntax for titles, lists, links, emphasis, and so on. Termcat aims to be more powerful, however. Like LaTeX, Termcat is fully programmable and it also comes with special syntax for typographic features that are difficult to unlock using plain Markdown or HTML.
-
-This document was compiled using Termcat. You can find the source code [here](https://github.com/jdevuyst/termcat/blob/master/doc/termcat-intro.tc).
+Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the user-friendly syntax for titles, lists, links, emphasis, and so on. Termcat aims to be more powerful, however. Like LaTeX, it is a programming language and it also comes with special syntax for typographic features that are difficult to unlock using plain Markdown or HTML.
 
 **Contents**
 
@@ -20,8 +18,7 @@ This document was compiled using Termcat. You can find the source code [here](ht
 - [The Structure of a Termcat Document](#struct)
 - [Math](#math)
 - [Programming](#prog)
-- [Usage](#usage)
-- [Status](#status)
+- [Usage Instructions](#usage)
 
 ## <a name="basics"></a>The Basics
 
@@ -88,7 +85,7 @@ Put a backslash <code>\\</code> in front of a symbol to indicate that the symbol
 
 ## <a name="html"></a>HTML
 
-When HTML tags are encountered in Termcat documents, they `fall through' to the HTML output. Hence <code>\<b>this\</b></code> renders as <q><b>this</b></q>.
+When HTML tags or entities are encountered in Termcat documents, they `fall through' to the HTML output. Hence <code>\<b>this \&amp; that\</b></code> renders as <q><b>this &amp; that</b></q>.
 
 When a <code>\<head></code> block is encountered, the code within that block is moved to the head of the output HTML document. This way the title of the document, stylesheets, and so on can be changed.
 
@@ -96,7 +93,7 @@ When a <code>\<head></code> block is encountered, the code within that block is 
 
 Termcat documents are trees. The nodes of these trees---`blocks' in Termcat parlance---are delimited by parentheses <code>()</code>, brackets <code>[]</code>, braces <code>{}</code>, indentation, or bullet marks. One important consequence of this is that parentheses, brackets, and braces must at all times be balanced (unless they're escaped by backslashes).
 
-For many purposes it doesn't matter how a block is delimited. For instance, a numbered list can be created using the notation:
+For many purposes it doesn't matter how a block is delimited. For instance, a numbered list can be created using the notation
 <pre>\:numbered-list<br>\- item 1<br>\- item 2</pre>
 or
 <pre>\:numbered-list(item 1)[item 2]</pre>
@@ -111,7 +108,7 @@ At least it expects to be told these things for *some* of the expressions that y
 
 To mark a character as a mathematical identifier, prefix it with an asterisk <code>\*</code>: <code>\*a</code> TO <q>*a</q>. Similarly, when Termcat encounters the expression <code>\*abc</code> then it will infer that `b' and `c' are also identifiers. The result is <q>*abc</q>. To turn a word into a single identifier, type <code>\*(op)</code>. This renders as <q>*(op)</q>---as in LaTeX, multi-character indentifiers are not italicized. Mathematical identifiers can also be typeset in a caligraphic font by using <code>\+</code> instead of <code>\*</code>. Thus, <code>\+M</code> becomes <q>+M</q>.
 
-To use the binary minus operator, type <code>x \~\-\~ y</code>. This yields <q>x ~-~ y</q>.
+To use the infix minus operator, type <code>x \~\-\~ y</code>. This yields <q>x ~-~ y</q>. Termcat automatically infers that the expressions to the left and to the right of the infix operator are mathematical identifiers.
 
 Does typing <code>\~-\~</code> over and over again sound like a chore? No problem. Simply include the following code at the top of your document:
   \!bind<br>\- -<br>"- \~-\~
@@ -224,9 +221,9 @@ It reduces to <q>.identity
   fib(fib#)(5)
 </q>.
 
-## <a name="usage"></a>Usage
+## <a name="usage"></a>Usage Instructions
 
-Termcat is a console app and is invoked as follows.
+Termcat can be embedded in web pages or it can be used from the terminal. Here's the syntax for calling it from the terminal:
 
 <pre>.lit(Usage: java -jar termcat.jar [options] <document[.tc]>
 
@@ -238,9 +235,10 @@ The HTML output is stored in document.html.
 )</pre>
 
 Combine the switches <code>-b</code> and <code>-w</code> for a live preview of your Termcat document: Any change you make in the source document will be automatically reflected in your browser.
+It's worth noting that when a document is changed, Termcat is smart enough not to recompile the blocks that it already processed previously.
 
-## <a name="status"></a>Status
+To use Termcat from JavaScript, first load <code>termcat.js</code>. Next, call the function <code>termcat.core.compile</code> with a string for argument to transform Termcat documents into HTML code. Optionally, a mutable cache can be passed as a second argument; <code>termcat.rewrite.cache()</code> returns a new cache.
 
-Termcat is written in Clojure and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Email, bug reports, and pull requests are welcome!
+Termcat is written in Clojure(Script) and is an open source project. You can find the Github project [here](https://github.com/jdevuyst/termcat). Email, bug reports, and pull requests are welcome!
 
-The current version of Termcat should be considered a prototype. I find it quite usable as-is, but nothing is set in stone and a lot of features are still missing.
+The current version of Termcat should be considered a prototype. I find it quite usable as-is, but nothing is set in stone and a lot of features are still missing. There's a lot of room for performance enhancements too.
