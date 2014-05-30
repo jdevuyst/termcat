@@ -6,7 +6,7 @@ Termcat takes inspiration from LaTeX and Markdown. From Markdown it copies the u
 
 Termcat is implemented in Clojure(Script). It can be used as a command line app or embedded in a web app.
 
-The [Termcat tutorial](http://jdevuyst.github.io/termcat/doc/termcat-intro.html) provides a general overview of Termcat. The tutorial is also available as a [live demo](http://jdevuyst.github.io/termcat/doc/termcat-demo.html) that runs in your web browser.
+The [Termcat tutorial](http://jdevuyst.github.io/termcat/doc/termcat-intro.html) provides a general overview of Termcat. The tutorial is also available as a **[live demo](http://jdevuyst.github.io/termcat/doc/termcat-demo.html)** that runs in your web browser.
 
 You can download Termcat [here](https://github.com/jdevuyst/termcat/tree/master/releases). To use the command line app, you may also need to install [Java](http://java.com).
 
