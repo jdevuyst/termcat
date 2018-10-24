@@ -1,0 +1,7 @@
+docs/*.tc linguist-documentation
+docs/termcat-intro.html linguist-generated
+docs/termcat.js linguist-generated
+docs/termcat.js.map linguist-generated
+docs/*.png linguist-documentation
+docs/js/* linguist-vendored
+releases/* linguist-generated
